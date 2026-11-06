@@ -109,6 +109,7 @@ export const sfx = {
   vroom() { tone(70, 0.9, 'sawtooth', 0.12, 0, 180); tone(140, 0.9, 'square', 0.04, 0, 300); },
   beep() { tone(660, 0.14, 'square', 0.08); tone(660, 0.14, 'square', 0.08, 0.2); },
   rocket() { noise(2.2, 0.35, 0, 600); tone(90, 2, 'sawtooth', 0.06, 0, 40); },
+  munch() { noise(0.07, 0.4, 0, 1100); noise(0.05, 0.25, 0.08, 2200); },
   boing() { tone(220, 0.3, 'sine', 0.25, 0, 520); },
   baa() { animalSound('sheep'); },
 };

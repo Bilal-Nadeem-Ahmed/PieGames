@@ -466,3 +466,40 @@ svg { display: block; }
 .workshop { grid-template-rows: minmax(0, 1fr); }
 .bench { min-height: 0; min-width: 0; }
 @media (orientation: portrait) { .workshop { grid-template-rows: minmax(0, 1fr) auto; } }
+
+/* ---------- Feed the animals ---------- */
+.feed { background: linear-gradient(#bfe6ff, #e8f7ff 50%, #a6e38a 50%, #86cf68); }
+.critters { position: absolute; left: 0; right: 0; top: calc(78px + var(--safe-t)); bottom: calc(24vmin + 24px + var(--safe-b)); display: flex; justify-content: space-evenly; align-items: flex-end; padding: 0 1vmin; }
+.critter { position: relative; height: 100%; max-height: 46vmin; aspect-ratio: 200 / 215; transform-origin: 50% 100%; }
+.critter svg { width: 100%; height: 100%; overflow: visible; }
+.critter .happy-eyes, .critter .mouth-open { display: none; }
+.critter.open .mouth-open, .critter.chew .mouth-open { display: inline; }
+.critter.open .mouth-closed, .critter.chew .mouth-closed { display: none; }
+.critter.open { animation: lean .3s forwards; }
+@keyframes lean { to { transform: scale(1.06) translateY(-4px); } }
+.critter.open .mouth-open { transform-box: fill-box; transform-origin: center; animation: gape .3s; }
+@keyframes gape { from { transform: scaleY(.2); } }
+.critter.chew .mouth-open { transform-box: fill-box; transform-origin: center; animation: chew .26s ease-in-out infinite; }
+@keyframes chew { 50% { transform: scaleY(.25); } }
+.critter.chew { animation: chewhead .26s ease-in-out infinite; }
+@keyframes chewhead { 50% { transform: scaleY(.97) translateY(2px); } }
+.critter.open .trunk, .critter.chew .trunk { transform-box: fill-box; transform-origin: 30% 0%; transform: rotate(-35deg); transition: transform .25s; }
+.critter.happy .eyes { display: none; } .critter.happy .happy-eyes { display: inline; }
+.critter.happy { animation: happydance .5s ease-in-out 4; }
+@keyframes happydance { 25% { transform: rotate(-6deg) translateY(-8px); } 75% { transform: rotate(6deg) translateY(-8px); } }
+.critter.nope { animation: nope .5s; }
+@keyframes nope { 20% { transform: rotate(-8deg); } 40% { transform: rotate(8deg); } 60% { transform: rotate(-6deg); } 80% { transform: rotate(4deg); } }
+.critter.blinky .eyes { transform-box: fill-box; transform-origin: center; animation: blink 4s infinite; }
+.critter:nth-child(2).blinky .eyes { animation-delay: -1.3s; } .critter:nth-child(3).blinky .eyes { animation-delay: -2.6s; }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+.critter.fed::after { content: "😋"; position: absolute; top: -4%; right: 2%; font-size: 7vmin; animation: popin .4s; }
+.hearts { position: absolute; inset: 0; pointer-events: none; }
+.hearts span { position: absolute; bottom: 60%; font-size: 5vmin; opacity: 0; animation: heartup 1.4s ease-out forwards; }
+@keyframes heartup { 0% { opacity: 0; transform: translateY(0) scale(.5); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-120%) scale(1.2); } }
+.tray { position: absolute; left: 4vmin; right: 4vmin; bottom: calc(12px + var(--safe-b)); height: 24vmin; background: linear-gradient(#c98b4f, #a96f38); border-radius: 4vmin;
+  border: 5px solid #7a4f24; display: flex; justify-content: space-evenly; align-items: center; box-shadow: 0 6px 0 #0002; }
+.food { font-size: 16vmin; line-height: 1; cursor: grab; animation: popin .4s backwards; filter: drop-shadow(0 4px 2px #0003); }
+@media (orientation: portrait) {
+  .critters { flex-wrap: wrap; align-content: center; align-items: center; gap: 2vh 0; bottom: calc(26vmin + 30px + var(--safe-b)); }
+  .critter { height: auto; width: 46vw; max-height: none; }
+}

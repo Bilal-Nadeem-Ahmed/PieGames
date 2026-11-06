@@ -17,6 +17,7 @@ const GAMES = [
   { href: '#peekaboo', icon: '🙈', label: 'Peekaboo', bg: '#fecaca' },
   { href: '#sorter', icon: '🔷', label: 'Shapes', bg: '#bfdbfe' },
   { href: '#build', icon: '🔨', label: 'Build it', bg: '#fde68a' },
+  { href: '#feed', icon: '🥕', label: 'Feed', bg: '#fed7aa' },
   { href: '#count', icon: '<b class="ico-txt">123</b>', label: 'Counting', bg: '#fde047' },
   { href: '#abc', icon: '<b class="ico-txt">ABC</b>', label: 'Letters', bg: '#f9a8d4' },
 ];

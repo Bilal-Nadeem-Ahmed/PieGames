@@ -16,6 +16,7 @@ import * as band from './games/instruments.js';
 import * as peekaboo from './games/peekaboo.js';
 import * as sorter from './games/sorter.js';
 import * as builder from './games/builder.js';
+import * as feed from './games/feed.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -34,6 +35,7 @@ const ROUTES = {
   peekaboo: () => peekaboo.mount(app),
   sorter: () => sorter.mount(app),
   build: () => builder.mount(app),
+  feed: () => feed.mount(app),
 };
 
 function route() {

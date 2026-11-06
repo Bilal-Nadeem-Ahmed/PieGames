@@ -54,7 +54,7 @@ export function mount(el) {
   cv.addEventListener('pointerdown', (e) => {
     if (mode !== 'ladybird') return;
     e.preventDefault();
-    const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, s = U * 0.09;
+    const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, s = U * 0.12;
     // visible ladybird?
     const b = bugs.find((b) => !b.hidden && b.state === 'walk' && Math.hypot(x - b.x, y - b.y) < s * 0.9);
     if (b) return flyAway(b);

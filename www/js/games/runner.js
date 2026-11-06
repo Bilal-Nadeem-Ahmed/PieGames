@@ -109,7 +109,7 @@ export function mount(el) {
     if (nextObs <= 0) { spawnObstacle(); nextObs = 2.4 + Math.random() * 2; }
     if (nextGift <= 0) { spawnGifts(); nextGift = 1.5 + Math.random() * 1.6; }
     for (const o of obs) {
-      o.t += dt;
+      o.t += dt; o.bounceT = Math.max(0, (o.bounceT || 0) - dt); o.squash = Math.max(0, (o.squash || 0) - dt);
       const walk = (o.type === 'sheep' || o.type === 'elephant' || o.type === 'dino') && !o.hit ? 0.15 : 0;
       o.x -= (speedNow * (1 + walk) + (walk && !speedNow ? 0 : 0)) * dt;
       if (o.hit && o.type !== 'puddle') { o.vy += gravity() * dt; o.dy += o.vy * dt; o.x += 260 * S * dt; }
@@ -139,6 +139,18 @@ export function mount(el) {
         if (o.hit) continue;
         const [w0, h0] = obsSize(o), w = w0 * S, h = h0 * S;
         if (o.x + w / 2 > hx0 && o.x - w / 2 < hx1 && G - h < hy1 - 6 * S) {
+          // Coming down on top of it (feet in its upper half) = bounce off it, not a fall.
+          const feetBefore = hy1 - Math.max(0, hero.vy) * dt;
+          if (o.type !== 'puddle' && !hero.onGround && feetBefore <= G - h * 0.5) {
+            if (o.bounceT > 0) continue;
+            o.bounceT = 0.35; o.squash = 0.3;
+            hero.vy = -Math.sqrt(2 * gravity() * H * 0.13); hero.jumps = 1; hero.holdT = 0;
+            sfx.boing(); buzz(15);
+            if (o.type === 'sheep') animalSound('sheep'); else if (o.type === 'elephant') animalSound('elephant'); else if (o.type === 'dino') sfx.roar(); else sfx.pop(5);
+            burst(o.x, G - h, { n: 12, speed: 220, shape: 'star' });
+            continue;
+          }
+          if (o.bounceT > 0) continue; // just bounced off it: don't trip over it on the way down
           o.hit = true;
           if (o.type === 'puddle') { sfx.pop(2); burst(o.x, G, { n: 24, colors: ['#7cc8ff', '#bfe8ff', '#fff'], speed: 300, shape: 'dot' }); continue; }
           o.vy = -420 * S;
@@ -168,6 +180,7 @@ export function mount(el) {
     // obstacles
     for (const o of obs) {
       c.save(); c.translate(0, o.dy);
+      if (o.squash > 0) { const q = o.squash / 0.3; c.translate(o.x, G); c.scale(1 + q * 0.25, 1 - q * 0.3); c.translate(-o.x, -G); }
       if (o.hit && o.type !== 'puddle') { c.translate(o.x, G - 40 * S); c.rotate(o.t * 6); c.translate(-o.x, -(G - 40 * S)); }
       if (o.type === 'sheep') drawSheep(c, o.x, G, 95 * S, { t: o.t, walking: true, bleat: o.hit });
       else if (o.type === 'elephant') drawEmoji('🐘', o.x, G + Math.abs(Math.sin(o.t * 6)) * -4 * S, 100 * S, false);
@@ -222,6 +235,7 @@ export function mount(el) {
     update(); draw();
     raf = requestAnimationFrame(frame);
   }
+  root.__dbg = { hero, obs, get W() { return W; }, get H() { return H; }, get S() { return S; }, box }; // for automated tests
   raf = requestAnimationFrame(frame);
   const vis = () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } };
   document.addEventListener('visibilitychange', vis);

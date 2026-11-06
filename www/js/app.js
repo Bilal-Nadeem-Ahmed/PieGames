@@ -13,6 +13,7 @@ import * as abc from './games/abc.js';
 import * as runner from './games/runner.js';
 import * as dino from './games/dino.js';
 import * as band from './games/instruments.js';
+import * as peekaboo from './games/peekaboo.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -28,6 +29,7 @@ const ROUTES = {
   runner: () => runner.mount(app),
   dino: () => dino.mount(app),
   music: () => band.mount(app),
+  peekaboo: () => peekaboo.mount(app),
 };
 
 function route() {

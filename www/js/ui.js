@@ -44,3 +44,34 @@ export function chips(list, active, onPick) {
 export const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 export const rnd = (n) => (Math.random() * n) | 0;
 export const pick = (a) => a[rnd(a.length)];
+
+// Drag an element with a finger. onDrop(x, y) returns true to accept (element stays where the
+// game puts it) or false to slide back home. onMove(x, y) is optional (hover feedback).
+export function draggable(el, { onStart, onMove, onDrop } = {}) {
+  let start = null;
+  el.style.touchAction = 'none';
+  el.addEventListener('pointerdown', (e) => {
+    if (el.dataset.locked) return;
+    e.preventDefault(); el.setPointerCapture(e.pointerId);
+    const r = el.getBoundingClientRect();
+    start = { x: e.clientX, y: e.clientY, ox: r.left + r.width / 2 - e.clientX, oy: r.top + r.height / 2 - e.clientY };
+    el.classList.add('dragging'); el.style.transition = 'none';
+    onStart?.(e);
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!start) return;
+    el.style.transform = `translate(${e.clientX - start.x}px, ${e.clientY - start.y}px) scale(1.12)`;
+    onMove?.(e.clientX + start.ox, e.clientY + start.oy);
+  });
+  const end = (e) => {
+    if (!start) return;
+    const cx = e.clientX + start.ox, cy = e.clientY + start.oy; start = null;
+    el.classList.remove('dragging');
+    const ok = onDrop?.(cx, cy);
+    if (!ok) { el.style.transition = 'transform .35s cubic-bezier(.3,1.5,.5,1)'; el.style.transform = ''; }
+  };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+}
+// Is point (x, y) inside element's box (with extra slack in px)?
+export const inside = (el, x, y, pad = 0) => { const r = el.getBoundingClientRect(); return x > r.left - pad && x < r.right + pad && y > r.top - pad && y < r.bottom + pad; };
+export const wait = (ms) => new Promise((r) => setTimeout(r, ms));

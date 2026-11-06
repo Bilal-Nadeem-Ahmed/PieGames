@@ -5,6 +5,7 @@ import { say } from '../speech.js';
 import { getPlayers, savePlayers, newPlayer, OPTIONS, getSettings, saveSettings, getSelectedId, setSelectedId } from '../store.js';
 import { avatarSVG } from '../avatar.js';
 import { SONGS, setSong } from '../music.js';
+import { VERSION } from '../version.js';
 
 const LABEL = {
   hair: 'Hair style', hairColor: 'Hair colour', skin: 'Skin', eyes: 'Eyes', outfit: 'Outfit', shirt: 'Clothes colour', pattern: 'Pattern',
@@ -25,7 +26,7 @@ export function mount(el) {
     <section class="kids-edit"><div class="tabs"></div>
       <div class="editor"><div class="preview"></div><div class="opts"></div></div></section>
     <section class="settings"><h2>Settings</h2><div class="set"></div>
-      <p class="tip">Tip: to stop little ones leaving the app, turn on <b>App pinning</b> in Android Settings → Security, then pin Pie Games.</p></section>
+      <p class="tip">Tip: to stop little ones leaving the app, turn on <b>App pinning</b> in Android Settings → Security, then pin Pie Games.</p><p class="tip">Pie Games version ${VERSION}</p></section>
   </div>`;
   const tabs = el.querySelector('.tabs'), preview = el.querySelector('.preview'), opts = el.querySelector('.opts');
   const save = () => savePlayers(players);

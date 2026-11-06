@@ -18,7 +18,7 @@ Quick buttons (top right): talking voice on/off, and music (tap to change song o
 On the home screen, **hold the gear button for 2 seconds**. Edit each kid's cartoon (hair, skin, clothes, bow, toy hammer…) and name (spoken in games), and change settings: sounds, talking voice, family voice notes, background music, numbers up to 5/10/20, pop speed/amount/size, counting aloud, surprises, runner speed.
 
 ## Install on Android
-1. Copy `dist/PieGames-1.0.apk` (always the latest build — the name stays the same so download links keep working) to the phone/tablet (or download it there).
+1. Copy `dist/PieGames-<version>.apk` (only the latest build is kept) to the phone/tablet (or download it there).
 2. Open it and allow "Install unknown apps" for your file manager/browser when asked.
 3. Tip: turn on **App pinning** (Settings → Security) so little ones can't leave the app.
 
@@ -28,7 +28,7 @@ The talking voice uses the device's built-in text-to-speech (Google TTS). If it'
 ```bash
 npm install
 npm run serve            # play in a browser at http://localhost:8080
-npm run apk              # build android/app/build/outputs/apk/debug/app-debug.apk (needs Android SDK + JDK 21)
+npm run apk              # build dist/PieGames-<version>.apk (needs Android SDK + JDK 21; version is versionName in android/app/build.gradle)
 ```
 Code lives in `www/` (plain HTML/CSS/JS modules, no bundler). Capacitor 8 wraps it for Android.
 Builds are signed with `android/app/piegames-debug.keystore` so each new APK installs over the old one and keeps saved data.

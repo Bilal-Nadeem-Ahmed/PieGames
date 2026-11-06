@@ -5,8 +5,8 @@
   "description": "Pie Games - a collection of simple games for toddlers",
   "scripts": {
     "serve": "python3 -m http.server 8080 --directory www",
-    "sync": "node scripts/copy-vendor.mjs && npx cap sync android",
-    "apk": "npm run sync && cd android && ./gradlew assembleDebug"
+    "sync": "node scripts/write-version.mjs && node scripts/copy-vendor.mjs && npx cap sync android",
+    "apk": "npm run sync && cd android && ./gradlew assembleDebug && cd .. && node scripts/release-apk.mjs"
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^8.0.2",

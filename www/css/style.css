@@ -266,3 +266,11 @@ svg { display: block; }
 .vol { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
 .vol input { flex: 1; height: 32px; accent-color: #3a6fd8; }
 .vol span { width: 48px; text-align: right; font-weight: 700; }
+/* colouring: keep going / start again */
+.chooser .choose { position: absolute; inset: calc(84px + var(--safe-t)) 16px calc(16px + var(--safe-b)); display: flex; gap: 5vmin; align-items: center; justify-content: center; }
+.chooser .thumb { height: min(70vh, 44vw); width: auto; aspect-ratio: 1; animation: popin .4s backwards; }
+.chooser .fresh { animation-delay: .1s; border-color: #b9f6ca; }
+.chooser .badge { position: absolute; right: -14px; bottom: -14px; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 30px; color: #fff; background: #3a6fd8; border: 4px solid #fff; box-shadow: 0 4px 0 #0002; }
+.chooser .fresh .badge { background: #22c55e; }
+@media (orientation: portrait) { .chooser .choose { flex-direction: column; } .chooser .thumb { height: auto; width: min(70vw, 38vh); } }

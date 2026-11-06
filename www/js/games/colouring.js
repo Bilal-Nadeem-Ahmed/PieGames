@@ -13,7 +13,32 @@ const STICKERS = ['⭐', '❤️', '🐑', '🎈', '🌸', '🦋', '🐘', '🌈
 const key = (id) => 'pg.colour.' + id;
 
 export function mount(el, { pic } = {}) {
-  return pic ? editor(el, pic) : gallery(el);
+  if (!pic) return gallery(el);
+  const d = storage.read(key(pic), null);
+  const hasWork = d && (d.img || Object.keys(d.fills || {}).length);
+  if (!hasWork) return editor(el, pic);
+  // Coming back to a coloured picture: choose "keep going" or "start again" (no reading needed).
+  let stop = null;
+  chooser(el, pic, (fresh) => {
+    if (fresh) storage.write(key(pic), null);
+    stop = editor(el, pic);
+  });
+  return () => stop?.();
+}
+
+function chooser(el, id, done) {
+  const p = getPictures().find((x) => x.id === id);
+  if (!p) { location.hash = '#colour'; return; }
+  el.innerHTML = `<div class="screen gallery chooser">${homeBtn()}
+    <div class="choose">
+      <button class="thumb keep" aria-label="Keep colouring">${p.svg()}<span class="badge">▶</span></button>
+      <button class="thumb fresh" aria-label="Start again">${p.svg()}<span class="badge">✨</span></button>
+    </div></div>`;
+  const keep = el.querySelector('.keep'), fresh = el.querySelector('.fresh');
+  const d = applySaved(keep.querySelector('svg'), id);
+  if (d?.img) { const im = new Image(); im.src = d.img; im.className = 'thumb-ink'; keep.appendChild(im); }
+  keep.onclick = () => { sfx.tap(); done(false); };
+  fresh.onclick = () => { sfx.sparkle(); done(true); };
 }
 
 function applySaved(svgEl, id) {

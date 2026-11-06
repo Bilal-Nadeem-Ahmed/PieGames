@@ -36,7 +36,7 @@ export function mount(el) {
       const r = R();
       if (Math.abs(x - e.x) < r * 1.2 && y > e.y - r * 2.8 && y < e.y + r * 0.4) {
         if (e.state === 'egg') {
-          e.taps++; e.wob = 0.5; sfx.tap(); buzz(12);
+          e.taps++; e.wob = 0.5; sfx.pop(e.taps + 2); buzz(12);
           burst(x, y, { n: 6, colors: ['#fff6dc', '#e9d8a6'], speed: 160, shape: 'dot' });
           if (e.taps >= 3) hatch(e);
         } else { roar(e); }
@@ -49,9 +49,8 @@ export function mount(el) {
   function roar(e) {
     e.roar = 0.9; e.vy = -700 * S; sfx.boing();
     roarSound();
-    say(pick(['Roar!', 'Rawr!', 'Roooar!']), { pitch: 0.8 });
   }
-  function roarSound() { sfx.oops(); }
+  function roarSound() { sfx.roar(); }
 
   function hatch(e) {
     e.state = 'hatched'; e.out = 0; hatched++;
@@ -108,7 +107,8 @@ export function mount(el) {
         e.vy += 2200 * S * dt; e.jump = Math.min(0, e.jump + e.vy * dt); if (e.jump === 0) e.vy = 0;
         e.roar = Math.max(0, e.roar - dt); e.t += dt; e.out = Math.min(1, e.out + dt * 3);
         const dance = Math.sin(e.t * 6) * 6 * S;
-        c.save(); c.translate(e.x, e.y + e.jump); c.scale(e.out, e.out); c.rotate(Math.sin(e.t * 3) * 0.06);
+        const wander = e.out >= 1 ? Math.sin(e.t * 0.9 + e.i) * r * 0.5 : 0, facing = Math.cos(e.t * 0.9 + e.i) < 0;
+        c.save(); c.translate(e.x + wander, e.y + e.jump); if (facing) c.scale(-1, 1); c.scale(e.out, e.out); c.rotate(Math.sin(e.t * 3) * 0.06);
         drawDino(c, 0, 0, r * 2.3, e.col, { roar: e.roar > 0, t: e.t });
         c.restore();
         // shell bottom

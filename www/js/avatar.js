@@ -13,6 +13,7 @@ export function avatarSVG(p, { pose = 'down', line = false, crop = false, inner 
   const path = (d, col) => sh('path', `d="${d}"`, col);
   const lineP = (d, col = OUT, w = 3) => `<path d="${d}" fill="none" stroke="${line ? OUT : col}" stroke-width="${w}" stroke-linecap="round" pointer-events="none"/>`;
   const up = pose === 'up';
+  const run = pose === 'run1' ? 1 : pose === 'run2' ? -1 : 0;
   const hairC = p.hairColor, skin = p.skin, acc = p.accent || p.shirt;
   let defs = '', shirt = p.shirt;
   if (!line && (p.pattern === 'stripes' || p.pattern === 'hstripes')) {
@@ -36,7 +37,8 @@ export function avatarSVG(p, { pose = 'down', line = false, crop = false, inner 
   };
 
   const L = [66, 156], R = [134, 156];
-  const hl = up ? [34, 104] : [50, 198], hr = up ? [166, 104] : [150, 198];
+  let hl = up ? [34, 104] : [50, 198], hr = up ? [166, 104] : [150, 198];
+  if (run) { hl = [66 + run * 26, 188]; hr = [134 - run * 26, 188]; }
   let s = '';
 
   // --- hair behind the head
@@ -53,10 +55,8 @@ export function avatarSVG(p, { pose = 'down', line = false, crop = false, inner 
   }
 
   // --- legs & shoes
-  s += sh('rect', 'x="72" y="184" width="25" height="40" rx="10"', p.pants);
-  s += sh('rect', 'x="103" y="184" width="25" height="40" rx="10"', p.pants);
-  s += sh('ellipse', 'cx="82" cy="226" rx="16" ry="9"', '#f3eeea');
-  s += sh('ellipse', 'cx="118" cy="226" rx="16" ry="9"', '#f3eeea');
+  const leg = (x, sx, a) => `<g transform="rotate(${a} ${x + 12} 188)">` + sh('rect', `x="${x}" y="184" width="25" height="40" rx="10"`, p.pants) + sh('ellipse', `cx="${sx}" cy="226" rx="16" ry="9"`, '#f3eeea') + '</g>';
+  s += leg(72, 82, run * 28) + leg(103, 118, -run * 28);
 
   // --- arms (skin), sleeves on top
   s += arm(L[0], L[1], hl[0], hl[1], 10, skin) + sleeve(L[0], L[1], hl[0], hl[1]);

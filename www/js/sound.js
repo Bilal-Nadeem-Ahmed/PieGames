@@ -1,6 +1,8 @@
 // All sounds are generated with WebAudio - no audio files needed.
 import { getSettings } from './store.js';
 import { hush } from './speech.js';
+import { attachMusic, duck } from './music.js';
+import { animalSound } from './animals.js';
 
 let ctx = null, master = null, noiseBuf = null;
 
@@ -15,6 +17,7 @@ export function unlockAudio() {
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    attachMusic(ctx);
   }
   if (ctx.state === 'suspended') ctx.resume();
 }
@@ -62,32 +65,45 @@ export const sfx = {
   },
   tap() { tone(700, 0.07, 'triangle', 0.12); },
   sparkle() { [0, 2, 4].forEach((n, k) => tone(SCALE[n + 4], 0.18, 'sine', 0.1, k * 0.05)); },
+  // Celebration: drum roll -> cymbal + bright fanfare -> sparkly twinkles
   yay() {
-    [0, 2, 4, 5].forEach((n, k) => tone(SCALE[n], 0.28, 'triangle', 0.2, k * 0.1));
-    tone(SCALE[7], 0.7, 'sine', 0.2, 0.42); tone(SCALE[5], 0.7, 'sine', 0.12, 0.42);
+    if (!on()) return;
+    for (let i = 0; i < 9; i++) noise(0.05, 0.18 + i * 0.02, i * 0.045 - i * i * 0.0012, 900);
+    const t0 = 0.36;
+    noise(1.1, 0.35, t0, 7000);
+    const brass = (f, when, dur, vol) => {
+      const t = ctx.currentTime + when;
+      const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+      o.type = 'sawtooth'; o2.type = 'square'; o.frequency.value = f; o2.frequency.value = f * 1.005;
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(800, t); lp.frequency.linearRampToValueAtTime(3200, t + 0.06); lp.frequency.linearRampToValueAtTime(1600, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.03); g.gain.setValueAtTime(vol, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(lp); o2.connect(lp); lp.connect(g).connect(master); o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
+    };
+    [[523.25, 0, 0.14], [659.25, 0.13, 0.14], [783.99, 0.26, 0.14], [1046.5, 0.39, 0.6]].forEach(([f, w, d]) => brass(f, t0 + w, d, 0.09));
+    brass(659.25, t0 + 0.39, 0.6, 0.05); brass(783.99, t0 + 0.39, 0.6, 0.05);
+    [0, 2, 4, 7, 9, 7].forEach((n, k) => tone(SCALE[n % SCALE.length] * 2, 0.25, 'sine', 0.07, t0 + 0.75 + k * 0.07));
   },
+  // small "well done" for each pop milestone / right answer
+  ding() { tone(SCALE[4], 0.18, 'triangle', 0.18); tone(SCALE[7], 0.4, 'triangle', 0.18, 0.1); tone(SCALE[7] * 2, 0.4, 'sine', 0.05, 0.1); },
   oops() { tone(392, 0.16, 'sine', 0.16, 0, 330); tone(330, 0.24, 'sine', 0.14, 0.14, 262); },
   giggle() { [900, 1150, 980, 1250, 1050, 1300].forEach((f, k) => tone(f, 0.07, 'triangle', 0.13, k * 0.075, f * 0.8)); },
-  boing() { tone(220, 0.3, 'sine', 0.25, 0, 520); },
-  baa() {
+  roar() {
     if (!on()) return;
     const t = ctx.currentTime;
-    const o = ctx.createOscillator(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-    const bp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
-    o.type = 'sawtooth';
-    o.frequency.setValueAtTime(330, t);
-    o.frequency.linearRampToValueAtTime(300, t + 0.7);
-    lfo.frequency.value = 7; lg.gain.value = 14;
-    lfo.connect(lg).connect(o.frequency);
-    bp.type = 'bandpass'; bp.frequency.value = 1100; bp.Q.value = 2;
-    lp.type = 'lowpass'; lp.frequency.value = 2600;
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.5, t + 0.06);
-    g.gain.setValueAtTime(0.5, t + 0.45);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
-    o.connect(bp).connect(lp).connect(g).connect(master);
-    o.start(t); lfo.start(t); o.stop(t + 0.85); lfo.stop(t + 0.85);
+    const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+    const lfo = ctx.createOscillator(), lg = ctx.createGain();
+    o.type = 'sawtooth'; o2.type = 'square';
+    o.frequency.setValueAtTime(150, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.exponentialRampToValueAtTime(110, t + 0.8);
+    o2.frequency.setValueAtTime(75, t); o2.frequency.linearRampToValueAtTime(115, t + 0.25); o2.frequency.exponentialRampToValueAtTime(55, t + 0.8);
+    lfo.frequency.value = 28; lg.gain.value = 18; lfo.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(700, t); lp.frequency.linearRampToValueAtTime(1600, t + 0.25); lp.frequency.linearRampToValueAtTime(500, t + 0.8); lp.Q.value = 4;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.45, t + 0.06); g.gain.setValueAtTime(0.45, t + 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+    o.connect(lp); o2.connect(lp); lp.connect(g).connect(master);
+    [o, o2, lfo].forEach((x) => { x.start(t); x.stop(t + 0.9); });
+    noise(0.5, 0.12, 0.02, 500);
   },
+  boing() { tone(220, 0.3, 'sine', 0.25, 0, 520); },
+  baa() { animalSound('sheep'); },
 };
 
 export function buzz(ms = 12) {
@@ -113,6 +129,7 @@ export function playClip(name, minGapMs = 5000) {
   lastClip = now;
   const a = preloadClip(name);
   hush();
+  duck(2200);
   try { a.currentTime = 0; const p = a.play(); p?.catch?.(() => {}); } catch { return false; }
   return true;
 }

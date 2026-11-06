@@ -8,17 +8,30 @@ import { homeBtn, chips, pick, rnd } from '../ui.js';
 import { burst, confettiRain } from '../fx.js';
 import { drawBalloon, drawBubble, drawSheep, drawCloud } from '../draw.js';
 import { COLOURS, ANIMALS } from '../data.js';
+import { createSea, drawFish } from '../sea.js';
+import { createMeadow } from '../scenery.js';
+import { FARM, animalSound, preloadAnimals, SOUND_FOR_NAME } from '../animals.js';
 
 const MODES = [
-  { id: 'count', icon: '<b>123</b>', label: 'Count' },
+  { id: 'count', icon: '🎈', label: 'Count the pops' },
   { id: 'colours', icon: '🎨', label: 'Colours' },
   { id: 'animals', icon: '🐮', label: 'Animals' },
   { id: 'letters', icon: '<b>ABC</b>', label: 'Letters' },
-  { id: 'numbers', icon: '<b>7</b>', label: 'Numbers' },
+  { id: 'numbers', icon: '<b>123</b>', label: 'Numbers' },
 ];
 const SPEED = { slow: 0.6, normal: 1, fast: 1.5 };
 const AMOUNT = { few: 4, some: 7, lots: 11 };
 const SIZE = { small: 0.75, medium: 0.9, big: 1.1 };
+
+// Emoji animals are drawn facing left by default (most emoji face left); flip makes them face right.
+function drawEmojiAnimal(c, e, x, y, s, flip, happy) {
+  c.save(); c.translate(x, y); if (flip) c.scale(-1, 1);
+  if (happy) c.scale(1.1, 1.1);
+  c.font = `${s}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+  c.textAlign = 'center'; c.textBaseline = 'bottom';
+  c.fillText(e, 0, s * 0.12);
+  c.restore();
+}
 
 export function mount(el, { theme = 'balloons' } = {}) {
   const bubbles = theme === 'bubbles';
@@ -26,7 +39,7 @@ export function mount(el, { theme = 'balloons' } = {}) {
   const root = el.firstElementChild, cv = root.querySelector('canvas'), c = cv.getContext('2d');
   const cfg = { speed: 'normal', amount: 'some', size: 'big', countAloud: true, surprises: true, faces: true, ...(getSettings().pop || {}) };
   let mode = storage.read('pg.popmode.' + theme, 'count');
-  root.appendChild(chips(MODES, mode, (m) => { mode = m; storage.write('pg.popmode.' + theme, m); items.forEach(decorate); }));
+  root.appendChild(chips(MODES.map((m) => (m.id === 'count' && bubbles ? { ...m, icon: '🫧' } : m)), mode, (m) => { mode = m; storage.write('pg.popmode.' + theme, m); items.forEach(decorate); }));
 
   let W = 0, H = 0, dpr = 1, unit = 1;
   const resize = () => {
@@ -38,16 +51,18 @@ export function mount(el, { theme = 'balloons' } = {}) {
   resize(); addEventListener('resize', resize);
 
   const players = getPlayers();
-  const kids = players.map((p, i) => ({ p, i, jump: 0, vy: 0, upT: 0, img: null, imgUp: null, face: null }));
+  // Bubbles: no kids on screen. Balloons: the kids cheer at the bottom.
+  const kids = bubbles ? [] : players.map((p, i) => ({ p, i, jump: 0, vy: 0, upT: 0, img: null, imgUp: null, face: null }));
   kids.forEach(async (k) => {
     k.img = await loadImg(avatarSVG(k.p)); k.imgUp = await loadImg(avatarSVG(k.p, { pose: 'up' }));
     k.face = await loadImg(avatarSVG(k.p, { crop: true }));
   });
 
-  if (!bubbles) preloadClip('balloons');
+  if (!bubbles) { preloadClip('balloons'); preloadAnimals(); }
   let items = [], sheep = [], floaters = [], pops = 0, t = 0, raf = 0, last = performance.now();
   const clouds = Array.from({ length: 4 }, (_, i) => ({ x: Math.random() * 1.2, y: 0.08 + i * 0.09, s: 0.6 + Math.random() * 0.6, v: 0.004 + Math.random() * 0.006 }));
-  const fish = Array.from({ length: 3 }, () => ({ x: Math.random(), y: 0.3 + Math.random() * 0.4, v: (Math.random() < 0.5 ? -1 : 1) * (0.02 + Math.random() * 0.03), e: pick(['🐠', '🐟', '🐡']) }));
+  const sea = bubbles ? createSea() : null;
+  const meadow = bubbles ? null : createMeadow();
 
   function decorate(b) {
     b.colour = pick(bubbles && mode !== 'colours' ? [{ n: '', c: '' }] : COLOURS);
@@ -59,11 +74,12 @@ export function mount(el, { theme = 'balloons' } = {}) {
     const r = Math.max(34, Math.min(95, unit * 0.085)) * SIZE[cfg.size] * (0.85 + Math.random() * 0.3);
     const roll = Math.random();
     let type = 'normal';
-    if (cfg.surprises && roll < 0.1) type = 'sheep';
+    if (cfg.surprises && roll < 0.14) type = bubbles ? 'fish' : 'sheep';
     else if (cfg.faces && roll < 0.18 && kids.length) type = 'face';
     const b = { x: r + Math.random() * (W - 2 * r), y: initial ? H * (0.3 + Math.random() * 0.8) : H + r * 1.6, r, type,
       vy: -(H * 0.075 + Math.random() * H * 0.05) * SPEED[cfg.speed] * (bubbles ? 0.8 : 1), ph: Math.random() * 7, kid: rnd(kids.length || 1) };
     decorate(b);
+    b.farm = pick(FARM);
     items.push(b);
   }
   for (let i = 0; i < AMOUNT[cfg.amount]; i++) spawn(true);
@@ -83,17 +99,24 @@ export function mount(el, { theme = 'balloons' } = {}) {
     burst(b.x, b.y, bubbles ? { n: 16, colors: ['#bfefff', '#ffffff', '#d5c7ff'], speed: 260, shape: 'dot' } : { n: 22, colors: [col, col, '#fff'] });
     kids.forEach((k) => { k.vy = -(260 + Math.random() * 120); k.upT = 0.7; });
     let words = '', show = '';
-    if (b.type === 'sheep') { sheep.push({ x: b.x, y: b.y + b.r * 2, vy: 30, state: 'fall', t: 0, flip: b.x > W / 2 }); }
+    if (b.type === 'fish') { sea.addFish(b.x / W, b.y / H, { depth: 1.1, boost: 0.8 }); sfx.chime(5); }
+    if (b.type === 'sheep') { sheep.push({ x: b.x, y: b.y + b.r * 2, vy: 30, state: 'fall', t: 0, flip: b.x > W / 2, farm: b.farm }); }
     if (b.type === 'face') { const k = kids[b.kid]; if (k) { k.vy = -520; k.upT = 1.2; sfx.giggle(); } words = k?.p.name ? k.p.name + '!' : ''; }
     if (mode === 'count') { words = String(pops); show = String(pops); }
     else if (mode === 'colours') { words = b.colour.n; show = b.colour.n; }
-    else if (mode === 'animals') { words = `${b.animal[1]}! ${b.animal[2]}`; show = b.animal[0]; }
+    else if (mode === 'animals') {
+      const snd = SOUND_FOR_NAME[b.animal[1]];
+      // real animal recording when we have one, then the voice says its name
+      if (snd && animalSound(snd)) { words = ''; setTimeout(() => say(b.animal[1] + '!'), 900); } else words = `${b.animal[1]}! ${b.animal[2]}`;
+      show = b.animal[0];
+    }
     else if (mode === 'letters') { words = b.letter + '!'; show = b.letter; }
     else if (mode === 'numbers') { words = String(b.num); show = String(b.num); }
     if (show) floaters.push({ x: b.x, y: b.y, text: show, life: 1.4, color: mode === 'colours' ? b.colour.c : '#fff' });
     // now and then, play the family "balloons" voice note instead of the spoken word
     const clipped = !bubbles && pops > 2 && Math.random() < 0.15 && playClip('balloons', 7000);
-    if (!clipped && (cfg.countAloud || mode !== 'count')) say(words, { rate: 1 });
+    // Bubbles is a quiet game: no talking voice
+    if (!bubbles && !clipped && (cfg.countAloud || mode !== 'count')) say(words, { rate: 1 });
     if (pops % 10 === 0) { setTimeout(() => { confettiRain(80); sfx.yay(); }, 250); }
   }
 
@@ -106,42 +129,29 @@ export function mount(el, { theme = 'balloons' } = {}) {
       const dx = (x - b.x) / (b.r * 1.3), dy = (y - b.y) / (b.r * (bubbles ? 1.3 : 1.5));
       if (dx * dx + dy * dy <= 1) return pop(b);
     }
-    for (const s of sheep) if (Math.abs(x - s.x) < 70 && Math.abs(y - (s.y - 40)) < 70) { sfx.baa(); s.bleat = 0.8; return; }
+    if (sea && sea.tap(x, y, W, H)) { sfx.chime(rnd(8)); burst(x, y, { n: 8, colors: ['#bfefff', '#fff'], speed: 140, shape: 'dot' }); return; }
+    for (const s of sheep) if (Math.abs(x - s.x) < 70 && Math.abs(y - (s.y - 40)) < 70) { animalSound(s.farm.id); s.bleat = 0.8; return; }
     for (const k of kids) if (k.box && x > k.box[0] && x < k.box[0] + k.box[2] && y > k.box[1] && y < k.box[1] + k.box[3]) {
-      k.vy = -480; k.upT = 1; sfx.giggle(); if (k.p.name) say(k.p.name + '!'); return;
+      k.vy = -480; k.upT = 1;
+      // tapping her (the first player) plays the family "balloons" voice note
+      if (!(k.i === 0 && playClip('balloons', 1200))) { sfx.giggle(); if (k.p.name) say(k.p.name + '!'); }
+      return;
     }
     burst(x, y, { n: 8, speed: 150, shape: 'star' }); sfx.tap();
   };
   cv.addEventListener('pointerdown', onDown);
 
-  function bg() {
+  function bg(dt) {
     if (bubbles) {
-      const g = c.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, '#7fd3f7'); g.addColorStop(1, '#2a7fc9');
-      c.fillStyle = g; c.fillRect(0, 0, W, H);
-      c.fillStyle = 'rgba(255,255,255,.08)';
-      for (let i = 0; i < 5; i++) { c.beginPath(); c.moveTo(W * (i * 0.25 - 0.1), 0); c.lineTo(W * (i * 0.25 + 0.05), 0); c.lineTo(W * (i * 0.25 + 0.2), H); c.lineTo(W * (i * 0.25 + 0.05), H); c.fill(); }
-      c.font = `${unit * 0.07}px sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
-      for (const f of fish) {
-        f.x += f.v * 0.016; if (f.x > 1.1) f.x = -0.1; if (f.x < -0.1) f.x = 1.1;
-        c.save(); c.translate(f.x * W, f.y * H + Math.sin(t + f.y * 10) * 8); if (f.v > 0) c.scale(-1, 1); c.globalAlpha = 0.8; c.fillText(f.e, 0, 0); c.restore();
-      }
-      c.fillStyle = '#f3d79b'; c.beginPath(); c.moveTo(0, H); c.lineTo(0, H * 0.9); c.quadraticCurveTo(W * 0.5, H * 0.84, W, H * 0.9); c.lineTo(W, H); c.fill();
-      c.fillStyle = '#2e9e5b';
-      for (let i = 0; i < 6; i++) { const sx = W * (0.05 + i * 0.19); c.beginPath(); c.moveTo(sx, H); c.quadraticCurveTo(sx - 20 + Math.sin(t * 1.5 + i) * 14, H * 0.8, sx + Math.sin(t + i) * 10, H * 0.72); c.quadraticCurveTo(sx + 26, H * 0.82, sx + 16, H); c.fill(); }
+      sea.draw(c, W, H, t, dt);
     } else {
-      const g = c.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, '#79c6ff'); g.addColorStop(1, '#d9f1ff');
-      c.fillStyle = g; c.fillRect(0, 0, W, H);
-      c.fillStyle = '#ffe36e'; c.beginPath(); c.arc(W * 0.9, H * 0.1, unit * 0.06, 0, 7); c.fill();
-      for (const cl of clouds) { cl.x += cl.v * 0.016; if (cl.x > 1.2) cl.x = -0.3; drawCloud(c, cl.x * W, cl.y * H, unit * 0.09 * cl.s); }
-      c.fillStyle = '#8fd96b'; c.beginPath(); c.moveTo(0, H); c.lineTo(0, H * 0.9); c.quadraticCurveTo(W * 0.25, H * 0.84, W * 0.5, H * 0.89); c.quadraticCurveTo(W * 0.75, H * 0.94, W, H * 0.87); c.lineTo(W, H); c.fill();
+      meadow.draw(c, W, H, t, dt, t * 12, H * 0.88);
     }
   }
 
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
-    bg();
+    bg(dt);
     // items
     while (items.length < AMOUNT[cfg.amount]) spawn();
     for (const b of [...items]) {
@@ -150,7 +160,8 @@ export function mount(el, { theme = 'balloons' } = {}) {
       const col = b.colour.c;
       if (bubbles) drawBubble(c, b.x, b.y, b.r, mode === 'colours' ? col : '', t + b.ph);
       else drawBalloon(c, b.x, b.y, b.r, col, t + b.ph);
-      if (b.type === 'sheep') drawSheep(c, b.x + 4, b.y + b.r * (bubbles ? 0.55 : 2.6), b.r * (bubbles ? 0.9 : 1.1), { t });
+      if (b.type === 'sheep') { if (b.farm.id === 'sheep') drawSheep(c, b.x + 4, b.y + b.r * 2.6, b.r * 1.1, { t }); else drawEmojiAnimal(c, b.farm.e, b.x + 4, b.y + b.r * 2.6, b.r * 1.1, false, false); }
+      if (b.type === 'fish') drawFish(c, b.x, b.y, b.r * 0.45, ['#ff8c42', '#fff'], -1, t);
       if (b.type === 'face' && kids[b.kid]?.face) {
         const k = kids[b.kid], s = b.r * 1.5;
         c.save(); c.beginPath(); c.arc(b.x, b.y, b.r * 0.86, 0, 7); c.clip();
@@ -168,12 +179,13 @@ export function mount(el, { theme = 'balloons' } = {}) {
     const ground = H * 0.93;
     for (const s of [...sheep]) {
       s.t += dt;
-      if (s.state === 'fall') { s.y += 70 * dt; s.x += Math.sin(s.t * 3) * 30 * dt; if (s.y >= ground) { s.y = ground; s.state = 'walk'; sfx.baa(); s.bleat = 0.8; } }
+      if (s.state === 'fall') { s.y += 70 * dt; s.x += Math.sin(s.t * 3) * 30 * dt; if (s.y >= ground) { s.y = ground; s.state = 'walk'; animalSound(s.farm.id); s.bleat = 0.8; } }
       else { s.x += (s.flip ? 1 : -1) * 90 * dt; if (s.x < -100 || s.x > W + 100) sheep.splice(sheep.indexOf(s), 1); }
       s.bleat = Math.max(0, (s.bleat || 0) - dt);
       const hop = s.state === 'walk' ? Math.abs(Math.sin(s.t * 8)) * 6 : 0;
       c.save(); if (s.state === 'fall') { c.translate(s.x, s.y); c.rotate(Math.sin(s.t * 3) * 0.15); c.translate(-s.x, -s.y); }
-      drawSheep(c, s.x, s.y - hop, unit * 0.13, { flip: s.flip, t: s.t, walking: s.state === 'walk', bleat: s.bleat > 0 });
+      if (s.farm.id === 'sheep') drawSheep(c, s.x, s.y - hop, unit * 0.13, { flip: s.flip, t: s.t, walking: s.state === 'walk', bleat: s.bleat > 0 });
+      else drawEmojiAnimal(c, s.farm.e, s.x, s.y - hop, unit * 0.13, s.flip, s.bleat > 0);
       c.restore();
     }
     // the kids cheering at the bottom

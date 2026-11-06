@@ -4,6 +4,8 @@ import { say } from '../speech.js';
 import { getPlayers, getSelectedId, setSelectedId } from '../store.js';
 import { avatarSVG } from '../avatar.js';
 import { ICON } from '../ui.js';
+import { createMeadow } from '../scenery.js';
+import { drawBalloon } from '../draw.js';
 
 const GAMES = [
   { href: '#balloons', icon: '🎈', label: 'Balloons', bg: '#ff8fab' },
@@ -27,8 +29,8 @@ export function mount(el) {
   const players = getPlayers();
   const sel = getSelectedId();
   el.innerHTML = `<div class="screen home">
-    <div class="sky"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="sun"></div></div>
-    <div class="hill"></div>
+    <canvas class="home-bg"></canvas>
+    <h1 class="logo"><span>P</span><span>i</span><span>e</span> <span>G</span><span>a</span><span>m</span><span>e</span><span>s</span></h1>
     <div class="walker">${SHEEP_SVG}</div>
     <div class="players"></div>
     <div class="tiles"></div>
@@ -68,5 +70,22 @@ export function mount(el) {
   const stop = () => { clearTimeout(hold); pb.classList.remove('holding'); };
   pb.addEventListener('pointerdown', start);
   pb.addEventListener('pointerup', stop); pb.addEventListener('pointerleave', stop); pb.addEventListener('pointercancel', stop);
-  return () => clearTimeout(hold);
+  // animated meadow background with balloons drifting up
+  const cv = el.querySelector('.home-bg'), c = cv.getContext('2d'), meadow = createMeadow();
+  const COLS = ['#ef4444', '#3b82f6', '#facc15', '#22c55e', '#a855f7', '#f472b6', '#fb923c'];
+  let W = 0, H = 0, t = 0, last = performance.now(), raf = 0;
+  const balloons = Array.from({ length: 7 }, (_, i) => ({ x: Math.random(), y: Math.random() * 1.2, v: 0.03 + Math.random() * 0.03, col: COLS[i % COLS.length], ph: Math.random() * 6 }));
+  const fit = () => { const d = Math.min(devicePixelRatio || 1, 2); W = el.clientWidth; H = el.clientHeight; cv.width = W * d; cv.height = H * d; c.setTransform(d, 0, 0, d, 0, 0); };
+  fit(); addEventListener('resize', fit);
+  const frame = (now) => {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    meadow.draw(c, W, H, t, dt, t * 8, H * 0.8);
+    for (const b of balloons) {
+      b.y -= b.v * dt; if (b.y < -0.2) { b.y = 1.1; b.x = Math.random(); }
+      c.globalAlpha = 0.85; drawBalloon(c, b.x * W + Math.sin(t + b.ph) * 12, b.y * H, Math.min(W, H) * 0.035, b.col, t + b.ph); c.globalAlpha = 1;
+    }
+    raf = requestAnimationFrame(frame);
+  };
+  raf = requestAnimationFrame(frame);
+  return () => { clearTimeout(hold); cancelAnimationFrame(raf); removeEventListener('resize', fit); };
 }

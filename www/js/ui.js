@@ -12,6 +12,10 @@ export const ICON = {
   brush: '<svg viewBox="0 0 48 48"><path d="M38 6 L22 26" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M20 26 Q10 26 10 36 Q10 42 4 42 Q20 46 24 36 Q26 30 20 26Z" fill="currentColor"/></svg>',
   eraser: '<svg viewBox="0 0 48 48"><path d="M6 32 L26 12 L40 26 L24 42 H14 Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M16 22 L30 36" stroke="currentColor" stroke-width="4"/></svg>',
   trash: '<svg viewBox="0 0 48 48"><path d="M10 14 H38 M18 14 V8 H30 V14 M14 14 L16 42 H32 L34 14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  voiceOn: '<svg viewBox="0 0 48 48"><circle cx="24" cy="17" r="9" fill="currentColor"/><path d="M8 42 C8 30 40 30 40 42 Z" fill="currentColor"/><path d="M38 10 Q43 17 38 24 M42 6 Q50 17 42 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+  voiceOff: '<svg viewBox="0 0 48 48"><circle cx="24" cy="17" r="9" fill="currentColor"/><path d="M8 42 C8 30 40 30 40 42 Z" fill="currentColor"/><path d="M6 6 L42 42" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/></svg>',
+  musicOn: '<svg viewBox="0 0 48 48"><path d="M18 36 V10 L40 5 V31" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><ellipse cx="13" cy="36" rx="7" ry="5.5" fill="currentColor"/><ellipse cx="35" cy="31" rx="7" ry="5.5" fill="currentColor"/></svg>',
+  musicOff: '<svg viewBox="0 0 48 48"><path d="M18 36 V10 L40 5 V31" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><ellipse cx="13" cy="36" rx="7" ry="5.5" fill="currentColor"/><ellipse cx="35" cy="31" rx="7" ry="5.5" fill="currentColor"/><path d="M6 6 L42 42" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/></svg>',
   pics: '<svg viewBox="0 0 48 48"><rect x="6" y="6" width="15" height="15" rx="3" fill="currentColor"/><rect x="27" y="6" width="15" height="15" rx="3" fill="currentColor"/><rect x="6" y="27" width="15" height="15" rx="3" fill="currentColor"/><rect x="27" y="27" width="15" height="15" rx="3" fill="currentColor"/></svg>',
 };
 

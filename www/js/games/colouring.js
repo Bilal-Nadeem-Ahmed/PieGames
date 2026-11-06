@@ -9,6 +9,7 @@ import { burst } from '../fx.js';
 const PALETTE = ['#ef4444', '#fb923c', '#facc15', '#a3e635', '#22c55e', '#38bdf8', '#3b82f6', '#a855f7', '#f472b6', '#a16207', '#fde7d3', '#111827', '#ffffff', 'rainbow'];
 const NAMES = { '#ef4444': 'red', '#fb923c': 'orange', '#facc15': 'yellow', '#a3e635': 'light green', '#22c55e': 'green', '#38bdf8': 'light blue', '#3b82f6': 'blue', '#a855f7': 'purple', '#f472b6': 'pink', '#a16207': 'brown', '#fde7d3': 'peach', '#111827': 'black', '#ffffff': 'white', rainbow: 'rainbow' };
 const RES = 1024;
+const STICKERS = ['⭐', '❤️', '🐑', '🎈', '🌸', '🦋', '🐘', '🌈', '🐥', '🍓', '🦕', '☀️'];
 const key = (id) => 'pg.colour.' + id;
 
 export function mount(el, { pic } = {}) {
@@ -46,6 +47,7 @@ function editor(el, id) {
       <button class="rbtn tool on" data-t="fill" aria-label="Fill">${ICON.bucket}</button>
       <button class="rbtn tool" data-t="brush" aria-label="Brush">${ICON.brush}</button>
       <button class="rbtn tool" data-t="eraser" aria-label="Eraser">${ICON.eraser}</button>
+      <button class="rbtn tool sticker-btn" data-t="sticker" aria-label="Stickers">⭐</button>
       <button class="rbtn size" data-a="size" aria-label="Brush size"><span></span></button>
       <button class="rbtn" data-a="undo" aria-label="Undo">${ICON.undo}</button>
       <button class="rbtn" data-a="clear" aria-label="Start again">${ICON.trash}</button>
@@ -134,6 +136,14 @@ function editor(el, id) {
     if (!drawing) {
       undo.push({ t: 'ink', data: c.getImageData(0, 0, RES, RES) });
       const inks = undo.filter((u) => u.t !== 'fill'); if (inks.length > 8) undo.splice(undo.indexOf(inks[0]), 1);
+    }
+    if (tool === 'sticker') {
+      const [x, y] = pos(e), st = STICKERS[(Math.random() * STICKERS.length) | 0];
+      c.save(); c.translate(x, y); c.rotate((Math.random() - 0.5) * 0.6);
+      c.font = `${big ? 190 : 120}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(st, 0, 0); c.restore();
+      sfx.pop(); buzz(12); burst(e.clientX, e.clientY, { n: 14, shape: 'star' });
+      inkUsed = true; save(); return;
     }
     drawing = { id: e.pointerId, p: pos(e), col: nextColour() };
     c.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';

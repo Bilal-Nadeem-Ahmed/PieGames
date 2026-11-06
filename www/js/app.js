@@ -1,5 +1,9 @@
 // Pie Games - simple router that swaps screens based on the URL hash.
-import { unlockAudio } from './sound.js';
+import { unlockAudio, sfx } from './sound.js';
+import { nextSong, musicOn } from './music.js';
+import { getSettings, saveSettings } from './store.js';
+import { hush } from './speech.js';
+import { ICON } from './ui.js';
 import * as home from './screens/home.js';
 import * as parent from './screens/parent.js';
 import * as pop from './games/pop.js';
@@ -32,7 +36,26 @@ function route() {
   document.querySelectorAll('.cheer').forEach((c) => c.remove());
   app.className = 'route-' + name;
   cleanup = (ROUTES[name] || ROUTES.home)(arg) || null;
+  quick.hidden = name === 'parent' || (name === 'colour' && !!arg);
 }
+
+// Quick buttons (top-right on every screen): talking voice on/off, and music (tap to change song / turn off).
+const quick = document.createElement('div');
+quick.id = 'quick';
+quick.innerHTML = `<button class="rbtn qb-voice" aria-label="Talking voice"></button><button class="rbtn qb-music" aria-label="Music"></button><div class="qtoast"></div>`;
+document.body.appendChild(quick);
+const vBtn = quick.querySelector('.qb-voice'), mBtn = quick.querySelector('.qb-music'), toast = quick.querySelector('.qtoast');
+const paintQuick = () => {
+  const s = getSettings();
+  vBtn.innerHTML = s.voice ? ICON.voiceOn : ICON.voiceOff; vBtn.classList.toggle('off', !s.voice);
+  mBtn.innerHTML = musicOn() ? ICON.musicOn : ICON.musicOff; mBtn.classList.toggle('off', !musicOn());
+};
+let toastT = 0;
+const showToast = (t) => { toast.textContent = t; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 1600); };
+vBtn.onclick = () => { const s = getSettings(); s.voice = !s.voice; saveSettings(s); if (!s.voice) hush(); sfx.tap(); paintQuick(); showToast(s.voice ? 'Voice on' : 'Voice off'); };
+mBtn.onclick = () => { unlockAudio(); showToast(nextSong()); paintQuick(); };
+paintQuick();
+window.addEventListener('pg-settings', paintQuick);
 
 addEventListener('hashchange', route);
 // Called by the Android back button. Returns true if handled (went back to home / gallery).

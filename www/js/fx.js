@@ -80,7 +80,7 @@ export function praise() {
 export function celebrate(text = praise()) {
   confettiRain();
   sfx.yay();
-  say(text);
+  setTimeout(() => say(text), 900);
   const p = currentPlayer();
   const d = document.createElement('div');
   d.className = 'cheer';

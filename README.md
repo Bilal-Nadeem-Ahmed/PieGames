@@ -1,21 +1,24 @@
 # Pie Games 🎈🐑
 
 A collection of simple, ad-free games for toddlers, packaged as an Android app (APK) to sideload.
-Everything works offline. Art is drawn in code and sounds are generated, so there are no third-party assets.
+Everything works offline. Art is drawn in code and music/effects are generated; animal sounds are free recordings listed in [CREDITS.md](CREDITS.md).
 
 ## Games
-- **Balloons** / **Bubbles** – endless popping. Chips at the top choose what's inside: counting (123), colours, animals (with animal noises), letters, numbers. Sheep surprises float down; the kids' faces appear on some balloons.
-- **Run & Jump** – the chosen kid runs through a meadow (the other kid follows). Tap to hop, hold to jump higher, double-jump allowed. Collect balloons and stars; bumping into sheep/logs/dinos never ends the game.
-- **Dino Eggs** – tap eggs to crack them; baby dinosaurs hatch, roar and say their colour.
-- **Colouring** – tap-to-fill or freehand brush, rainbow colour, eraser, undo. Includes colouring pages of each kid. Work saves automatically.
-- **Counting** – tap and count, "how many?", "find the number".
-- **Letters** – A-is-for-apple flashcards and "find the letter".
+- **Balloons** – endless popping in a meadow. Buttons at the top choose what's inside: 🎈 count the pops, 🎨 colours, 🐮 animals (real animal sounds), ABC letters, 123 numbers. Farm animals (sheep, cow, duck, dog, cat, chicken, horse, elephant) float down from surprise balloons. Tapping her cartoon plays the family "balloons" voice note.
+- **Bubbles** – a quiet underwater bubble-pop (no kids, no talking): lots of fish to tap, a crab, jellyfish, coral; surprise bubbles release fish.
+- **Run & Jump** – the selected child runs through changing places (meadow → farm → seaside → snow → sunset). Tap to hop, hold to jump higher, double-jump. Low stars can be grabbed running, high stars need a jump. Bumping into sheep/elephants/dinos/logs makes them fall over, see stars and get back up (sometimes with the family "standing" voice note).
+- **Dino Eggs** – tap eggs to crack them; baby dinosaurs hatch, wander, roar and say their colour.
+- **Colouring** – tap-to-fill, freehand brush, rainbow colour, ⭐ stickers, eraser, undo. Includes colouring pages of each kid. Work saves automatically.
+- **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
+- **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
+
+Quick buttons (top right): talking voice on/off, and music (tap to change song or turn off). Songs: Twinkle Twinkle, Mary Had a Little Lamb, Old MacDonald, Row Your Boat, Sheepy Hop.
 
 ## Grown-ups area
-On the home screen, **hold the gear button for 2 seconds**. Edit each kid's cartoon (hair, skin, clothes, bow, toy hammer…) and name (spoken in games), and change settings: sounds, talking voice, family voice notes, numbers up to 5/10/20, pop speed/amount/size, counting aloud, surprises, runner speed.
+On the home screen, **hold the gear button for 2 seconds**. Edit each kid's cartoon (hair, skin, clothes, bow, toy hammer…) and name (spoken in games), and change settings: sounds, talking voice, family voice notes, background music, numbers up to 5/10/20, pop speed/amount/size, counting aloud, surprises, runner speed.
 
 ## Install on Android
-1. Copy `dist/PieGames-1.0.apk` to the phone/tablet (or download it there).
+1. Copy `dist/PieGames-1.0.apk` (always the latest build — the name stays the same so download links keep working) to the phone/tablet (or download it there).
 2. Open it and allow "Install unknown apps" for your file manager/browser when asked.
 3. Tip: turn on **App pinning** (Settings → Security) so little ones can't leave the app.
 

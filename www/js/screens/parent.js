@@ -3,6 +3,7 @@ import { sfx } from '../sound.js';
 import { say } from '../speech.js';
 import { getPlayers, savePlayers, newPlayer, OPTIONS, getSettings, saveSettings, getSelectedId, setSelectedId } from '../store.js';
 import { avatarSVG } from '../avatar.js';
+import { SONGS, setSong } from '../music.js';
 
 const LABEL = {
   hair: 'Hair style', hairColor: 'Hair colour', skin: 'Skin', eyes: 'Eyes', outfit: 'Outfit', shirt: 'Clothes colour', pattern: 'Pattern',
@@ -95,6 +96,15 @@ export function mount(el) {
     onoff('Sounds', s, 'sound');
     onoff('Talking voice', s, 'voice');
     onoff('Family voice notes', s, 'familyClips');
+    {
+      const w = document.createElement('div'); w.className = 'seg';
+      [...SONGS.map((sg, i) => [i, sg.name]), [false, 'Off']].forEach(([v, n]) => {
+        const b = document.createElement('button'); b.textContent = n; b.className = s.music === v ? 'on' : '';
+        b.onclick = () => { s.music = v; saveSettings(s); setSong(v); renderSettings(); };
+        w.appendChild(b);
+      });
+      set.appendChild(row('Background music', w));
+    }
     seg('Numbers up to', s, 'countMax', [5, 10, 20], ['5', '10', '20']);
     seg('Pop games: speed', s.pop, 'speed', ['slow', 'normal', 'fast'], ['Slow', 'Normal', 'Fast']);
     seg('Pop games: how many', s.pop, 'amount', ['few', 'some', 'lots'], ['Few', 'Some', 'Lots']);

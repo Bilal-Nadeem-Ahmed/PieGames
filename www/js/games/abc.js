@@ -5,17 +5,21 @@ import { storage } from '../store.js';
 import { homeBtn, chips, ICON, shuffle, pick, rnd } from '../ui.js';
 import { celebrate, burst } from '../fx.js';
 import { ABC, letterLine } from '../data.js';
+import { traceRound } from './trace.js';
+import { popFind, makeOptions } from './popfind.js';
 
 const MODES = [
   { id: 'learn', icon: '📖', label: 'Learn letters' },
   { id: 'find', icon: '🔍', label: 'Find the letter' },
+  { id: 'pop', icon: '🎈', label: 'Pop the letter' },
+  { id: 'trace', icon: '✍️', label: 'Trace the letter' },
 ];
 
 export function mount(el) {
   el.innerHTML = `<div class="screen learn abc">${homeBtn()}<button class="rbtn say-btn" aria-label="Say again">${ICON.speaker}</button>
     <div class="board"></div><div class="answers"></div></div>`;
   const root = el.firstElementChild, board = root.querySelector('.board'), answers = root.querySelector('.answers');
-  let mode = storage.read('pg.abcmode', 'learn'), idx = storage.read('pg.abcidx', 0), prompt = '', timer = 0, alive = true;
+  let mode = storage.read('pg.abcmode', 'learn'), idx = storage.read('pg.abcidx', 0), prompt = '', timer = 0, alive = true, stopPop = null;
   root.insertBefore(chips(MODES, mode, (m) => { mode = m; storage.write('pg.abcmode', m); show(); }), board);
   root.querySelector('.say-btn').onclick = () => say(prompt);
 
@@ -64,7 +68,27 @@ export function mount(el) {
     }
   }
 
-  const show = () => (mode === 'learn' ? learn() : find());
+  function popLetters() {
+    const e = pick(ABC);
+    answers.innerHTML = '';
+    prompt = `Pop the letter ${e[0]}!`; say(prompt);
+    stopPop = popFind(board, { target: e[0], options: makeOptions(e[0], ABC.map((x) => x[0]), 4), wrongText: (k) => `That's ${k}!`,
+      onRight: () => { celebrate(`Yes! ${letterLine(e)}`); timer = setTimeout(() => alive && show(), 3800); } });
+  }
+  function trace() {
+    const e = ABC[idx];
+    answers.innerHTML = `<div class="trace-hint">${e[1]} <span>${e[2]}</span></div>`;
+    prompt = `Trace the letter ${e[0]}!`; say(prompt);
+    traceRound(board, e[0], () => {
+      celebrate(`${letterLine(e)}`);
+      idx = (idx + 1) % ABC.length; storage.write('pg.abcidx', idx);
+      timer = setTimeout(() => alive && show(), 3800);
+    });
+  }
+  const show = () => {
+    clearTimeout(timer); stopPop?.(); stopPop = null;
+    ({ learn, find, pop: popLetters, trace })[mode]();
+  };
   show();
-  return () => { alive = false; clearTimeout(timer); };
+  return () => { alive = false; clearTimeout(timer); stopPop?.(); };
 }

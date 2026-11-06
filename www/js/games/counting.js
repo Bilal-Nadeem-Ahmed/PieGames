@@ -5,11 +5,15 @@ import { getSettings, storage } from '../store.js';
 import { homeBtn, chips, ICON, shuffle, pick, rnd } from '../ui.js';
 import { celebrate, burst } from '../fx.js';
 import { COUNT_THINGS } from '../data.js';
+import { traceRound } from './trace.js';
+import { popFind, makeOptions } from './popfind.js';
 
 const MODES = [
   { id: 'count', icon: '👆', label: 'Tap and count' },
   { id: 'howmany', icon: '❓', label: 'How many?' },
   { id: 'find', icon: '🔍', label: 'Find the number' },
+  { id: 'pop', icon: '🎈', label: 'Pop the number' },
+  { id: 'trace', icon: '✍️', label: 'Trace the number' },
 ];
 
 export function mount(el) {
@@ -19,7 +23,7 @@ export function mount(el) {
   let mode = storage.read('pg.countmode', 'count');
   root.insertBefore(chips(MODES, mode, (m) => { mode = m; storage.write('pg.countmode', m); round(); }), board);
   const max = () => Math.max(3, Math.min(getSettings().countMax || 10, 20));
-  let prompt = '', timer = 0, alive = true;
+  let prompt = '', timer = 0, alive = true, stopPop = null;
   root.querySelector('.say-btn').onclick = () => say(prompt);
   const next = (ms = 2600) => { clearTimeout(timer); timer = setTimeout(() => alive && round(), ms); };
 
@@ -40,6 +44,7 @@ export function mount(el) {
         b.classList.add('counted');
         sfx.chime(counted); buzz(10);
         burst(e.clientX, e.clientY, { n: 10, speed: 180, shape: 'star' });
+        if (counted === n) board.querySelectorAll('.item').forEach((it, j) => { it.style.animationDelay = j * 80 + 'ms'; it.classList.add('dance'); });
         if (counted === n && mode === 'count') {
           say(String(counted)).then(() => alive && celebrate(`${n} ${n === 1 ? thing[1] : thing[2]}! ` + pick(['Well done!', 'Yay!', 'Brilliant!'])));
           next(3500);
@@ -71,7 +76,7 @@ export function mount(el) {
   }
 
   function round() {
-    clearTimeout(timer);
+    clearTimeout(timer); stopPop?.(); stopPop = null;
     const thing = pick(COUNT_THINGS);
     answers.innerHTML = '';
     if (mode === 'count') {
@@ -83,6 +88,16 @@ export function mount(el) {
       items(n, thing, true);
       prompt = `How many ${thing[2]}?`;
       choices(n, () => celebrate(`Yes! ${n} ${n === 1 ? thing[1] : thing[2]}!`));
+    } else if (mode === 'pop') {
+      const n = 1 + rnd(max());
+      const pool = Array.from({ length: max() }, (_, i) => String(i + 1));
+      prompt = `Pop number ${n}!`;
+      stopPop = popFind(board, { target: String(n), options: makeOptions(String(n), pool, 4), wrongText: (k) => `That's ${k}!`,
+        onRight: () => { celebrate(`Yes! Number ${n}!`); next(3200); } });
+    } else if (mode === 'trace') {
+      const n = 1 + rnd(Math.min(max(), 10));
+      prompt = `Trace the number ${n} with your finger!`;
+      traceRound(board, String(n), () => { celebrate(`${n}! ` + pick(['Well done!', 'Brilliant!', 'Super tracing!'])); next(3500); });
     } else {
       const n = 1 + rnd(max());
       board.innerHTML = `<div class="bignum-ask">?</div>`;
@@ -92,5 +107,5 @@ export function mount(el) {
     say(prompt);
   }
   round();
-  return () => { alive = false; clearTimeout(timer); };
+  return () => { alive = false; clearTimeout(timer); stopPop?.(); };
 }

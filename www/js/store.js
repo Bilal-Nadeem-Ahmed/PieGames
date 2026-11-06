@@ -24,7 +24,9 @@ const DEFAULT_PLAYERS = [
     shirt: '#7d9fd0', pattern: 'stripes', stripe: '#f6f1e6', pants: '#7d9fd0', sleeves: 'long', outfit: 'top', extra: 'hammer', accent: '#29a8d8' },
 ];
 
-const DEFAULT_SETTINGS = { sound: true, voice: true, countMax: 10, familyClips: true, music: 0 };
+const DEFAULT_SETTINGS = { sound: true, voice: true, countMax: 10, familyClips: true, music: 0,
+  // volumes 0..1 (grown-ups area sliders)
+  vol: { music: 0.7, sfx: 0.8, animals: 0.4, clips: 1, voice: 1 } };
 
 function read(k, d) {
   try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; }
@@ -47,7 +49,8 @@ export function currentPlayer() {
   return ps.find((p) => p.id === getSelectedId()) || ps[0];
 }
 
-export function getSettings() { return { ...DEFAULT_SETTINGS, ...read(SKEY, {}) }; }
+export function getSettings() { const s = { ...DEFAULT_SETTINGS, ...read(SKEY, {}) }; s.vol = { ...DEFAULT_SETTINGS.vol, ...(s.vol || {}) }; return s; }
+export const vol = (k) => getSettings().vol[k];
 export function saveSettings(s) { write(SKEY, s); try { window.dispatchEvent(new Event('pg-settings')); } catch {} }
 
 export const storage = { read, write };

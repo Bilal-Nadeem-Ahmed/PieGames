@@ -1,5 +1,6 @@
 // Grown-ups area: edit the cartoon kids, names and game settings.
-import { sfx } from '../sound.js';
+import { sfx, playClip } from '../sound.js';
+import { animalSound } from '../animals.js';
 import { say } from '../speech.js';
 import { getPlayers, savePlayers, newPlayer, OPTIONS, getSettings, saveSettings, getSelectedId, setSelectedId } from '../store.js';
 import { avatarSVG } from '../avatar.js';
@@ -94,6 +95,19 @@ export function mount(el) {
     };
     const onoff = (label, obj, key) => seg(label, obj, key, [true, false], ['On', 'Off']);
     onoff('Sounds', s, 'sound');
+    const slider = (label, key, test) => {
+      const w = document.createElement('div'); w.className = 'vol';
+      const r = document.createElement('input'); r.type = 'range'; r.min = 0; r.max = 100; r.value = Math.round(s.vol[key] * 100);
+      const out = document.createElement('span'); out.textContent = r.value + '%';
+      r.oninput = () => { s.vol[key] = r.value / 100; out.textContent = r.value + '%'; saveSettings(s); };
+      r.onchange = () => test?.();
+      w.append(r, out); set.appendChild(row(label, w));
+    };
+    slider('Music volume', 'music');
+    slider('Sound effects volume', 'sfx', () => sfx.pop());
+    slider('Animal sounds volume', 'animals', () => animalSound('cow'));
+    slider('Voice notes volume', 'clips', () => playClip('balloons', 0));
+    slider('Talking voice volume', 'voice', () => say('Hello!'));
     onoff('Talking voice', s, 'voice');
     onoff('Family voice notes', s, 'familyClips');
     {

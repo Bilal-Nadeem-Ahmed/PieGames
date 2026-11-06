@@ -1,5 +1,5 @@
 // Farm animals with real recorded sounds (see CREDITS.md for the recordings' authors and licences).
-import { getSettings } from './store.js';
+import { getSettings, vol } from './store.js';
 
 export const FARM = [
   { id: 'sheep', e: '🐑', name: 'Sheep', sounds: ['sheep', 'sheep2', 'lamb'] },
@@ -27,6 +27,6 @@ export function animalSound(id) {
   if (!getSettings().sound) return false;
   const a = byId[id]; if (!a) return false;
   const el = audio(a.sounds[(Math.random() * a.sounds.length) | 0]);
-  try { el.currentTime = 0; el.volume = 0.9; el.play()?.catch?.(() => {}); } catch { return false; }
+  try { el.currentTime = 0; el.volume = Math.min(1, vol('animals')); el.play()?.catch?.(() => {}); } catch { return false; }
   return true;
 }

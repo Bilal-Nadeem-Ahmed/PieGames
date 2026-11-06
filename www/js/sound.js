@@ -1,5 +1,5 @@
 // All sounds are generated with WebAudio - no audio files needed.
-import { getSettings } from './store.js';
+import { getSettings, vol } from './store.js';
 import { hush } from './speech.js';
 import { attachMusic, duck } from './music.js';
 import { animalSound } from './animals.js';
@@ -12,7 +12,8 @@ export function unlockAudio() {
     if (!AC) return;
     ctx = new AC();
     master = ctx.createGain();
-    master.gain.value = 0.7;
+    master.gain.value = 0.9 * vol('sfx');
+    window.addEventListener('pg-settings', () => { master.gain.setTargetAtTime(0.9 * vol('sfx'), ctx.currentTime, 0.05); });
     master.connect(ctx.destination);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
@@ -130,6 +131,6 @@ export function playClip(name, minGapMs = 5000) {
   const a = preloadClip(name);
   hush();
   duck(2200);
-  try { a.currentTime = 0; const p = a.play(); p?.catch?.(() => {}); } catch { return false; }
+  try { a.currentTime = 0; a.volume = Math.min(1, vol('clips')); const p = a.play(); p?.catch?.(() => {}); } catch { return false; }
   return true;
 }

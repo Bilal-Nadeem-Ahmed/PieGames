@@ -263,3 +263,6 @@ svg { display: block; }
   .learn .chips { top: calc(80px + var(--safe-t)); max-width: calc(100% - 24px); }
 }
 @media (orientation: landscape) { .learn .chips { max-width: calc(100% - 330px); } }
+.vol { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
+.vol input { flex: 1; height: 32px; accent-color: #3a6fd8; }
+.vol span { width: 48px; text-align: right; font-weight: 700; }

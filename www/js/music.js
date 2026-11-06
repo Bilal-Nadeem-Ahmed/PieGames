@@ -1,6 +1,7 @@
 // Gentle background music, generated live with WebAudio (music-box melody + soft bass + shaker).
 // Songs are traditional public-domain nursery tunes plus one original.
-import { getSettings, saveSettings } from './store.js';
+import { getSettings, saveSettings, vol } from './store.js';
+const level = () => Math.max(0.0001, 1.5 * vol('music'));
 
 // Notes: "C4/1" = note C4 for 1 beat, "R/1" = rest. Chords: one per bar (4 beats unless set).
 export const SONGS = [
@@ -85,7 +86,7 @@ export function play(i) {
   if (!ctx || i == null || i === false || !SONGS[i]) return;
   cur = i; parsed = parse(SONGS[i]); nextIdx = 0; loopN = 0; startAt = ctx.currentTime + 0.15;
   out.gain.cancelScheduledValues(ctx.currentTime);
-  out.gain.setValueAtTime(0.0001, ctx.currentTime); out.gain.exponentialRampToValueAtTime(0.55, ctx.currentTime + 1);
+  out.gain.setValueAtTime(0.0001, ctx.currentTime); out.gain.exponentialRampToValueAtTime(level(), ctx.currentTime + 1);
   schedule(); timer = setInterval(schedule, 100);
 }
 export function stop() {
@@ -110,8 +111,11 @@ export function duck(ms = 2000) {
   if (!out || cur < 0) return;
   const t = ctx.currentTime;
   out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
-  out.gain.linearRampToValueAtTime(0.12, t + 0.1); out.gain.setValueAtTime(0.12, t + ms / 1000); out.gain.linearRampToValueAtTime(0.55, t + ms / 1000 + 0.6);
+  const low = level() * 0.25;
+  out.gain.linearRampToValueAtTime(low, t + 0.1); out.gain.setValueAtTime(low, t + ms / 1000); out.gain.linearRampToValueAtTime(level(), t + ms / 1000 + 0.6);
 }
+// follow the music volume slider live
+window.addEventListener('pg-settings', () => { if (out && ctx && cur >= 0) { out.gain.cancelScheduledValues(ctx.currentTime); out.gain.setTargetAtTime(level(), ctx.currentTime, 0.05); } });
 document.addEventListener('visibilitychange', () => {
   if (!ctx) return;
   if (document.hidden) ctx.suspend?.(); else ctx.resume?.();

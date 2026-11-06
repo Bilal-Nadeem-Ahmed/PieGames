@@ -24,6 +24,17 @@ const flower = ({ r }, x, y, s = 1) =>
 const band = (cx, cy, R1, R2) => `M${cx - R1} ${cy} A${R1} ${R1} 0 0 1 ${cx + R1} ${cy} L${cx + R2} ${cy} A${R2} ${R2} 0 0 0 ${cx - R2} ${cy} Z`;
 
 const PICS = [
+  { id: 'ladybird', svg: () => pic((a) => { const { bg, r, p, k, l } = a; return bg() +
+    r('circle', 'cx="60" cy="60" r="34"') + p(cloud(320, 60, 48, 20, 9)) +
+    p('M30 330 C40 200 200 120 370 150 C330 300 180 380 30 330 Z') + l('M40 320 C140 260 260 200 360 156') +
+    l('M150 200 L175 188 M150 236 L178 230 M262 202 L270 186 M266 240 L292 236') +
+    l('M180 150 Q168 120 150 112') + l('M220 150 Q232 120 250 112') + r('circle', 'cx="150" cy="110" r="8"') + r('circle', 'cx="250" cy="110" r="8"') +
+    r('ellipse', 'cx="200" cy="172" rx="40" ry="28"') + r('circle', 'cx="186" cy="166" r="9"') + r('circle', 'cx="214" cy="166" r="9"') +
+    k('circle', 'cx="186" cy="167" r="4"') + k('circle', 'cx="214" cy="167" r="4"') +
+    p('M200 192 C140 192 120 240 126 270 C132 310 170 330 200 330 Z') + p('M200 192 C260 192 280 240 274 270 C268 310 230 330 200 330 Z') +
+    r('circle', 'cx="164" cy="230" r="14"') + r('circle', 'cx="152" cy="282" r="12"') + r('circle', 'cx="182" cy="300" r="10"') +
+    r('circle', 'cx="236" cy="230" r="14"') + r('circle', 'cx="248" cy="282" r="12"') + r('circle', 'cx="218" cy="300" r="10"') +
+    flower(a, 60, 370) + flower(a, 345, 360) + flower(a, 330, 250, 0.8); }) },
   { id: 'sheep', svg: () => pic((a) => { const { bg, r, p, k, l } = a; return bg() +
     p('M0 300 Q120 255 220 285 T400 280 L400 400 L0 400 Z') + r('circle', 'cx="62" cy="62" r="34"') + p(cloud(300, 72, 52, 22, 9)) +
     r('rect', 'x="128" y="250" width="24" height="64" rx="10"') + r('rect', 'x="166" y="262" width="24" height="56" rx="10"') +

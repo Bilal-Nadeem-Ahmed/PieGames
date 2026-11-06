@@ -545,3 +545,21 @@ svg { display: block; }
   .pz-board { height: auto; width: 100%; max-width: 100%; }
   .pz-tray { width: 100%; }
 }
+
+/* ---------- Find it ---------- */
+.findit .zoo { position: absolute; left: 4%; right: 4%; top: calc(90px + var(--safe-t)); bottom: calc(10px + var(--safe-b)); pointer-events: none; }
+.findit.animals .zoo { pointer-events: auto; }
+.beast { position: absolute; transform: translate(-50%, -50%); background: none; padding: 0; font-size: min(17vmin, 16vw); line-height: 1; animation: popin .4s backwards, idlebob 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 6px 3px #0003); }
+.beast:nth-child(2n) { animation-delay: 0s, -1.3s; }
+.beast.yes { animation: matchjump2 .7s; }
+@keyframes matchjump2 { 30% { transform: translate(-50%, -80%) scale(1.3) rotate(-8deg); } 60% { transform: translate(-50%, -50%) scale(.95); } }
+.beast.got::after { content: "⭐"; position: absolute; top: -20%; right: -20%; font-size: 40%; }
+.beast.wiggle { animation: shake .4s; }
+@keyframes idlebob { 50% { translate: 0 -6px; } }
+.findit .score { position: absolute; top: calc(14px + var(--safe-t)); left: 50%; transform: translateX(-50%); min-width: 70px; padding: 4px 16px; font-size: 40px; font-weight: 900;
+  color: #fff; background: #e53935; border-radius: 30px; text-align: center; border: 4px solid #fff; box-shadow: 0 4px 0 #0002; z-index: 5; }
+.findit .score:empty { display: none; }
+.findit .score.bump { animation: bump .3s; }
+@media (orientation: landscape) { .findit .chips { top: calc(80px + var(--safe-t)); } .findit .zoo { top: calc(150px + var(--safe-t)); } }
+@media (orientation: portrait) { .findit .zoo { top: calc(160px + var(--safe-t)); } }

@@ -20,6 +20,7 @@ import * as feed from './games/feed.js';
 import * as pairs from './games/pairs.js';
 import * as roundup from './games/roundup.js';
 import * as puzzle from './games/puzzle.js';
+import * as findit from './games/findit.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -42,6 +43,7 @@ const ROUTES = {
   pairs: () => pairs.mount(app),
   roundup: () => roundup.mount(app),
   puzzle: () => puzzle.mount(app),
+  findit: () => findit.mount(app),
 };
 
 function route() {

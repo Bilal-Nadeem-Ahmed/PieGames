@@ -14,6 +14,7 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Shapes** – 🔷 drag shapes into matching holes on a wooden board, or 🎨 put fruit and toys into the basket of the same colour.
 - **Build it** – pick a house, car or rocket: saw a plank, then hammer the nails and screw the screws as each part flies in; it gets painted and the house puffs smoke (builder waves from the door), the car drives off, the rocket blasts off.
 - **Feed** – drag the right food to each hungry animal (dog 🦴, cat 🐟, bunny 🥕, elephant 🥜, monkey 🍌, sheep 🌿): mouths open as food comes near, they chew, then get happy eyes, hearts, a dance and their own sound; wrong food gets a head shake.
+- **Pairs** – memory game with 2, 3, 4 or 6 pairs of big flip cards: animals (with their sounds), a ladybird and the kids' own faces.
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
 

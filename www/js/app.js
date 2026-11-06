@@ -17,6 +17,7 @@ import * as peekaboo from './games/peekaboo.js';
 import * as sorter from './games/sorter.js';
 import * as builder from './games/builder.js';
 import * as feed from './games/feed.js';
+import * as pairs from './games/pairs.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -36,6 +37,7 @@ const ROUTES = {
   sorter: () => sorter.mount(app),
   build: () => builder.mount(app),
   feed: () => feed.mount(app),
+  pairs: () => pairs.mount(app),
 };
 
 function route() {

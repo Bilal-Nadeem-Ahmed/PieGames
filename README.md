@@ -16,6 +16,7 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Feed** – drag the right food to each hungry animal (dog 🦴, cat 🐟, bunny 🥕, elephant 🥜, monkey 🍌, sheep 🌿): mouths open as food comes near, they chew, then get happy eyes, hearts, a dance and their own sound; wrong food gets a head shake.
 - **Pairs** – memory game with 2, 3, 4 or 6 pairs of big flip cards: animals (with their sounds), a ladybird and the kids' own faces.
 - **Sheep pen** – tap the wandering sheep to make them leap into the pen; they're counted out loud, the gate shuts, they dance, then run out for another round.
+- **Puzzles** – 2, 4, 6 or 9 big pieces to drag onto a faint guide picture: sheep, dinosaur, balloons, ladybird, fish and the kids themselves.
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
 

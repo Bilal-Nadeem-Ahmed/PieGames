@@ -19,6 +19,7 @@ import * as builder from './games/builder.js';
 import * as feed from './games/feed.js';
 import * as pairs from './games/pairs.js';
 import * as roundup from './games/roundup.js';
+import * as puzzle from './games/puzzle.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -40,6 +41,7 @@ const ROUTES = {
   feed: () => feed.mount(app),
   pairs: () => pairs.mount(app),
   roundup: () => roundup.mount(app),
+  puzzle: () => puzzle.mount(app),
 };
 
 function route() {

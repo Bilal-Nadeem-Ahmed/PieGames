@@ -528,3 +528,20 @@ svg { display: block; }
   color: #fff; background: #84cc16; border-radius: 30px; text-align: center; border: 4px solid #fff; box-shadow: 0 4px 0 #0002; }
 .roundup .score:empty { display: none; }
 .roundup .score.bump { animation: bump .3s; }
+
+/* ---------- Puzzles ---------- */
+.puzzle { background: radial-gradient(circle at 80% 10%, #fff8, transparent 40%), linear-gradient(#ffe3f1, #d9ecff); }
+.pz-wrap { position: absolute; inset: calc(84px + var(--safe-t)) 12px calc(12px + var(--safe-b)); display: flex; gap: 3vmin; align-items: center; justify-content: center; }
+.pz-board { position: relative; height: 100%; aspect-ratio: 1; max-width: 60%; border-radius: 18px; background: #fff; box-shadow: 0 8px 0 #0002; border: 6px solid #fff; overflow: hidden; flex: none; }
+.pz-board::before { content: ""; position: absolute; inset: 0; background: var(--img) center / cover; opacity: .22; filter: grayscale(.4); }
+.pz-slot { position: absolute; outline: 2px dashed #9aa7bd; outline-offset: -2px; }
+.pz-tray { flex: 1; height: 100%; display: flex; flex-wrap: wrap; gap: 2vmin; align-content: center; justify-content: center; }
+.pz-piece { border-radius: 10px; box-shadow: 0 5px 0 #0003, 0 0 0 3px #fff; cursor: grab; animation: popin .4s backwards; flex: none; }
+.pz-slot .pz-piece.placed { position: absolute; inset: 0; width: 100% !important; height: 100% !important; border-radius: 0; box-shadow: none; animation: snapin .3s; }
+.pz-board.complete { animation: bump .5s; }
+.pz-board.complete .pz-slot { outline: none; }
+@media (orientation: portrait) {
+  .pz-wrap { flex-direction: column; top: calc(150px + var(--safe-t)); }
+  .pz-board { height: auto; width: 100%; max-width: 100%; }
+  .pz-tray { width: 100%; }
+}

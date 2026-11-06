@@ -118,3 +118,39 @@ export function drawStar(c, x, y, R, color = '#ffd23f') {
   for (let i = 0; i < 10; i++) { const a = (i * Math.PI) / 5 - Math.PI / 2, rr = i % 2 ? R * 0.48 : R; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
   c.closePath(); c.fill(); c.stroke(); c.restore();
 }
+
+// Ladybird seen from above, centred on (x, y), facing up. open = wings lifted (about to fly).
+export function drawLadybird(c, x, y, s, { t = 0, open = 0, angle = 0 } = {}) {
+  const u = s / 100;
+  c.save(); c.translate(x, y); c.rotate(angle);
+  c.strokeStyle = '#1b1b1b'; c.lineWidth = 3 * u; c.lineCap = 'round';
+  // legs (wiggle while walking)
+  for (const sd of [-1, 1]) for (let i = 0; i < 3; i++) {
+    const w = Math.sin(t * 14 + i * 2 + (sd > 0 ? 1 : 0)) * 4 * u;
+    c.beginPath(); c.moveTo(sd * 24 * u, (-12 + i * 16) * u); c.lineTo(sd * 46 * u, (-20 + i * 20) * u + w); c.stroke();
+  }
+  // antennae
+  c.beginPath(); c.moveTo(-8 * u, -46 * u); c.quadraticCurveTo(-16 * u, -64 * u, -24 * u, -66 * u); c.moveTo(8 * u, -46 * u); c.quadraticCurveTo(16 * u, -64 * u, 24 * u, -66 * u); c.stroke();
+  c.fillStyle = '#1b1b1b'; c.beginPath(); c.arc(-24 * u, -66 * u, 4 * u, 0, 7); c.arc(24 * u, -66 * u, 4 * u, 0, 7); c.fill();
+  // head
+  c.beginPath(); c.ellipse(0, -36 * u, 22 * u, 16 * u, 0, 0, 7); c.fill();
+  c.fillStyle = '#fff'; c.beginPath(); c.arc(-9 * u, -40 * u, 6 * u, 0, 7); c.arc(9 * u, -40 * u, 6 * u, 0, 7); c.fill();
+  c.fillStyle = '#111'; c.beginPath(); c.arc(-9 * u, -41 * u, 3 * u, 0, 7); c.arc(9 * u, -41 * u, 3 * u, 0, 7); c.fill();
+  // see-through flying wings under the shell
+  if (open > 0) {
+    c.fillStyle = 'rgba(220,235,255,.7)';
+    for (const sd of [-1, 1]) { c.save(); c.rotate(sd * (0.5 + Math.sin(t * 40) * 0.15) * open); c.beginPath(); c.ellipse(sd * 30 * u, 10 * u, 22 * u, 40 * u, sd * 0.4, 0, 7); c.fill(); c.restore(); }
+  }
+  // shell halves (lift apart when open)
+  for (const sd of [-1, 1]) {
+    c.save(); c.rotate(sd * 0.55 * open); c.translate(sd * 6 * u * open, 0);
+    c.fillStyle = '#e53935';
+    c.beginPath(); c.moveTo(0, -24 * u); c.arc(0, 4 * u, 38 * u, -Math.PI / 2, Math.PI / 2, sd < 0); c.closePath(); c.fill();
+    c.strokeStyle = '#1b1b1b'; c.lineWidth = 3 * u; c.stroke();
+    c.fillStyle = '#1b1b1b';
+    for (const [dx, dy, r] of [[14, -10, 7], [22, 14, 8], [10, 28, 6]]) { c.beginPath(); c.arc(sd * dx * u, dy * u, r * u, 0, 7); c.fill(); }
+    c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(sd * 14 * u, -12 * u, 6 * u, 3 * u, sd * -0.6, 0, 7); c.fill();
+    c.restore();
+  }
+  c.restore();
+}

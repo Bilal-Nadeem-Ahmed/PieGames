@@ -1,0 +1,8 @@
+{
+  "appId": "com.piegames.kids",
+  "appName": "Pie Games",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#79c6ff"
+  }
+}

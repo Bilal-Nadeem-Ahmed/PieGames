@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pie Games</string>
+    <string name="title_activity_main">Pie Games</string>
+    <string name="package_name">com.piegames.kids</string>
+    <string name="custom_url_scheme">com.piegames.kids</string>
+</resources>

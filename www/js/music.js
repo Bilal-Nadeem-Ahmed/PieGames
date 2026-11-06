@@ -120,3 +120,7 @@ document.addEventListener('visibilitychange', () => {
   if (!ctx) return;
   if (document.hidden) ctx.suspend?.(); else ctx.resume?.();
 });
+
+// Pause the background song while an instrument is being played (resumes the saved song after).
+export function pauseMusic() { stop(); }
+export function resumeMusic() { const s = getSettings(); if (ctx && s.music !== false && s.music != null) play(s.music); }

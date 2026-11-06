@@ -9,6 +9,7 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Run & Jump** – the selected child runs through changing places (meadow → farm → seaside → snow → sunset). Tap to hop, hold to jump higher, double-jump. Low stars can be grabbed running, high stars need a jump. Bumping into sheep/elephants/dinos/logs makes them fall over, see stars and get back up (sometimes with the family "standing" voice note).
 - **Dino Eggs** – tap eggs to crack them; baby dinosaurs hatch, wander, roar and say their colour.
 - **Colouring** – tap-to-fill, freehand brush, rainbow colour, ⭐ stickers, eraser, undo. Includes colouring pages of each kid. Work saves automatically.
+- **Music** – choose 🥁 drums (kick, snare, toms, hi-hat, cymbals), 🎸 guitar (tap or strum the strings) or 🎹 piano (multi-touch, slide for glissando). Every part lights up or moves when played; sounds are synthesised live. Background music pauses while playing.
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
 

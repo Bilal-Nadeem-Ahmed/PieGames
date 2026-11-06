@@ -13,6 +13,7 @@ const GAMES = [
   { href: '#runner', icon: '🏃', label: 'Run & Jump', bg: '#86efac' },
   { href: '#dino', icon: '🥚', label: 'Dino Eggs', bg: '#fdba74' },
   { href: '#colour', icon: '🎨', label: 'Colouring', bg: '#c4b5fd' },
+  { href: '#music', icon: '🎹', label: 'Music', bg: '#a7f3d0' },
   { href: '#count', icon: '<b class="ico-txt">123</b>', label: 'Counting', bg: '#fde047' },
   { href: '#abc', icon: '<b class="ico-txt">ABC</b>', label: 'Letters', bg: '#f9a8d4' },
 ];

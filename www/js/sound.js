@@ -134,3 +134,9 @@ export function playClip(name, minGapMs = 5000) {
   try { a.currentTime = 0; a.volume = Math.min(1, vol('clips')); const p = a.play(); p?.catch?.(() => {}); } catch { return false; }
   return true;
 }
+
+// Direct access to the audio context + effects output (used by the Music game's instruments).
+export function audioOut() {
+  unlockAudio();
+  return ctx ? { ctx, out: master } : null;
+}

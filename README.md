@@ -12,6 +12,7 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Music** – choose 🥁 drums (kick, snare, toms, hi-hat, cymbals), 🎸 guitar (tap or strum the strings) or 🎹 piano (multi-touch, slide for glissando). Every part lights up or moves when played; sounds are synthesised live. Background music pauses while playing.
 - **Peekaboo** – animals (and sometimes the kids) hide behind bushes, barn doors, haystacks, boxes and trees; tap to find them, hear their real sound and name.
 - **Shapes** – 🔷 drag shapes into matching holes on a wooden board, or 🎨 put fruit and toys into the basket of the same colour.
+- **Build it** – pick a house, car or rocket: saw a plank, then hammer the nails and screw the screws as each part flies in; it gets painted and the house puffs smoke (builder waves from the door), the car drives off, the rocket blasts off.
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
 

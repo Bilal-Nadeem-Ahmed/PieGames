@@ -103,6 +103,12 @@ export const sfx = {
     [o, o2, lfo].forEach((x) => { x.start(t); x.stop(t + 0.9); });
     noise(0.5, 0.12, 0.02, 500);
   },
+  knock() { tone(520, 0.08, 'sine', 0.35, 0, 300); noise(0.04, 0.35, 0, 1800); },
+  screw() { tone(180, 0.12, 'sawtooth', 0.08, 0, 260); noise(0.1, 0.15, 0, 3500); },
+  saw() { noise(0.16, 0.25, 0, 2200); noise(0.12, 0.12, 0.02, 4500); },
+  vroom() { tone(70, 0.9, 'sawtooth', 0.12, 0, 180); tone(140, 0.9, 'square', 0.04, 0, 300); },
+  beep() { tone(660, 0.14, 'square', 0.08); tone(660, 0.14, 'square', 0.08, 0.2); },
+  rocket() { noise(2.2, 0.35, 0, 600); tone(90, 2, 'sawtooth', 0.06, 0, 40); },
   boing() { tone(220, 0.3, 'sine', 0.25, 0, 520); },
   baa() { animalSound('sheep'); },
 };

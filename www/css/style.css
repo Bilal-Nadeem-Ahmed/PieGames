@@ -412,3 +412,57 @@ svg { display: block; }
 @keyframes dropin { from { transform: translateY(-60px) scale(1.4); } }
 .basket.yum .b-body { animation: bump .35s; }
 @media (orientation: portrait) { .basket { width: 29vw; } .hole { width: 24vw; } .piece { width: 22vw; } .targets { flex-wrap: wrap; } }
+
+/* ---------- Build it ---------- */
+.build { background: linear-gradient(#cfe9ff, #eaf6ff 55%, #c9a172 55%, #b8895a); }
+.pick { position: absolute; inset: calc(84px + var(--safe-t)) 16px calc(16px + var(--safe-b)); display: flex; gap: 4vmin; justify-content: center; align-items: center; flex-wrap: wrap; }
+.pcard { width: min(30vmin, 28vw); aspect-ratio: 1; border-radius: 6vmin; background: #fff; box-shadow: 0 8px 0 #0002; border: 6px solid #ffd23f; display: grid; place-items: center; animation: popin .4s backwards; }
+.pcard:nth-child(2) { animation-delay: .1s; } .pcard:nth-child(3) { animation-delay: .2s; }
+.pcard span { font-size: min(18vmin, 16vw); }
+.workshop { position: absolute; inset: calc(76px + var(--safe-t)) 8px calc(8px + var(--safe-b)); display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 8px; }
+.builder { width: min(22vmin, 20vw); align-self: end; } .builder svg { width: 100%; }
+.builder.hop { animation: hop .6s; }
+.bench { width: 100%; height: 100%; max-height: 100%; touch-action: none; overflow: visible; }
+.toolbox { display: flex; flex-direction: column; gap: 1vmin; font-size: min(8vmin, 7vw); background: #c0392b; border-radius: 16px; padding: 1.4vmin; border: 4px solid #8e2a20; align-self: center; }
+.ghost * { fill: none !important; stroke: #ffffffb0 !important; stroke-dasharray: 8 7; stroke-width: 3 !important; }
+.part { transition: opacity .3s; }
+.part.loose { opacity: .92; animation: loose .9s ease-in-out infinite, flyin .5s cubic-bezier(.3, 1.4, .5, 1); transform-box: fill-box; transform-origin: center; }
+@keyframes loose { 0%, 100% { rotate: -2.5deg; } 50% { rotate: 2.5deg; } }
+@keyframes flyin { from { translate: 0 -220px; } }
+.part.fixed { animation: snapin .3s; transform-box: fill-box; transform-origin: center; }
+.fastener { cursor: pointer; }
+.fastener .glow { animation: glowpulse 1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.fastener.done .glow { display: none; }
+@keyframes glowpulse { 50% { opacity: .2; scale: 1.25; } }
+.swing { transform-box: fill-box; transform-origin: 80% 80%; animation: swing .35s ease-in; }
+@keyframes swing { 0% { rotate: -50deg; } 60% { rotate: 15deg; } 100% { rotate: 0deg; } }
+.twist { transform-box: fill-box; transform-origin: 20% 80%; animation: twist .35s; }
+@keyframes twist { 0% { rotate: -40deg; } 100% { rotate: 40deg; } }
+.pow { animation: popin .4s reverse forwards; transform-box: fill-box; transform-origin: center; }
+.dust { animation: dust .7s ease-out forwards; }
+@keyframes dust { to { translate: 0 60px; opacity: 0; } }
+.endpiece.dropoff { animation: drop .9s ease-in forwards; transform-box: fill-box; transform-origin: center; }
+@keyframes drop { to { translate: 40px 200px; rotate: 60deg; opacity: 0; } }
+.saw { pointer-events: none; }
+.smoke { animation: smoke 2s ease-out forwards; }
+@keyframes smoke { to { translate: 20px -90px; scale: 3; opacity: 0; } }
+.door.open { transform-box: fill-box; transform-origin: 0% 50%; animation: dooropen .6s forwards; }
+@keyframes dooropen { to { transform: perspective(300px) rotateY(-75deg); } }
+.doorkid { animation: popin .5s .3s backwards; }
+.made.drive { animation: drive 3.2s ease-in-out forwards; }
+@keyframes drive { 0% { transform: none; } 45% { transform: translateX(520px); } 46% { transform: translateX(-520px); } 100% { transform: none; } }
+.made.drive .wheel { animation: spin .4s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes spin { to { rotate: 360deg; } }
+.made.launch { animation: launch 2.6s ease-in forwards; }
+@keyframes launch { 0% { transform: none; } 10% { transform: translate(-3px, 0); } 15% { transform: translate(3px, 0); } 70% { transform: translateY(-700px); } 71% { transform: translateY(700px); } 100% { transform: none; } }
+.flame { animation: flicker .12s infinite alternate; }
+@keyframes flicker { to { opacity: .6; } }
+@media (orientation: portrait) {
+  .workshop { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .builder { position: absolute; left: 4px; bottom: 4px; width: 22vw; z-index: 2; }
+  .toolbox { flex-direction: row; justify-self: center; }
+}
+.bench .fx, .bench .ghost, .doorkid, .flame, .smoke { pointer-events: none; }
+.workshop { grid-template-rows: minmax(0, 1fr); }
+.bench { min-height: 0; min-width: 0; }
+@media (orientation: portrait) { .workshop { grid-template-rows: minmax(0, 1fr) auto; } }

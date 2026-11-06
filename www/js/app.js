@@ -14,6 +14,7 @@ import * as runner from './games/runner.js';
 import * as dino from './games/dino.js';
 import * as band from './games/instruments.js';
 import * as peekaboo from './games/peekaboo.js';
+import * as sorter from './games/sorter.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -30,6 +31,7 @@ const ROUTES = {
   dino: () => dino.mount(app),
   music: () => band.mount(app),
   peekaboo: () => peekaboo.mount(app),
+  sorter: () => sorter.mount(app),
 };
 
 function route() {

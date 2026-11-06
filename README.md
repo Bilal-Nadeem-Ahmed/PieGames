@@ -11,6 +11,7 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Colouring** – tap-to-fill, freehand brush, rainbow colour, ⭐ stickers, eraser, undo. Includes colouring pages of each kid. Work saves automatically.
 - **Music** – choose 🥁 drums (kick, snare, toms, hi-hat, cymbals), 🎸 guitar (tap or strum the strings) or 🎹 piano (multi-touch, slide for glissando). Every part lights up or moves when played; sounds are synthesised live. Background music pauses while playing.
 - **Peekaboo** – animals (and sometimes the kids) hide behind bushes, barn doors, haystacks, boxes and trees; tap to find them, hear their real sound and name.
+- **Shapes** – 🔷 drag shapes into matching holes on a wooden board, or 🎨 put fruit and toys into the basket of the same colour.
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
 

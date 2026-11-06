@@ -388,3 +388,27 @@ svg { display: block; }
   .spot { width: 40vw; }
   .spot .hider { font-size: 30vw; }
 }
+
+/* ---------- Shapes & colours sorter ---------- */
+.sorter { justify-content: space-evenly; }
+.targets { display: flex; justify-content: center; align-items: center; gap: 3vmin; width: min(100%, 900px); }
+.targets.shapeboard { background: linear-gradient(#d9a066, #b97a3f); border-radius: 4vmin; padding: 3vmin; box-shadow: 0 8px 0 #7a4f24, inset 0 4px 0 #fff4; }
+.hole { position: relative; width: min(20vmin, 19vw); aspect-ratio: 1; }
+.hole > svg { width: 100%; height: 100%; opacity: .85; filter: drop-shadow(0 3px 0 #fff3); }
+.hole .piece.placed { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; animation: snapin .35s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes snapin { from { transform: scale(1.3); } }
+.nope { animation: shake .4s; }
+.pieces { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4vmin; min-height: 22vmin; }
+.piece { width: min(18vmin, 17vw); aspect-ratio: 1; cursor: grab; filter: drop-shadow(0 6px 3px #0003); animation: popin .4s backwards; }
+.piece svg { width: 100%; height: 100%; display: block; }
+.piece.thing { width: auto; aspect-ratio: auto; font-size: min(13vmin, 12vw); line-height: 1; }
+.basket { position: relative; width: min(24vmin, 26vw); aspect-ratio: 1.1; display: flex; flex-direction: column; justify-content: flex-end; }
+.b-body { height: 62%; background: repeating-linear-gradient(45deg, var(--c) 0 10px, color-mix(in srgb, var(--c) 75%, #000) 10px 14px); border-radius: 0 0 40% 40% / 0 0 30% 30%;
+  border: 5px solid color-mix(in srgb, var(--c) 60%, #000); display: grid; place-items: center; box-shadow: 0 8px 0 #0002; position: relative; z-index: 2; }
+.b-body span { background: #fff; padding: 2px 12px; border-radius: 20px; font-weight: 900; font-size: clamp(14px, 3.4vmin, 24px); color: var(--c); -webkit-text-stroke: .5px #0004; }
+.basket::before { content: ""; position: absolute; left: 8%; right: 8%; top: 2%; height: 60%; border: 6px solid color-mix(in srgb, var(--c) 60%, #000); border-bottom: 0; border-radius: 50% 50% 0 0; z-index: 0; }
+.b-stack { position: absolute; left: 8%; right: 8%; bottom: 40%; display: flex; flex-wrap: wrap-reverse; justify-content: center; z-index: 1; }
+.b-stack .piece.placed { font-size: min(8vmin, 8vw); animation: dropin .4s cubic-bezier(.3, 1.6, .5, 1); margin: -1vmin; }
+@keyframes dropin { from { transform: translateY(-60px) scale(1.4); } }
+.basket.yum .b-body { animation: bump .35s; }
+@media (orientation: portrait) { .basket { width: 29vw; } .hole { width: 24vw; } .piece { width: 22vw; } .targets { flex-wrap: wrap; } }

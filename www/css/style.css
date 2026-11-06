@@ -563,3 +563,7 @@ svg { display: block; }
 .findit .score.bump { animation: bump .3s; }
 @media (orientation: landscape) { .findit .chips { top: calc(80px + var(--safe-t)); } .findit .zoo { top: calc(150px + var(--safe-t)); } }
 @media (orientation: portrait) { .findit .zoo { top: calc(160px + var(--safe-t)); } }
+/* grown-ups gear: top-right under the quick buttons so it never covers a game tile */
+.home .parent-btn { top: calc(72px + var(--safe-t)); bottom: auto; right: 16px; width: 44px; height: 44px; padding: 9px; opacity: .7; z-index: 6; }
+.home .parent-btn .ring { width: 52px; height: 52px; }
+@media (orientation: portrait) { .home .parent-btn { top: auto; bottom: calc(10px + var(--safe-b)); } .tiles { bottom: calc(64px + var(--safe-b)); } }

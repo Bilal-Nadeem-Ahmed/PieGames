@@ -22,3 +22,17 @@ The CC BY-SA 3.0 sound files remain under CC BY-SA 3.0 in their modified form.
 
 ## Family voice notes (`www/audio/balloons.m4a`, `www/audio/standing.m4a`)
 Recorded by the family for this app.
+
+## Sound effects (www/audio/sfx)
+Trimmed, level-matched and converted to mono MP3 for the app.
+
+From the **Lots of Sounds free sample API** (https://github.com/lotsofsounds/free-sound-effects-api, sounds marked CC0 / public domain; originally from Freesound, ids `fs-…`):
+pop-1 (fs-161628 Blop Pop), pop-2 (fs-447910 Plop), pop-3 (fs-217762 Bubble Wrap Pop), boing-1 (fs-368175), boing-2 (fs-383240), boing-3 (fs-717769),
+giggle-1 (fs-19260 Cute Girl Giggle), giggle-2 (fs-371342 Two Kids Laughing), cheer-1 (fs-162395 Group Cheer Yay), ding-1 (fs-242501 Success Power Up Chime),
+tada-1/2 (fs-397355 / fs-397353 Tada Fanfare), knock-2 (fs-369712 Knock Against Wood), horn-1 (fs-434878 Car Horn), rocket-1 (fs-435779 Engine Test),
+firework-1 (fs-336008), magic-1 (fs-264981 Magic Reveal Chimes), poof-1 (fs-208111 Smoke Poof), creak-1 (fs-104532 Door Creak), drip-1 (fs-371274 Water Bead Drop),
+coin-1 (fs-242857 Retro Coin), spray-1 (fs-267709 Aerosol Spray), whoosh-1 (fs-184325 Woosh Slide In), roar-1 (fs-553173 Monster Roar).
+
+From **JimLynchCodes/Game-Sound-Effects** (https://github.com/JimLynchCodes/Game-Sound-Effects; described by its author as royalty free / open source, no formal licence file):
+boing-4 (badBoing.wav), cheer-2 (girl_yeaaaaah.wav), knock-1 (HAMMER.WAV), magic-2 (cast_a_spell_sound.wav), coin-2 (coin.wav), whoosh-2 (WHOOSH.WAV),
+splash-1/2 (Splash_Small.wav / Splash_Big.wav), drumroll-1 (DRUMROLL.WAV), brush-1 (brush_sfx.wav).

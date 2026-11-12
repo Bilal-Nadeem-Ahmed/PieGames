@@ -132,7 +132,7 @@ export function mount(el) {
         const r = (gf.big ? 30 : 24) * S;
         if (gf.x + r > hx0 && gf.x - r < hx1 && gf.y + r > hy0 && gf.y - r < hy1) {
           gifts.splice(gifts.indexOf(gf), 1); got += gf.big ? 2 : 1;
-          sfx.pop(got); if (gf.big) sfx.sparkle(); buzz(10);
+          sfx.coin(got); if (gf.big) sfx.sparkle(); buzz(10);
           burst(gf.x, gf.y, { n: gf.big ? 26 : 14, colors: gf.type === 'star' ? ['#ffd23f', '#fff', '#ffb300'] : [gf.col, '#fff'], speed: gf.big ? 340 : 240 });
           scoreEl.textContent = got;
           scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump');
@@ -158,7 +158,7 @@ export function mount(el) {
           }
           if (o.bounceT > 0) continue; // just bounced off it: don't trip over it on the way down
           o.hit = true;
-          if (o.type === 'puddle') { sfx.pop(2); burst(o.x, G, { n: 24, colors: ['#7cc8ff', '#bfe8ff', '#fff'], speed: 300, shape: 'dot' }); continue; }
+          if (o.type === 'puddle') { sfx.splash(); burst(o.x, G, { n: 24, colors: ['#7cc8ff', '#bfe8ff', '#fff'], speed: 300, shape: 'dot' }); continue; }
           o.vy = -420 * S;
           if (o.type === 'sheep') animalSound('sheep'); else if (o.type === 'elephant') animalSound('elephant'); else if (o.type === 'dino') sfx.roar();
           burst(o.x, G - h, { n: 10, speed: 200, shape: 'star' });

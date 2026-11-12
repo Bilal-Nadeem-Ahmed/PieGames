@@ -88,3 +88,4 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - Wikimedia upload server rate-limits (429) this container; OpenGameArt works for CC0 sounds.
 - 1.30: Balloons background = www/js/sky.js createSky() (draw/tap), replaces meadow; Bubbles speaks words in non-count modes.
 - 1.31: Colouring: pics-more.js (19 pages), kid pages per child (me/mepet/meballoons/together, id includes sig(player) hash), blank + build pages; tools: fill patterns via paintRef ('pat:kind:col'), brushes, sticker picker, 3 sizes, 19 colours.
+- 1.32: Recorded sfx in www/audio/sfx/<name>-<n>.mp3; sound.js SAMPLES/TRIM + sample() with synth fallback; new sfx: splash whoosh poof creak drip coin spray brush firework cheer. Credits in CREDITS.md. To add: drop name-N.mp3 in and bump SAMPLES count.

@@ -1,7 +1,7 @@
 # Pie Games 🎈🐑
 
 A collection of simple, ad-free games for toddlers, packaged as an Android app (APK) to sideload.
-Everything works offline. Art is drawn in code and music/effects are generated; animal sounds are free recordings listed in [CREDITS.md](CREDITS.md).
+Everything works offline. Art is drawn in code, music is generated, and sound effects are free recordings (with generated fallbacks); animal sounds are free recordings listed in [CREDITS.md](CREDITS.md).
 
 ## Games
 - **Pie Pet** – a modern Tamagotchi: each child picks a puppy, kitten, bunny, lamb or dino that lives in its own room. Its needs (🍎 food, 😊 fun, ⚡ energy, 🛁 clean, ❤️ health) change in real time, even when the app is closed. Feed it (drag food to its mouth), stroke it, play (ball, teddy, bubbles, music), bath it (scrub with the sponge), switch off the light for bed, sweep up its messes, and give medicine when it's poorly. Good care makes it grow: Baby → Little → Big → Grown-up. Grown-ups → **New pet for …** lets a child start again.

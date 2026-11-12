@@ -223,6 +223,7 @@ function editor(el, id) {
     c.strokeStyle = drawing.col; c.fillStyle = drawing.col;
     if (tool === 'eraser' || brush === 'pen') { c.beginPath(); c.arc(...drawing.p, c.lineWidth / 2, 0, 7); c.fill(); }
     else stroke(drawing.p, drawing.p);
+    if (tool === 'brush') ({ spray: sfx.spray, glitter: sfx.sparkle, crayon: sfx.brush })[brush]?.();
     inkUsed = true;
   });
   cv.addEventListener('pointermove', (e) => {

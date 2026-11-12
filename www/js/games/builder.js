@@ -244,7 +244,7 @@ export function mount(el) {
         const def = g.dataset.paint.split(',');
         shapesOf(g).forEach((s, j) => s.setAttribute('fill', j === 0 ? colour : def[j] || colour));
         g.classList.remove('splat'); void g.getBBox(); g.classList.add('splat');
-        sfx.pop(3 + painted.size % 5); buzz(10);
+        sfx.brush(); sfx.pop(3 + painted.size % 5); buzz(10);
         burst(e.clientX, e.clientY, { n: 12, colors: [colour, colour, '#fff'], shape: 'dot', speed: 220 });
         const first = !painted.has(g); painted.add(g);
         if (first && painted.size === parts.length) { setTimeout(() => { if (!alive) return; say('Beautiful!'); sfx.ding(); setTimeout(finish, 900); }, 400); }
@@ -287,7 +287,7 @@ export function mount(el) {
       waves.setAttribute('class', 'waves');
       waves.innerHTML = `<path d="M-200 236 q25 -14 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V320 H-200 Z" fill="#60a5fa" opacity=".85"/>`;
       bench.querySelector('.fx').appendChild(waves);
-      say('Sail away!'); sfx.splash ? sfx.splash() : sfx.boing();
+      say('Sail away!'); sfx.splash();
       made.classList.add('sail');
     } else if (key === 'train') {
       for (let i = 0; i < 6; i++) setTimeout(() => { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('cx', 106); c.setAttribute('cy', 76); c.setAttribute('r', 10); c.setAttribute('fill', '#e5e7eb'); c.setAttribute('class', 'smoke'); made.appendChild(c); }, i * 300);
@@ -295,7 +295,7 @@ export function mount(el) {
       setTimeout(() => { if (alive) { made.classList.add('drive'); sfx.vroom(); } }, 600);
     } else if (key === 'plane') {
       made.classList.add('spinprop'); sfx.vroom();
-      setTimeout(() => { if (!alive) return; say('Up, up and away!'); sfx.rocket(); made.classList.add('fly'); }, 900);
+      setTimeout(() => { if (!alive) return; say('Up, up and away!'); sfx.whoosh(); sfx.rocket(); made.classList.add('fly'); }, 900);
     } else if (key === 'kennel') {
       const pup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       pup.setAttribute('class', 'doorkid');

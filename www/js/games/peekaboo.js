@@ -75,6 +75,7 @@ export function mount(el) {
         e.preventDefault(); buzz(10);
         if (!open) {
           open = true; s.classList.add('open'); s.classList.remove('peek'); sfx.boing();
+          ({ door: sfx.creak, curtain: sfx.whoosh, box: sfx.creak, hay: sfx.poof, bush: sfx.whoosh, tree: sfx.whoosh, pot: sfx.poof })[covers[i]]?.();
           if (who.kind === 'pet') { hid.innerHTML = petSVG(who.t, 2, 'excited'); setTimeout(() => { if (alive) hid.innerHTML = petSVG(who.t, 2, 'happy'); }, 1200); }
           const r = s.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * 0.4, { n: 18, shape: 'star' });
           setTimeout(speak, 250);

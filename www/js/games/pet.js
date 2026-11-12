@@ -127,7 +127,7 @@ export function mount(el) {
     });
     root.querySelector('.poops').addEventListener('pointerdown', (e) => {
       const p = e.target.closest('.poop'); if (!p) return;
-      const i = +p.dataset.i; p.classList.add('swept'); sfx.saw(); buzz(10);
+      const i = +p.dataset.i; p.classList.add('swept'); sfx.poof(); buzz(10);
       setTimeout(() => { pet.poops.splice(i, 1); pet.s.clean = clamp(pet.s.clean + 6); gain(4); draw(); }, 450);
     });
     draw();
@@ -347,7 +347,7 @@ export function mount(el) {
         if (inside(petEl, e.clientX, e.clientY)) {
           scrub += Math.hypot(e.clientX - lp[0], e.clientY - lp[1]);
           if (Math.random() < 0.25) { const f = document.createElement('i'); const r = petEl.getBoundingClientRect(); f.style.left = e.clientX - r.left + 'px'; f.style.top = e.clientY - r.top + 'px'; foam.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px`; foam.appendChild(f); }
-          if (Math.random() < 0.08) sfx.pop(2);
+          if (Math.random() < 0.08) sfx.drip();
         }
         lp = [e.clientX, e.clientY];
         if (scrub > 1600) done();
@@ -356,7 +356,7 @@ export function mount(el) {
     });
     sponge.remove();
     zone.insertAdjacentHTML('beforeend', '<div class="shower">🚿</div><div class="rain"></div>');
-    sfx.saw(); await wait(500); foam.innerHTML = ''; mode = 'wet'; draw(); sfx.saw(); await wait(900);
+    sfx.splash(); await wait(500); foam.innerHTML = ''; mode = 'wet'; draw(); sfx.drip(); await wait(900);
     zone.innerHTML = ''; root.querySelector('.petwrap').classList.remove('inbath');
     pet.s.clean = 100; pet.s.fun = clamp(pet.s.fun + 8); gain(6);
     mode = 'love'; draw(); confettiRain(30); sfx.sparkle(); say(pick(['All clean!', 'Wow!', 'Yay!']));

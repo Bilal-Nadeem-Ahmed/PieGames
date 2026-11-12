@@ -7,6 +7,7 @@ import { avatarSVG } from '../avatar.js';
 import { SONGS, setSong } from '../music.js';
 import { VERSION } from '../version.js';
 import { voicesPanel } from './voices-panel.js';
+import { resetPet } from '../games/pet.js';
 
 const LABEL = {
   hair: 'Hair style', hairColor: 'Hair colour', skin: 'Skin', eyes: 'Eyes', outfit: 'Outfit', shirt: 'Clothes colour', pattern: 'Pattern',
@@ -130,6 +131,15 @@ export function mount(el) {
     onoff('Sheep surprises', s.pop, 'surprises');
     onoff('Kids’ faces on balloons', s.pop, 'faces');
     seg('Run & Jump speed', s.runner, 'speed', ['slow', 'normal', 'fast'], ['Slow', 'Normal', 'Fast']);
+    {
+      const w = document.createElement('div'); w.className = 'seg';
+      for (const pl of getPlayers()) {
+        const b = document.createElement('button'); b.textContent = `New pet for ${pl.name || 'player'}`;
+        b.onclick = () => { if (confirm(`Let ${pl.name || 'this player'} choose a new Pie Pet? Their current pet will be gone.`)) { resetPet(pl.id); sfx.tap(); b.textContent = '✓ Done'; } };
+        w.appendChild(b);
+      }
+      set.appendChild(row('Pie Pet', w));
+    }
   }
 
   const renderAll = () => { renderTabs(); renderOpts(); };

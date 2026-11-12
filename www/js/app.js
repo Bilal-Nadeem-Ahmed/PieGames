@@ -22,6 +22,7 @@ import * as pairs from './games/pairs.js';
 import * as roundup from './games/roundup.js';
 import * as puzzle from './games/puzzle.js';
 import * as findit from './games/findit.js';
+import * as pet from './games/pet.js';
 
 const app = document.getElementById('app');
 let cleanup = null;
@@ -45,6 +46,7 @@ const ROUTES = {
   roundup: () => roundup.mount(app),
   puzzle: () => puzzle.mount(app),
   findit: () => findit.mount(app),
+  pet: () => pet.mount(app),
 };
 
 let routeSeq = 0;

@@ -8,6 +8,7 @@ import { createMeadow } from '../scenery.js';
 import { drawBalloon } from '../draw.js';
 
 const GAMES = [
+  { href: '#pet', icon: '🐾', label: 'Pie Pet', bg: '#fcd34d' },
   { href: '#balloons', icon: '🎈', label: 'Balloons', bg: '#ff8fab' },
   { href: '#bubbles', icon: '🫧', label: 'Bubbles', bg: '#7dd3fc' },
   { href: '#runner', icon: '🏃', label: 'Run & Jump', bg: '#86efac' },

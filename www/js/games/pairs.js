@@ -7,12 +7,16 @@ import { getLevel, setLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, chips, shuffle, wait } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { FARM, animalSound, preloadAnimals } from '../animals.js';
+import { petSVG, PETS } from './pet-art.js';
 
 const LEVELS = [
   { id: 2, icon: '<b>2</b>', label: '2 pairs' }, { id: 3, icon: '<b>3</b>', label: '3 pairs' },
   { id: 4, icon: '<b>4</b>', label: '4 pairs' }, { id: 6, icon: '<b>6</b>', label: '6 pairs' },
 ];
-const EXTRA = [{ id: 'ladybird', e: '🐞', name: 'Ladybird' }, { id: 'lion', e: '🦁', name: 'Lion' }, { id: 'frog', e: '🐸', name: 'Frog' }, { id: 'dino', e: '🦕', name: 'Dinosaur' }, { id: 'bunny', e: '🐰', name: 'Bunny' }];
+const EXTRA = [['ladybird', '🐞', 'Ladybird'], ['lion', '🦁', 'Lion'], ['frog', '🐸', 'Frog'], ['penguin', '🐧', 'Penguin'], ['giraffe', '🦒', 'Giraffe'],
+  ['turtle', '🐢', 'Turtle'], ['butterfly', '🦋', 'Butterfly'], ['bee', '🐝', 'Bee'], ['octopus', '🐙', 'Octopus'], ['unicorn', '🦄', 'Unicorn'], ['whale', '🐳', 'Whale'],
+  ['crab', '🦀', 'Crab'], ['snail', '🐌', 'Snail'], ['rainbow', '🌈', 'Rainbow'], ['star', '⭐', 'Star'], ['car', '🚗', 'Car'], ['train', '🚂', 'Train'],
+  ['balloon', '🎈', 'Balloon'], ['strawberry', '🍓', 'Strawberry'], ['apple', '🍎', 'Apple'], ['sun', '☀️', 'Sun'], ['moon', '🌙', 'Moon']].map(([id, e, name]) => ({ id, e, name }));
 
 export function mount(el) {
   preloadAnimals();
@@ -27,7 +31,8 @@ export function mount(el) {
 
   function faces() {
     const kids = getPlayers().map((p) => ({ id: 'kid-' + p.id, html: avatarSVG(p, { crop: true }), name: p.name || '', kid: true }));
-    const animals = [...FARM.map((a) => ({ id: a.id, html: a.e, name: a.name, sound: a.id })), ...EXTRA.map((a) => ({ id: a.id, html: a.e, name: a.name }))];
+    const drawn = Object.keys(PETS).map((t) => ({ id: 'pet-' + t, html: petSVG(t, 2, 'happy'), name: PETS[t].name, sound: PETS[t].sound, kid: true }));
+    const animals = [...drawn, ...FARM.map((a) => ({ id: a.id, html: a.e, name: a.name, sound: a.id })), ...EXTRA.map((a) => ({ id: a.id, html: a.e, name: a.name }))];
     // always include the ladybird and one of the kids when there's room
     const must = [animals.find((a) => a.id === 'ladybird'), ...(level >= 3 ? [shuffle(kids)[0]] : [])].filter(Boolean);
     const rest = shuffle([...animals.filter((a) => a.id !== 'ladybird'), ...kids.filter((k) => !must.includes(k))]);

@@ -71,11 +71,12 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - [x] Picture prompts (`askPill` in ui.js) so find-it rounds work without voice clips.
 - [ ] README: APK location + QR, install, every game with screenshot, levels + reset, voices how-to; keep updated.
 - [ ] Dino eggs improvement.
-- [ ] Colouring: more pictures (different animals etc.).
+- [x] Colouring: 8 animal pages via `lineArt(petSVG())` in pictures.js (1.25).
 - [x] Music: xylophone + bells added (1.24).
 - [ ] Peekaboo improvement.
 - [ ] Build it: more projects/options and polish.
-- [ ] Puzzles: more pictures. Pairs: more card images.
+- [x] Puzzles: animals in farm/seaside/snow/sunset scenes; Pairs: drawn animals + 22 more emoji cards (1.25).
+- Note: pet-art `dedupe()` removes duplicate attributes so petSVG works as an <img>/data URL too.
 - [ ] Voice clips still to record: see docs/VOICE_CLIPS.md (27/178 done at 1.19). Numbers 1–20 are the priority.
 
 ## Gotchas learned

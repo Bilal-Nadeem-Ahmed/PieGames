@@ -9,15 +9,15 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Bubbles** – a quiet underwater bubble-pop (no kids, no talking): lots of fish to tap, a crab, jellyfish, coral; surprise bubbles release fish.
 - **Run & Jump** – the selected child runs through changing places (meadow → farm → seaside → snow → sunset). Tap to hop, hold to jump higher, double-jump. Low stars can be grabbed running, high stars need a jump. Bumping into sheep/elephants/dinos/logs makes them fall over, see stars and get back up (sometimes with the family "standing" voice note).
 - **Dino Eggs** – tap eggs to crack them; baby dinosaurs hatch, wander, roar and say their colour.
-- **Colouring** – tap-to-fill, freehand brush, rainbow colour, ⭐ stickers, eraser, undo. Includes colouring pages of each kid and a ladybird. Work saves automatically.
+- **Colouring** – tap-to-fill, freehand brush, rainbow colour, ⭐ stickers, eraser, undo. Includes colouring pages of each kid, a ladybird and 8 animals (puppy, kitten, bunny, lamb, cow, elephant, duck, dinosaur). Work saves automatically.
 - **Music** – choose 🥁 drums (kick, snare, toms, hi-hat, cymbals), 🎸 guitar (tap or strum the strings), 🎹 piano (multi-touch, slide for glissando), 🎼 xylophone (rainbow bars, tap or slide) or 🔔 handbells (swing and ring). Every part lights up or moves when played; sounds are synthesised live. Background music pauses while playing.
 - **Peekaboo** – animals (and sometimes the kids) hide behind bushes, barn doors, haystacks, boxes and trees; tap to find them, hear their real sound and name.
 - **Shapes** – 🔷 drag shapes into matching holes on a wooden board, or 🎨 put fruit and toys into the basket of the same colour.
 - **Build it** – pick a house, car or rocket: saw a plank, then hammer the nails and screw the screws as each part flies in; it gets painted and the house puffs smoke (builder waves from the door), the car drives off, the rocket blasts off.
 - **Feed** – up to 4 animals (puppy, kitten, bunny, lamb, cow, elephant, duck, dino) wander around the farm; each hungry one shows the food it wants in a bubble. Drag food to it: it stops, opens its mouth, munches and does a happy wiggle with its own sound. Stroke an animal to pet it (love eyes and hearts), tap it to make it hop. Wrong food gets a head shake. They get hungry again after a while, and new animals wander in.
-- **Pairs** – memory game with 2, 3, 4 or 6 pairs of big flip cards: animals (with their sounds), a ladybird and the kids' own faces.
+- **Pairs** – memory game with 2, 3, 4 or 6 pairs of big flip cards from 40+ pictures: drawn animals, farm animals (with their sounds), a ladybird, penguin, giraffe, unicorn, cars, trains, fruit… and the kids' own faces.
 - **Sheep pen** – tap the wandering sheep to make them leap into the pen; they're counted out loud, the gate shuts, they dance, then run out for another round.
-- **Puzzles** – 2, 4, 6 or 9 big pieces to drag onto a faint guide picture: sheep, dinosaur, balloons, ladybird, fish and the kids themselves.
+- **Puzzles** – 2, 4, 6 or 9 big pieces to drag onto a faint guide picture: sheep, dinosaur, balloons, ladybird, fish, the kids themselves, and 8 animals at the farm, seaside, snow and sunset.
 - **Find it** – 🐞 ladybird hunt (ladybirds crawl around the garden and hide under leaves; tap to find them and they fly away, counted) and 🔍 find the animal ("Where is the cow?").
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.

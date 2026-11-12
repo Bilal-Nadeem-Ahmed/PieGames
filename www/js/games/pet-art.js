@@ -120,9 +120,18 @@ export function petSVG(type, stage, mood, { dirty = false, wet = false } = {}) {
   }
   if (wet) extra += [-0.6, -0.2, 0.3, 0.7].map((d, i) => `<path class="drip" style="animation-delay:${i * 0.2}s" d="M${150 + d * bRx} ${bCy + bRy * 0.6} q-5 10 0 14 q5 -4 0 -14z" fill="#7cc8ff"/>`).join('');
 
-  return `<svg viewBox="0 0 300 300" class="pet-svg"><g class="pet-scale" style="transform-origin:150px ${feetY}px;transform:scale(${k})">
+  return dedupe(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" class="pet-svg"><g class="pet-scale" style="transform-origin:150px ${feetY}px;transform:scale(${k})">
     <ellipse cx="150" cy="${feetY + 4}" rx="${bRx * 1.1}" ry="10" fill="#0002"/>
     <g class="pet-body">${back}${legs}${body}${extra.includes('drip') ? '' : ''}</g>
     <g class="pet-head" style="transform-origin:150px ${hCy + headR}px">${ears}${head}${eyes}${face}</g>
-    ${extra}</g></svg>`;
+    ${extra}</g></svg>`);
+}
+
+// Some shapes get a style attribute twice (e.g. a default stroke-width and a custom one). Browsers forgive that
+// when drawing inline, but not when the SVG is loaded as an image, so keep only the first of each (as browsers do).
+function dedupe(svg) {
+  return svg.replace(/<([a-zA-Z]+)([^<>]*?)(\/?)>/g, (m, tag, attrs, slash) => {
+    const seen = new Set();
+    return `<${tag}${attrs.replace(/\s([\w:-]+)="[^"]*"/g, (a, name) => (seen.has(name) ? '' : (seen.add(name), a)))}${slash}>`;
+  });
 }

@@ -2,6 +2,7 @@
 import { cloud } from './shapes.js';
 import { avatarSVG } from './avatar.js';
 import { getPlayers } from './store.js';
+import { petSVG } from './games/pet-art.js';
 
 const S = 'stroke="#2b2118" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"';
 
@@ -133,6 +134,29 @@ const PICS = [
     p('M270 92 l8 16 l18 2 l-13 12 l4 18 l-17 -9 l-17 9 l4 -18 l-13 -12 l18 -2 z')) },
 ];
 
+// Turn a coloured Pie Pet drawing into colouring-in line art: every filled shape becomes a white,
+// outlined, tappable region; pupils stay black. Ids are numbered in drawing order so saves are stable.
+function lineArt(svg, prefix) {
+  const doc = new DOMParser().parseFromString(`<body>${svg}</body>`, 'text/html');   // forgiving parser (the drawings repeat some attributes)
+  const g = doc.querySelector('.pet-scale');
+  let n = 0;
+  for (const el of g.querySelectorAll('ellipse, circle, path, rect')) {
+    const fill = (el.getAttribute('fill') || '').toLowerCase();
+    if (fill === 'none' || fill === '') { el.setAttribute('pointer-events', 'none'); continue; }
+    if (['#1b1b1b', '#111', '#2b2118', '#0002'].includes(fill)) { if (fill === '#0002') el.remove(); continue; }
+    el.removeAttribute('opacity');
+    el.setAttribute('fill', '#fff'); el.setAttribute('class', 'r'); el.setAttribute('id', `${prefix}${n++}`);
+    if (!el.getAttribute('stroke')) { el.setAttribute('stroke', '#2b2118'); el.setAttribute('stroke-width', '3'); }
+  }
+  g.removeAttribute('style');
+  return g.innerHTML;
+}
+const ANIMAL_PAGES = ['puppy', 'kitten', 'bunny', 'lamb', 'cow', 'elephant', 'duck', 'dino'].map((t) => ({
+  id: 'pet-' + t,
+  svg: () => pic(({ bg, p, r }) => bg() + p('M0 330 Q200 300 400 330 L400 400 L0 400 Z') + r('circle', 'cx="345" cy="58" r="30"') + p(cloud(70, 60, 46, 18, 8)) +
+    `<g transform="translate(20 -10) scale(1.2)">${lineArt(petSVG(t, 3, 'happy'), 'p' + t + '-')}</g>`),
+}));
+
 export function getPictures() {
   const kids = getPlayers().map((pl, i) => ({
     id: 'me-' + pl.id,
@@ -141,5 +165,5 @@ export function getPictures() {
       p(cloud(70, 56, 46, 18, 8)) +
       `<g transform="translate(50 18) scale(1.5)">${avatarSVG(pl, { line: true, inner: true, pose: i % 2 ? 'up' : 'down', idPrefix: 'a' })}</g>`),
   }));
-  return [...kids, ...PICS];
+  return [...kids, ...PICS, ...ANIMAL_PAGES];
 }

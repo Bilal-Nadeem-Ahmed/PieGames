@@ -10,6 +10,8 @@ import { burst, celebrate } from '../fx.js';
 import { drawSheep, drawDino, drawBalloon, drawCloud, drawLadybird } from '../draw.js';
 import { drawFish } from '../sea.js';
 import { animalSound, preloadAnimals } from '../animals.js';
+import { petSVG, PETS } from './pet-art.js';
+import { createMeadow } from '../scenery.js';
 
 const LEVELS = [{ id: 2, icon: '<b>2</b>' }, { id: 4, icon: '<b>4</b>' }, { id: 6, icon: '<b>6</b>' }, { id: 9, icon: '<b>9</b>' }];
 const GRID = { 2: [2, 1], 4: [2, 2], 6: [3, 2], 9: [3, 3] };
@@ -54,11 +56,20 @@ export function mount(el) {
 
   async function picture() {
     const kids = getPlayers().map((p) => ({ id: 'kid-' + p.id, name: p.name || '', kid: p }));
-    const all = [...PICTURES, ...kids].filter((p) => p.id !== lastPic);
+    const places = ['farm', 'seaside', 'snow', 'sunset'];
+    const animals = Object.keys(PETS).map((a, i) => ({ id: 'pet-' + a, name: PETS[a].name.toLowerCase(), animal: a, place: places[i % places.length] }));
+    const all = [...PICTURES, ...kids, ...animals].filter((p) => p.id !== lastPic);
     const P = pick(all); lastPic = P.id;
     const cv = document.createElement('canvas'); cv.width = cv.height = N;
     const c = cv.getContext('2d');
-    if (P.kid) {
+    if (P.place) {
+      // an animal in a place: farm / seaside / snow / sunset scenery with the animal big in front
+      const zone = { farm: 4500, seaside: 7500, snow: 10500, sunset: 13500 }[P.place];
+      createMeadow({ zones: true }).draw(c, N, N, 0, 0, zone, N * 0.72);
+      const im = await loadImg(petSVG(P.animal, 3, 'happy'));
+      if (im) c.drawImage(im, 60, 60, 480, 480);
+      P.sound = () => { const s = PETS[P.animal].sound; if (s) animalSound(s); else sfx.giggle(); };
+    } else if (P.kid) {
       sky(c, '#ffd6e8', '#fff3fa', '#a6e38a');
       const im = await loadImg(avatarSVG(P.kid, { pose: 'up' }));
       if (im) c.drawImage(im, 110, 90, 380, 456);

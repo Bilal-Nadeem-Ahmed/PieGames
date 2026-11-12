@@ -1,8 +1,8 @@
 // Locks the screen upright or sideways depending on the screen being shown.
-// Balloons, Bubbles and the Sheep pen are upright; the grown-ups area can rotate freely;
+// Balloons, Bubbles and the Sheep pen are upright;
 // everything else (home and the other games) is sideways.
 const PORTRAIT = new Set(['balloons', 'bubbles', 'roundup']);
-const FREE = new Set(['parent']);
+const FREE = new Set(); // every screen is forced; the grown-ups area is sideways too
 
 let plugin = null, current = null;
 function so() {

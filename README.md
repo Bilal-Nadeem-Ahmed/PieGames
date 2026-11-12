@@ -21,6 +21,8 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
 - **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
 
+Screen direction: Balloons, Bubbles and Sheep pen turn the phone upright; the home screen and all other games are sideways; the grown-ups area can rotate freely.
+
 Quick buttons (top right): talking voice on/off, and music (tap to change song or turn off). Songs: Twinkle Twinkle, Mary Had a Little Lamb, Old MacDonald, Row Your Boat, Sheepy Hop.
 
 ## Grown-ups area

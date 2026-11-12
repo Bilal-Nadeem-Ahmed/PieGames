@@ -4,6 +4,7 @@ import { nextSong, musicOn } from './music.js';
 import { getSettings, saveSettings } from './store.js';
 import { hush } from './speech.js';
 import { ICON } from './ui.js';
+import { lockFor } from './orientation.js';
 import * as home from './screens/home.js';
 import * as parent from './screens/parent.js';
 import * as pop from './games/pop.js';
@@ -46,12 +47,18 @@ const ROUTES = {
   findit: () => findit.mount(app),
 };
 
-function route() {
+let routeSeq = 0;
+async function route() {
   const [name, arg] = (location.hash.slice(1) || 'home').split('/');
+  const my = ++routeSeq;
   try { cleanup?.(); } catch {}
   cleanup = null;
   document.getElementById('fx')?.getContext('2d')?.clearRect(0, 0, 1e5, 1e5);
   document.querySelectorAll('.cheer').forEach((c) => c.remove());
+  // turn the screen upright/sideways for this game first, so it lays out at the right size
+  app.innerHTML = '';
+  await lockFor(ROUTES[name] ? name : 'home');
+  if (my !== routeSeq) return;
   app.className = 'route-' + name;
   cleanup = (ROUTES[name] || ROUTES.home)(arg) || null;
   quick.hidden = name === 'parent' || (name === 'colour' && !!arg);

@@ -11,7 +11,8 @@
   "dependencies": {
     "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "^8.6.0",
-    "@capacitor/core": "^8.6.0"
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/screen-orientation": "^8.0.2"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0"

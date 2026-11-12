@@ -1,6 +1,7 @@
 // Dino eggs: tap eggs to crack them, baby dinosaurs hatch, roar and dance. Tap a dino to make it roar.
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, pick, rnd, shuffle } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { drawDino, drawCloud } from '../draw.js';
@@ -10,12 +11,14 @@ const DINO_COLOURS = [['green', '#6fcf5b'], ['orange', '#ff9f43'], ['blue', '#5f
 export function mount(el) {
   el.innerHTML = `<div class="game dino"><canvas></canvas>${homeBtn()}</div>`;
   const root = el.firstElementChild, cv = root.querySelector('canvas'), c = cv.getContext('2d');
+  const badge = levelBadge(root, 'dino', () => newNest());
+  const taps = () => [2, 3, 3, 4][getLevel('dino') - 1];
   let W, H, S, dpr;
   const resize = () => { dpr = Math.min(devicePixelRatio || 1, 2); W = root.clientWidth; H = root.clientHeight; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); S = Math.min(W / 900, H / 600); layout(); };
   let eggs = [], hatched = 0, t = 0, raf = 0, last = performance.now(), timer = 0, alive = true;
 
   function newNest() {
-    const n = 3 + rnd(3);
+    const n = [2, 3, 4, 5][getLevel('dino') - 1];
     const cols = shuffle([...DINO_COLOURS]).slice(0, n);
     eggs = cols.map(([name, col], i) => ({ i, name, col, taps: 0, state: 'egg', wob: 0, jump: 0, vy: 0, roar: 0, t: Math.random() * 5, out: 0 }));
     layout();
@@ -38,7 +41,7 @@ export function mount(el) {
         if (e.state === 'egg') {
           e.taps++; e.wob = 0.5; sfx.pop(e.taps + 2); buzz(12);
           burst(x, y, { n: 6, colors: ['#fff6dc', '#e9d8a6'], speed: 160, shape: 'dot' });
-          if (e.taps >= 3) hatch(e);
+          if (e.taps >= taps()) hatch(e);
         } else { roar(e); }
         return;
       }
@@ -61,7 +64,7 @@ export function mount(el) {
     if (eggs.every((x) => x.state === 'hatched')) {
       timer = setTimeout(() => {
         if (!alive) return;
-        celebrate(`${eggs.length} baby dinosaurs! Hooray!`);
+        celebrate(`${eggs.length} baby dinosaurs! Hooray!`); win('dino', badge);
         timer = setTimeout(() => alive && newNest(), 4500);
       }, 1600);
     }

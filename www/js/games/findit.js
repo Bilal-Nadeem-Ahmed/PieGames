@@ -5,7 +5,8 @@
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { storage } from '../store.js';
-import { homeBtn, chips, shuffle, rnd, pick } from '../ui.js';
+import { getLevel, win, levelBadge } from '../levels.js';
+import { askPill, homeBtn, chips, shuffle, rnd, pick } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { drawLadybird } from '../draw.js';
 import { createMeadow } from '../scenery.js';
@@ -18,6 +19,8 @@ export function mount(el) {
   preloadAnimals();
   el.innerHTML = `<div class="game findit"><canvas></canvas>${homeBtn()}<div class="zoo"></div><div class="score"></div></div>`;
   const root = el.firstElementChild, cv = root.querySelector('canvas'), c = cv.getContext('2d'), zoo = root.querySelector('.zoo'), scoreEl = root.querySelector('.score');
+  const badge = levelBadge(root, 'findit', () => start());
+  const L = () => getLevel('findit') - 1;
   let mode = storage.read('pg.findmode', 'ladybird'), alive = true, timer = 0;
   root.appendChild(chips(MODES, mode, (m) => { mode = m; storage.write('pg.findmode', m); start(); }));
   const meadow = createMeadow();
@@ -30,13 +33,13 @@ export function mount(el) {
   const top = () => (W > H ? 90 : 150);
   function ladybirdRound() {
     zoo.innerHTML = '';
-    total = 4 + rnd(4); found = 0; scoreEl.textContent = '';
+    total = [3, 4, 6, 8][L()]; found = 0; scoreEl.textContent = '';
     const area = { x: W * 0.06, y: top(), w: W * 0.88, h: H - top() - 20 };
     const spot = () => ({ x: area.x + Math.random() * area.w, y: area.y + 30 + Math.random() * (area.h - 40) });
     flowers = Array.from({ length: 8 }, () => ({ ...spot(), c: pick(['#ff6fa5', '#ffd23f', '#ffffff', '#b38cff']), s: U * (0.03 + Math.random() * 0.02) }));
     leaves = []; bugs = [];
     for (let i = 0; i < total; i++) {
-      const p = spot(), hidden = i < Math.ceil(total / 2);
+      const p = spot(), hidden = i < [0, 1, Math.ceil(total / 2), total - 1][L()];
       bugs.push({ x: p.x, y: p.y, a: Math.random() * 6, v: hidden ? 0 : U * (0.03 + Math.random() * 0.04), turn: 0, state: 'walk', t: Math.random() * 5, open: 0, hidden });
       if (hidden) leaves.push({ x: p.x + (Math.random() - 0.5) * 10, y: p.y + (Math.random() - 0.5) * 10, a: Math.random() * 6, s: U * 0.15, bug: bugs[i], lift: 0 });
     }
@@ -49,7 +52,7 @@ export function mount(el) {
     scoreEl.textContent = found; scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump');
     sfx.sparkle(); buzz(15); say(String(found));
     const r = cv.getBoundingClientRect(); burst(r.left + b.x, r.top + b.y, { n: 16, colors: ['#e53935', '#1b1b1b', '#fff'], shape: 'dot' });
-    if (found === total) timer = setTimeout(() => { if (!alive) return; celebrate(`You found all ${total} ladybirds!`); timer = setTimeout(() => alive && mode === 'ladybird' && ladybirdRound(), 3800); }, 900);
+    if (found === total) timer = setTimeout(() => { if (!alive) return; celebrate(`You found all ${total} ladybirds!`); win('findit', badge); timer = setTimeout(() => alive && mode === 'ladybird' && ladybirdRound(), 3800); }, 900);
   }
   cv.addEventListener('pointerdown', (e) => {
     if (mode !== 'ladybird') return;
@@ -97,7 +100,7 @@ export function mount(el) {
   // ---------------- find the animal (DOM) ----------------
   function animalRound() {
     bugs = []; leaves = []; flowers = []; scoreEl.textContent = '';
-    const pool = shuffle([...FARM.map((a) => ({ id: a.id, e: a.e, name: a.name, sound: a.id })), ...EXTRA]).slice(0, W > H ? 6 : 5);
+    const pool = shuffle([...FARM.map((a) => ({ id: a.id, e: a.e, name: a.name, sound: a.id })), ...EXTRA]).slice(0, Math.min(W > H ? 6 : 5, [3, 4, 5, 6][L()]));
     zoo.innerHTML = '';
     const cols = W > H ? 3 : 2;
     pool.forEach((a, i) => {
@@ -110,7 +113,7 @@ export function mount(el) {
       zoo.appendChild(d);
     });
     let targets = shuffle([...pool]).slice(0, 3), cur = null;
-    const ask = () => { cur = targets.shift(); if (!cur) return; say(`Where is the ${cur.name.toLowerCase()}?`); };
+    const ask = () => { cur = targets.shift(); askPill(root, cur ? cur.e : ''); if (!cur) return; say(`Where is the ${cur.name.toLowerCase()}?`); };
     zoo.querySelectorAll('.beast').forEach((d) => d.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       if (!cur || d.classList.contains('got')) return;
@@ -123,7 +126,7 @@ export function mount(el) {
         setTimeout(() => alive && say(`Yes! The ${a.name.toLowerCase()}!`), a.sound ? 900 : 100);
         cur = null;
         if (targets.length) timer = setTimeout(() => alive && ask(), 2400);
-        else timer = setTimeout(() => { if (!alive) return; celebrate('Brilliant finding!'); timer = setTimeout(() => alive && mode === 'animal' && animalRound(), 3800); }, 2000);
+        else timer = setTimeout(() => { if (!alive) return; celebrate('Brilliant finding!'); win('findit', badge); timer = setTimeout(() => alive && mode === 'animal' && animalRound(), 3800); }, 2000);
       } else {
         d.classList.add('wiggle'); sfx.oops(); say(`That's the ${a.name.toLowerCase()}!`);
       }
@@ -131,7 +134,7 @@ export function mount(el) {
     timer = setTimeout(() => alive && ask(), 700);
   }
 
-  function start() { clearTimeout(timer); root.classList.toggle('animals', mode === 'animal'); mode === 'ladybird' ? ladybirdRound() : animalRound(); }
+  function start() { clearTimeout(timer); askPill(root, ''); root.classList.toggle('animals', mode === 'animal'); mode === 'ladybird' ? ladybirdRound() : animalRound(); }
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
     if (mode === 'ladybird') ladybirdFrame(dt); else meadow.draw(c, W, H, t, dt, t * 5, H * 0.45);

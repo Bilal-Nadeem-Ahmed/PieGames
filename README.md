@@ -29,6 +29,25 @@ Quick buttons (top right): talking voice on/off, and music (tap to change song o
 ## Grown-ups area
 On the home screen, **hold the gear button for 2 seconds**. Edit each kid's cartoon (hair, skin, clothes, bow, toy hammer…) and name (spoken in games), and change settings: sounds, talking voice, family voice notes, background music, numbers up to 5/10/20, pop speed/amount/size, counting aloud, surprises, runner speed.
 
+## Levels
+Each child has their own level in each game (the ⭐ badge at the top right shows it, the little bar shows progress to the next level). Levels go up automatically after a couple of wins, with a big "Level up!" star.
+- **Start one game again:** hold the ⭐ badge for 2 seconds – that game goes back to level 1.
+- **Start everything again for a child:** Grown-ups → Settings → **Levels → Start again for …**.
+
+| Game | What changes as the level goes up |
+|---|---|
+| Balloons / Bubbles | a level every 20 pops: a bit faster, one more balloon, slightly smaller |
+| Run & Jump | a level every 20 stars: faster, things on the path more often, more high stars |
+| Counting | numbers up to 3 → 5 → 10 → 15 → 20 (never past *Numbers up to* in settings), more choices |
+| Letters | 2 → 3 → 4 choices, level 4 uses lowercase letters |
+| Shapes | 3 → 6 shapes; 2 → 4 colour baskets |
+| Feed | 2 → 3 → 4 animals, level 4 adds a food nobody wants |
+| Sheep pen | 3 → 4 → 6 → 8 sheep that wander faster |
+| Find it | 3 → 8 ladybirds with more of them hiding; 3 → 6 animals to search |
+| Dino eggs | 2 → 5 eggs that need more taps |
+| Peekaboo | 2 → 5 hiding places |
+| Puzzles / Pairs | 2 → 9 pieces / 2 → 6 pairs (the number buttons still let you pick) |
+
 ## Voices
 The games speak with recorded family voices (Dad and Rahma by default). Where more than one voice has recorded a word, one is picked at random using the **How often each voice is used** sliders (Rahma mostly, by default).
 - **Grown-ups → Voices**: pick a voice, then ▶ play, ● record (tap again to stop) or ⬆ upload a clip for any word. **+ Add a voice** for anyone else (e.g. Ibrahim, Grandma).

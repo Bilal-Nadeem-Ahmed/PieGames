@@ -75,3 +75,12 @@ export function draggable(el, { onStart, onMove, onDrop } = {}) {
 // Is point (x, y) inside element's box (with extra slack in px)?
 export const inside = (el, x, y, pad = 0) => { const r = el.getBoundingClientRect(); return x > r.left - pad && x < r.right + pad && y > r.top - pad && y < r.bottom + pad; };
 export const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// A picture prompt ("🔍 4") so 'find it' rounds work even without a recorded voice.
+export function askPill(host, html) {
+  let p = host.querySelector(':scope > .ask-pill');
+  if (!p) { p = document.createElement('div'); p.className = 'ask-pill'; host.appendChild(p); }
+  if (!html) { p.classList.remove('on'); return; }
+  p.innerHTML = `<span>🔍</span><b>${html}</b>`;
+  p.classList.remove('on'); void p.offsetWidth; p.classList.add('on');
+}

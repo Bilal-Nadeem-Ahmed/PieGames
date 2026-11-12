@@ -4,6 +4,7 @@ import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { getPlayers } from '../store.js';
 import { avatarSVG } from '../avatar.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, shuffle, pick } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { FARM, animalSound, preloadAnimals } from '../animals.js';
@@ -29,6 +30,7 @@ const COVERS = {
 export function mount(el) {
   el.innerHTML = `<div class="screen peek"><canvas class="peek-bg"></canvas>${homeBtn()}<div class="spots"></div></div>`;
   const root = el.firstElementChild, spotsEl = root.querySelector('.spots');
+  const badge = levelBadge(root, 'peekaboo', () => round());
   preloadAnimals();
 
   // animated meadow background
@@ -40,7 +42,7 @@ export function mount(el) {
   raf = requestAnimationFrame(frame);
 
   function round() {
-    const n = W > H ? 4 : 3;
+    const n = Math.min(W > H ? 5 : 3, [2, 3, 4, 5][getLevel('peekaboo') - 1]);
     const animals = shuffle([...FARM]).slice(0, n).map((a) => ({ kind: 'animal', a }));
     const players = getPlayers();
     if (Math.random() < 0.5 && players.length) animals[(Math.random() * n) | 0] = { kind: 'kid', p: pick(players) };
@@ -64,7 +66,7 @@ export function mount(el) {
           open = true; s.classList.add('open'); sfx.boing();
           const r = s.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * 0.4, { n: 18, shape: 'star' });
           setTimeout(speak, 250);
-          if (++found === n) timer = setTimeout(() => { if (!alive) return; celebrate('You found them all!'); timer = setTimeout(() => alive && closeAll(), 3200); }, 1800);
+          if (++found === n) timer = setTimeout(() => { if (!alive) return; celebrate('You found them all!'); win('peekaboo', badge); timer = setTimeout(() => alive && closeAll(), 3200); }, 1800);
         } else {
           hid.classList.remove('hop'); void hid.offsetWidth; hid.classList.add('hop'); speak();
         }

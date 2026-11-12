@@ -4,6 +4,7 @@ import { say } from '../speech.js';
 import { getPlayers, getSettings, storage } from '../store.js';
 import { avatarSVG } from '../avatar.js';
 import { loadImg } from '../shapes.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, chips, pick, rnd } from '../ui.js';
 import { burst, confettiRain } from '../fx.js';
 import { drawBalloon, drawBubble, drawSheep, drawCloud } from '../draw.js';
@@ -38,6 +39,9 @@ export function mount(el, { theme = 'balloons' } = {}) {
   const bubbles = theme === 'bubbles';
   el.innerHTML = `<div class="game pop ${theme}"><canvas></canvas>${homeBtn()}</div>`;
   const root = el.firstElementChild, cv = root.querySelector('canvas'), c = cv.getContext('2d');
+  const badge = levelBadge(root, theme, () => {});
+  const lv = () => getLevel(theme) - 1;           // each level: a bit faster, one more balloon, slightly smaller
+  const amount = () => AMOUNT[cfg.amount] + lv();
   const cfg = { speed: 'normal', amount: 'some', size: 'big', countAloud: true, surprises: true, faces: true, ...(getSettings().pop || {}) };
   let mode = storage.read('pg.popmode.' + theme, 'count');
   root.appendChild(chips(MODES.map((m) => (m.id === 'count' && bubbles ? { ...m, icon: '🫧' } : m)), mode, (m) => { mode = m; storage.write('pg.popmode.' + theme, m); items.forEach(decorate); }));
@@ -72,18 +76,18 @@ export function mount(el, { theme = 'balloons' } = {}) {
     b.animal = pick(ANIMALS);
   }
   function spawn(initial = false) {
-    const r = Math.max(34, Math.min(95, unit * 0.085)) * SIZE[cfg.size] * (0.85 + Math.random() * 0.3);
+    const r = Math.max(34, Math.min(95, unit * 0.085)) * SIZE[cfg.size] * (1 - lv() * 0.05) * (0.85 + Math.random() * 0.3);
     const roll = Math.random();
     let type = 'normal';
     if (cfg.surprises && roll < 0.14) type = bubbles ? 'fish' : 'sheep';
     else if (cfg.faces && roll < 0.18 && kids.length) type = 'face';
     const b = { x: r + Math.random() * (W - 2 * r), y: initial ? H * (0.3 + Math.random() * 0.8) : H + r * 1.6, r, type,
-      vy: -(H * 0.075 + Math.random() * H * 0.05) * SPEED[cfg.speed] * (bubbles ? 0.8 : 1), ph: Math.random() * 7, kid: rnd(kids.length || 1) };
+      vy: -(H * 0.075 + Math.random() * H * 0.05) * SPEED[cfg.speed] * (1 + lv() * 0.12) * (bubbles ? 0.8 : 1), ph: Math.random() * 7, kid: rnd(kids.length || 1) };
     decorate(b);
     b.farm = pick(FARM);
     items.push(b);
   }
-  for (let i = 0; i < AMOUNT[cfg.amount]; i++) spawn(true);
+  for (let i = 0; i < amount(); i++) spawn(true);
 
   function label(b) {
     if (mode === 'letters') return b.letter;
@@ -122,7 +126,7 @@ export function mount(el, { theme = 'balloons' } = {}) {
       else if (mode !== 'count') say(words);
       else if (cfg.countAloud) say(canSpeak(words) ? words : Math.random() < 0.3 ? 'Pop!' : '');
     }
-    if (pops % 10 === 0) { setTimeout(() => { confettiRain(80); sfx.yay(); }, 250); }
+    if (pops % 10 === 0) { setTimeout(() => { confettiRain(80); sfx.yay(); }, 250); win(theme, badge); }
   }
 
   const onDown = (e) => {
@@ -158,7 +162,7 @@ export function mount(el, { theme = 'balloons' } = {}) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
     bg(dt);
     // items
-    while (items.length < AMOUNT[cfg.amount]) spawn();
+    while (items.length < amount()) spawn();
     for (const b of [...items]) {
       b.y += b.vy * dt; b.x += Math.sin(t * (bubbles ? 1.6 : 1) + b.ph) * (bubbles ? 30 : 12) * dt;
       if (b.y < -b.r * 3) { items.splice(items.indexOf(b), 1); continue; }

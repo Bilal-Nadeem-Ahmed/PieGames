@@ -1,6 +1,7 @@
 // Sheep round-up: tap the wandering sheep to make them leap into the pen. They're counted out loud.
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, rnd } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { drawSheep } from '../draw.js';
@@ -11,6 +12,7 @@ export function mount(el) {
   preloadAnimals();
   el.innerHTML = `<div class="game roundup"><canvas></canvas>${homeBtn()}<div class="score"></div></div>`;
   const root = el.firstElementChild, cv = root.querySelector('canvas'), c = cv.getContext('2d'), scoreEl = root.querySelector('.score');
+  const badge = levelBadge(root, 'roundup', () => { clearTimeout(timer); round(); });
   const meadow = createMeadow();
   let W, H, U, pen, field;
   const resize = () => {
@@ -27,7 +29,7 @@ export function mount(el) {
   const rndIn = (r, m = 0.1) => ({ x: r.x + r.w * (m + Math.random() * (1 - 2 * m)), y: r.y + r.h * (0.35 + Math.random() * 0.6) });
 
   function round() {
-    total = 3 + rnd(4); inPen = 0; state = 'play'; gate = 1;
+    total = [3, 4, 6, 8][getLevel('roundup') - 1]; inPen = 0; state = 'play'; gate = 1;
     scoreEl.textContent = '';
     sheep = Array.from({ length: total }, (_, i) => {
       const p = rndIn(field);
@@ -63,7 +65,7 @@ export function mount(el) {
       timer = setTimeout(() => {
         if (!alive) return;
         gate = 0; sfx.knock();
-        celebrate(`${total} sheep in the pen! Well done!`);
+        celebrate(`${total} sheep in the pen! Well done!`); win('roundup', badge);
         timer = setTimeout(() => {
           if (!alive) return;
           gate = 1; state = 'out';
@@ -109,7 +111,7 @@ export function mount(el) {
       sh.t += dt; sh.bleat = Math.max(0, sh.bleat - dt);
       let hop = 0, walking = false, rot = 0;
       if (sh.state === 'enter' || sh.state === 'wander') {
-        const dx = sh.tx - sh.x, dy = sh.ty - sh.y, d = Math.hypot(dx, dy), sp = U * 0.12;
+        const dx = sh.tx - sh.x, dy = sh.ty - sh.y, d = Math.hypot(dx, dy), sp = U * 0.12 * [0.8, 1, 1.3, 1.6][getLevel('roundup') - 1];
         if (d > 3) { sh.x += (dx / d) * sp * dt; sh.y += (dy / d) * sp * dt; walking = true; sh.flip = dx > 0; hop = Math.abs(Math.sin(sh.t * 9)) * s * 0.04; }
         else { sh.state = 'wander'; if (Math.random() < dt * 0.5) { const p = rndIn(field); sh.tx = p.x; sh.ty = p.y; } }
       } else if (sh.state === 'jump') {

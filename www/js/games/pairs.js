@@ -3,6 +3,7 @@ import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { getPlayers, storage } from '../store.js';
 import { avatarSVG } from '../avatar.js';
+import { getLevel, setLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, chips, shuffle, wait } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { FARM, animalSound, preloadAnimals } from '../animals.js';
@@ -17,8 +18,12 @@ export function mount(el) {
   preloadAnimals();
   el.innerHTML = `<div class="screen pairs">${homeBtn()}<div class="deck"></div></div>`;
   const root = el.firstElementChild, deck = root.querySelector('.deck');
-  let level = storage.read('pg.pairs', 2), alive = true, timer = 0;
-  root.appendChild(chips(LEVELS, level, (l) => { level = l; storage.write('pg.pairs', l); deal(); }));
+  const SIZES = LEVELS.map((x) => x.id);
+  let level = SIZES[getLevel('pairs') - 1], alive = true, timer = 0;
+  const chipsEl = chips(LEVELS, level, (l) => { level = l; setLevel('pairs', SIZES.indexOf(l) + 1); badge.update(); deal(); });
+  root.appendChild(chipsEl);
+  const badge = levelBadge(root, 'pairs', () => { level = SIZES[0]; syncChips(); deal(); });
+  const syncChips = () => chipsEl.querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('on', SIZES[i] === level));
 
   function faces() {
     const kids = getPlayers().map((p) => ({ id: 'kid-' + p.id, html: avatarSVG(p, { crop: true }), name: p.name || '', kid: true }));
@@ -56,7 +61,7 @@ export function mount(el) {
           if (f.sound) animalSound(f.sound); else if (f.kid) sfx.giggle();
           setTimeout(() => alive && f.name && say(`${f.name}!`), f.sound ? 900 : 200);
           matched++;
-          if (matched === set.length) timer = setTimeout(() => { if (!alive) return; celebrate('You found all the pairs!'); timer = setTimeout(() => alive && deal(), 3600); }, 900);
+          if (matched === set.length) timer = setTimeout(() => { if (!alive) return; celebrate('You found all the pairs!'); level = SIZES[win('pairs', badge) - 1]; syncChips(); timer = setTimeout(() => alive && deal(), 3600); }, 900);
         } else {
           await wait(600);
           a.classList.remove('up'); b.classList.remove('up'); sfx.boing();

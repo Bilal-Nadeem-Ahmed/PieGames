@@ -8,6 +8,7 @@ import { SONGS, setSong } from '../music.js';
 import { VERSION } from '../version.js';
 import { voicesPanel } from './voices-panel.js';
 import { resetPet } from '../games/pet.js';
+import { resetAllLevels } from '../levels.js';
 
 const LABEL = {
   hair: 'Hair style', hairColor: 'Hair colour', skin: 'Skin', eyes: 'Eyes', outfit: 'Outfit', shirt: 'Clothes colour', pattern: 'Pattern',
@@ -139,6 +140,15 @@ export function mount(el) {
         w.appendChild(b);
       }
       set.appendChild(row('Pie Pet', w));
+    }
+    {
+      const w = document.createElement('div'); w.className = 'seg';
+      for (const pl of getPlayers()) {
+        const b = document.createElement('button'); b.textContent = `Start again for ${pl.name || 'player'}`;
+        b.onclick = () => { if (confirm(`Put every game back to level 1 for ${pl.name || 'this player'}?`)) { resetAllLevels(pl.id); sfx.tap(); b.textContent = '✓ Back to level 1'; } };
+        w.appendChild(b);
+      }
+      set.appendChild(row('Levels', w));
     }
   }
 

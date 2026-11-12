@@ -4,6 +4,7 @@ import { say } from '../speech.js';
 import { getPlayers, storage } from '../store.js';
 import { avatarSVG } from '../avatar.js';
 import { loadImg } from '../shapes.js';
+import { getLevel, setLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, chips, shuffle, pick, draggable, inside } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { drawSheep, drawDino, drawBalloon, drawCloud, drawLadybird } from '../draw.js';
@@ -44,8 +45,12 @@ export function mount(el) {
   preloadAnimals();
   el.innerHTML = `<div class="screen puzzle">${homeBtn()}<div class="pz-wrap"><div class="pz-board"></div><div class="pz-tray"></div></div></div>`;
   const root = el.firstElementChild, board = root.querySelector('.pz-board'), tray = root.querySelector('.pz-tray');
-  let level = storage.read('pg.puzzle', 4), alive = true, timer = 0, lastPic = '';
-  root.appendChild(chips(LEVELS, level, (l) => { level = l; storage.write('pg.puzzle', l); start(); }));
+  const PIECES = LEVELS.map((x) => x.id);
+  let level = PIECES[getLevel('puzzle') - 1], alive = true, timer = 0, lastPic = '';
+  const chipsEl = chips(LEVELS, level, (l) => { level = l; setLevel('puzzle', PIECES.indexOf(l) + 1); badge.update(); start(); });
+  root.appendChild(chipsEl);
+  const badge = levelBadge(root, 'puzzle', () => { level = PIECES[0]; syncChips(); start(); });
+  const syncChips = () => chipsEl.querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('on', PIECES[i] === level));
 
   async function picture() {
     const kids = getPlayers().map((p) => ({ id: 'kid-' + p.id, name: p.name || '', kid: p }));
@@ -111,6 +116,7 @@ export function mount(el) {
               if (!alive) return;
               P.sound?.();
               celebrate(P.kid ? (P.name ? `It's ${P.name}!` : 'Yay!') : `A ${P.name}! Well done!`);
+              level = PIECES[win('puzzle', badge) - 1]; syncChips();
               timer = setTimeout(() => { board.classList.remove('complete'); alive && start(); }, 3800);
             }, 400);
           }

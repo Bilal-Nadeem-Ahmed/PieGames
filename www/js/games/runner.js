@@ -5,6 +5,7 @@ import { sfx, buzz, playClip, preloadClip } from '../sound.js';
 import { currentPlayer, getSettings } from '../store.js';
 import { avatarSVG } from '../avatar.js';
 import { loadImg } from '../shapes.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, pick, rnd } from '../ui.js';
 import { burst, confettiRain } from '../fx.js';
 import { drawBalloon, drawSheep, drawStar, drawDino } from '../draw.js';
@@ -18,6 +19,8 @@ const SPEED = { slow: 0.7, normal: 1, fast: 1.35 };
 export function mount(el) {
   el.innerHTML = `<div class="game runner"><canvas></canvas>${homeBtn()}<div class="score"></div></div>`;
   const root = el.firstElementChild, cv = root.querySelector('canvas'), c = cv.getContext('2d'), scoreEl = root.querySelector('.score');
+  const badge = levelBadge(root, 'runner', () => {});
+  const lv = () => getLevel('runner') - 1;   // each level: a bit faster, things on the path more often, more high stars
   const cfg = { speed: 'normal', ...(getSettings().runner || {}) };
   let W, H, G, S;
   const resize = () => {
@@ -60,7 +63,7 @@ export function mount(el) {
   }
   function spawnGifts() {
     const { ah } = size();
-    const n = 3 + rnd(3), high = Math.random() < 0.55;
+    const n = 3 + rnd(3), high = Math.random() < 0.4 + lv() * 0.1;
     // low: grab while running (chest height). high: only reachable with a jump.
     const baseY = high ? G - ah - H * (0.1 + Math.random() * 0.1) : G - ah * 0.55;
     for (let i = 0; i < n; i++) {
@@ -77,7 +80,7 @@ export function mount(el) {
 
   function update() {
     // world speed eases to a stop while the child is down
-    const target = hero.state === 'run' ? W * 0.32 * SPEED[cfg.speed] : 0;
+    const target = hero.state === 'run' ? W * 0.32 * SPEED[cfg.speed] * (1 + lv() * 0.08) : 0;
     speedNow += (target - speedNow) * Math.min(1, dt * (hero.state === 'run' ? 2 : 4));
     dist += speedNow * dt; t += dt;
 
@@ -109,7 +112,7 @@ export function mount(el) {
     while (dust.length && dust[0].life <= 0) dust.shift();
 
     nextObs -= dt * (speedNow / (W * 0.32)); nextGift -= dt * (speedNow / (W * 0.32));
-    if (nextObs <= 0) { spawnObstacle(); nextObs = 2.4 + Math.random() * 2; }
+    if (nextObs <= 0) { spawnObstacle(); nextObs = (2.4 + Math.random() * 2) * (1 - lv() * 0.1); }
     if (nextGift <= 0) { spawnGifts(); nextGift = 1.5 + Math.random() * 1.6; }
     for (const o of obs) {
       o.t += dt; o.bounceT = Math.max(0, (o.bounceT || 0) - dt); o.squash = Math.max(0, (o.squash || 0) - dt);
@@ -133,7 +136,7 @@ export function mount(el) {
           burst(gf.x, gf.y, { n: gf.big ? 26 : 14, colors: gf.type === 'star' ? ['#ffd23f', '#fff', '#ffb300'] : [gf.col, '#fff'], speed: gf.big ? 340 : 240 });
           scoreEl.textContent = got;
           scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump');
-          if (Math.floor(got / 10) > Math.floor((got - (gf.big ? 2 : 1)) / 10)) { confettiRain(70); setTimeout(() => sfx.yay(), 200); }
+          if (Math.floor(got / 10) > Math.floor((got - (gf.big ? 2 : 1)) / 10)) { confettiRain(70); setTimeout(() => sfx.yay(), 200); win('runner', badge); }
         }
       }
     }

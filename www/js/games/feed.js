@@ -3,6 +3,7 @@
 // Stroke an animal to pet it (love eyes + hearts); tap it to make it hop. Wrong food gets a polite head shake.
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, shuffle, pick, draggable, wait } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { animalSound, preloadAnimals } from '../animals.js';
@@ -16,6 +17,7 @@ export function mount(el) {
   preloadAnimals();
   el.innerHTML = `<div class="screen feed2"><canvas class="farm-bg"></canvas>${homeBtn()}<div class="field"></div><div class="foodbasket"></div></div>`;
   const root = el.firstElementChild, field = root.querySelector('.field'), basket = root.querySelector('.foodbasket');
+  const badge = levelBadge(root, 'feed', () => { clearTimeout(timer); round(true); });
   const cv = root.querySelector('.farm-bg'), c = cv.getContext('2d'), meadow = createMeadow();
   let W, H, alive = true, raf = 0, t = 0, last = performance.now(), timer = 0, animals = [];
   const fit = () => { const d = Math.min(devicePixelRatio || 1, 2); W = root.clientWidth; H = root.clientHeight; cv.width = W * d; cv.height = H * d; c.setTransform(d, 0, 0, d, 0, 0); };
@@ -47,8 +49,8 @@ export function mount(el) {
   }
 
   function round(fresh) {
-    const n = W > H ? 4 : 3;
-    if (fresh || !animals.length) {
+    const n = Math.min(W > H ? 4 : 3, [2, 3, 4, 4][getLevel('feed') - 1]);
+    if (fresh || animals.length !== n) {
       field.innerHTML = '';
       animals = shuffle([...KINDS]).slice(0, n).map((k, i) => makeAnimal(k, i, n));
     } else {
@@ -66,6 +68,12 @@ export function mount(el) {
 
   function fillBasket() {
     basket.innerHTML = '';
+    // level 4: one extra food that nobody here eats
+    if (getLevel('feed') >= 4) {
+      const used = new Set(animals.map((a) => a.kind)), k = pick(KINDS.filter((x) => !used.has(x)));
+      const f = document.createElement('div'); f.className = 'food2'; f.textContent = PETS[k].food; basket.appendChild(f);
+      draggable(f, { onStart: () => sfx.tap(), onDrop: (x, y) => { const an = nearest(x, y); if (an) { refuse(an); say('No thank you!'); } return false; } });
+    }
     for (const an of shuffle(animals.filter((a) => a.hungry))) {
       const f = document.createElement('div');
       f.className = 'food2'; f.textContent = PETS[an.kind].food; f.dataset.k = an.kind;
@@ -120,7 +128,7 @@ export function mount(el) {
     an.el.classList.remove('wiggle'); an.mood = 'happy'; an.state = 'walk';
     if (!animals.some((x) => x.hungry && x.state !== 'leave')) timer = setTimeout(() => {
       if (!alive) return;
-      celebrate('All the animals are full!');
+      celebrate('All the animals are full!'); win('feed', badge);
       timer = setTimeout(() => alive && round(false), 9000);   // after a little while they get hungry again
     }, 500);
   }

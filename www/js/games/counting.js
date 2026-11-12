@@ -2,7 +2,8 @@
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { getSettings, storage } from '../store.js';
-import { homeBtn, chips, ICON, shuffle, pick, rnd } from '../ui.js';
+import { getLevel, win, levelBadge } from '../levels.js';
+import { askPill, homeBtn, chips, ICON, shuffle, pick, rnd } from '../ui.js';
 import { celebrate, burst } from '../fx.js';
 import { COUNT_THINGS } from '../data.js';
 import { traceRound } from './trace.js';
@@ -20,9 +21,13 @@ export function mount(el) {
   el.innerHTML = `<div class="screen learn counting">${homeBtn()}<button class="rbtn say-btn" aria-label="Say again">${ICON.speaker}</button>
     <div class="board"></div><div class="answers"></div></div>`;
   const root = el.firstElementChild, board = root.querySelector('.board'), answers = root.querySelector('.answers');
+  const badge = levelBadge(root, 'count', () => round());
+  const L = () => getLevel('count') - 1;
+  const cele = (t) => { celebrate(t); win('count', badge); };
   let mode = storage.read('pg.countmode', 'count');
   root.insertBefore(chips(MODES, mode, (m) => { mode = m; storage.write('pg.countmode', m); round(); }), board);
-  const max = () => Math.max(3, Math.min(getSettings().countMax || 10, 20));
+  // numbers go up with the level (3, 5, 10, 15, 20), never past the grown-ups' 'Numbers up to' setting
+  const max = () => Math.min([3, 5, 10, 15, 20][L()], Math.max(3, getSettings().countMax || 20));
   let prompt = '', timer = 0, alive = true, stopPop = null;
   root.querySelector('.say-btn').onclick = () => say(prompt);
   const next = (ms = 2600) => { clearTimeout(timer); timer = setTimeout(() => alive && round(), ms); };
@@ -46,7 +51,7 @@ export function mount(el) {
         burst(e.clientX, e.clientY, { n: 10, speed: 180, shape: 'star' });
         if (counted === n) board.querySelectorAll('.item').forEach((it, j) => { it.style.animationDelay = j * 80 + 'ms'; it.classList.add('dance'); });
         if (counted === n && mode === 'count') {
-          say(String(counted)).then(() => alive && celebrate(`${n} ${n === 1 ? thing[1] : thing[2]}! ` + pick(['Well done!', 'Yay!', 'Brilliant!'])));
+          say(String(counted)).then(() => alive && cele(`${n} ${n === 1 ? thing[1] : thing[2]}! ` + pick(['Well done!', 'Yay!', 'Brilliant!'])));
           next(3500);
         } else say(String(counted), { rate: 1 });
       };
@@ -57,7 +62,7 @@ export function mount(el) {
   function choices(n, onRight, render = (k) => String(k)) {
     answers.innerHTML = '';
     const opts = new Set([n]);
-    while (opts.size < 3) { const k = 1 + rnd(max()); opts.add(k); }
+    while (opts.size < Math.min(max(), [2, 3, 3, 4, 4][L()])) { const k = 1 + rnd(max()); opts.add(k); }
     for (const k of shuffle([...opts])) {
       const b = document.createElement('button');
       b.className = 'answer';
@@ -76,7 +81,7 @@ export function mount(el) {
   }
 
   function round() {
-    clearTimeout(timer); stopPop?.(); stopPop = null;
+    clearTimeout(timer); stopPop?.(); stopPop = null; askPill(root, '');
     const thing = pick(COUNT_THINGS);
     answers.innerHTML = '';
     if (mode === 'count') {
@@ -87,22 +92,22 @@ export function mount(el) {
       const n = 1 + rnd(Math.min(max(), 10));
       items(n, thing, true);
       prompt = `How many ${thing[2]}?`;
-      choices(n, () => celebrate(`Yes! ${n} ${n === 1 ? thing[1] : thing[2]}!`));
+      choices(n, () => cele(`Yes! ${n} ${n === 1 ? thing[1] : thing[2]}!`));
     } else if (mode === 'pop') {
       const n = 1 + rnd(max());
       const pool = Array.from({ length: max() }, (_, i) => String(i + 1));
-      prompt = `Pop number ${n}!`;
-      stopPop = popFind(board, { target: String(n), options: makeOptions(String(n), pool, 4), wrongText: (k) => `That's ${k}!`,
-        onRight: () => { celebrate(`Yes! Number ${n}!`); next(3200); } });
+      prompt = `Pop number ${n}!`; askPill(root, n);
+      stopPop = popFind(board, { target: String(n), options: makeOptions(String(n), pool, [2, 3, 4, 4, 5][L()]), wrongText: (k) => `That's ${k}!`,
+        onRight: () => { cele(`Yes! Number ${n}!`); next(3200); } });
     } else if (mode === 'trace') {
       const n = 1 + rnd(Math.min(max(), 10));
       prompt = `Trace the number ${n} with your finger!`;
-      traceRound(board, String(n), () => { celebrate(`${n}! ` + pick(['Well done!', 'Brilliant!', 'Super tracing!'])); next(3500); });
+      traceRound(board, String(n), () => { cele(`${n}! ` + pick(['Well done!', 'Brilliant!', 'Super tracing!'])); next(3500); });
     } else {
       const n = 1 + rnd(max());
-      board.innerHTML = `<div class="bignum-ask">?</div>`;
+      board.innerHTML = `<div class="ask-card"><span>🔍</span>${n}</div>`;
       prompt = `Can you find number ${n}?`;
-      choices(n, () => { board.innerHTML = `<div class="bignum">${n}</div>`; celebrate(`Yes! That's ${n}!`); }, (k) => `<span class="num">${k}</span>`);
+      choices(n, () => { board.innerHTML = `<div class="bignum">${n}</div>`; cele(`Yes! That's ${n}!`); }, (k) => `<span class="num">${k}</span>`);
     }
     say(prompt);
   }

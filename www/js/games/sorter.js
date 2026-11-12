@@ -2,6 +2,7 @@
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { storage } from '../store.js';
+import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, chips, shuffle, pick, draggable, inside } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 
@@ -29,16 +30,19 @@ const svg = (d, fill, stroke = '#2b2118') => `<svg viewBox="0 0 100 100"><path d
 export function mount(el) {
   el.innerHTML = `<div class="screen learn sorter">${homeBtn()}<div class="targets"></div><div class="pieces"></div></div>`;
   const root = el.firstElementChild, targets = root.querySelector('.targets'), pieces = root.querySelector('.pieces');
+  const badge = levelBadge(root, 'sorter', () => round());
+  const L = () => getLevel('sorter') - 1;
   let mode = storage.read('pg.sortmode', 'shapes'), timer = 0, alive = true;
   root.insertBefore(chips(MODES, mode, (m) => { mode = m; storage.write('pg.sortmode', m); round(); }), targets);
 
   function finishCheck(left) {
     if (left > 0) return;
+    win('sorter', badge);
     timer = setTimeout(() => { if (!alive) return; celebrate(); timer = setTimeout(() => alive && round(), 3300); }, 500);
   }
 
   function shapesRound() {
-    const names = shuffle(Object.keys(SHAPES)).slice(0, innerWidth > innerHeight ? 4 : 3);
+    const names = shuffle(Object.keys(SHAPES)).slice(0, [3, 4, 5, 6][L()]);
     targets.className = 'targets shapeboard';
     targets.innerHTML = names.map((n) => `<div class="hole" data-k="${n}">${svg(SHAPES[n], '#5a3b22', '#3a2412')}</div>`).join('');
     pieces.innerHTML = '';
@@ -66,10 +70,10 @@ export function mount(el) {
   }
 
   function coloursRound() {
-    const names = shuffle(Object.keys(COLOURS)).slice(0, 3);
+    const names = shuffle(Object.keys(COLOURS)).slice(0, [2, 3, 3, 4][L()]);
     targets.className = 'targets baskets';
     targets.innerHTML = names.map((n) => `<div class="basket" data-k="${n}" style="--c:${COLOURS[n].c}"><div class="b-stack"></div><div class="b-body"><span>${n}</span></div></div>`).join('');
-    const things = shuffle(names.flatMap((n) => shuffle([...COLOURS[n].items]).slice(0, 2).map((e) => ({ n, e }))));
+    const things = shuffle(names.flatMap((n) => shuffle([...COLOURS[n].items]).slice(0, [2, 2, 3, 2][L()]).map((e) => ({ n, e }))));
     pieces.innerHTML = '';
     let left = things.length;
     for (const th of things) {

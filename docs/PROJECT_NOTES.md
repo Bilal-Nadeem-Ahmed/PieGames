@@ -74,7 +74,7 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - [x] Colouring: 8 animal pages via `lineArt(petSVG())` in pictures.js (1.25).
 - [x] Music: xylophone + bells added (1.24).
 - [x] Peekaboo improvement (1.26: drawn pets, peek hints, curtain + flowerpot).
-- [ ] Build it: more projects/options and polish.
+- [x] Build it (1.28): boat, train, plane, kennel; paint step (PAINTS pots, tap parts, ✅); svg previews on pick cards.
 - [x] Puzzles: animals in farm/seaside/snow/sunset scenes; Pairs: drawn animals + 22 more emoji cards (1.25).
 - Note: pet-art `dedupe()` removes duplicate attributes so petSVG works as an <img>/data URL too.
 - [ ] Voice clips still to record: see docs/VOICE_CLIPS.md (27/178 done at 1.19). Numbers 1–20 are the priority.

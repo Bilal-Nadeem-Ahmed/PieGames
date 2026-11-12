@@ -802,3 +802,27 @@ svg { display: block; }
 .spot.open .cover-curtain .cr { transform-box: fill-box; transform-origin: 100% 0; animation: curtr .6s forwards; }
 @keyframes curtl { to { transform: scaleX(.22); } } @keyframes curtr { to { transform: scaleX(.22); } }
 .spot.open .cover-pot { animation: openpot .6s forwards; } @keyframes openpot { to { transform: translate(70%, 10%) scale(.55) rotate(18deg); } }
+/* build it v2 */
+.pick { gap: 2.4vmin 3vmin; max-width: 92vw; margin: 0 auto; left: 0; right: 0; align-content: center; }
+.pcard { width: min(31vmin, 21vw); padding: .6vmin; border-width: 5px; border-radius: 4vmin; }
+.pcard:nth-child(4) { animation-delay: .3s; } .pcard:nth-child(5) { animation-delay: .4s; } .pcard:nth-child(6) { animation-delay: .5s; } .pcard:nth-child(7) { animation-delay: .6s; } .pcard:nth-child(8) { animation-delay: .7s; }
+.pcard svg { width: 100%; height: 100%; }
+.pcard svg * { stroke: #8a5a2b; stroke-width: 6; stroke-linejoin: round; }
+@media (orientation: portrait) { .pcard { width: 27vw; } }
+.toolbox.paints { display: grid; grid-template-columns: repeat(2, auto); gap: 1.2vmin; padding: 1.2vmin; background: #fff; border-color: #e2c9a0; }
+.pot { width: min(9vmin, 9vw); aspect-ratio: 1; border-radius: 50%; background: var(--c); border: 3px solid #0003; box-shadow: inset 0 -5px 0 #0002; transition: scale .15s; }
+.pot.on { scale: 1.2; border: 4px solid #2b2118; }
+.pdone { grid-column: 1 / -1; font-size: min(7vmin, 7vw); background: none; border: none; }
+@media (orientation: portrait) { .toolbox.paints { grid-template-columns: repeat(6, auto); } .pdone { grid-column: auto; } }
+.painting .fastener { pointer-events: none; }
+.painting .part { cursor: pointer; }
+.part.splat { animation: splat .3s; transform-box: fill-box; transform-origin: center; }
+@keyframes splat { 40% { scale: 1.06; } }
+.made.sail { animation: sail 4.4s ease-in-out forwards; }
+@keyframes sail { 0% { transform: none; } 10% { transform: translateY(-6px) rotate(-2deg); } 45% { transform: translateX(520px) rotate(3deg); } 46% { transform: translateX(-520px); } 100% { transform: none; } }
+.waves { animation: waves 1.2s linear infinite; }
+@keyframes waves { to { transform: translateX(100px); } }
+.made.spinprop .part:last-child, .made.fly .part:last-child { transform-box: fill-box; transform-origin: center; animation: propspin .12s linear infinite; }
+@keyframes propspin { 50% { scale: 1 .15; } }
+.made.fly { animation: fly 3.4s ease-in forwards; }
+@keyframes fly { 0% { transform: none; } 20% { transform: translate(60px, -10px) rotate(-6deg); } 50% { transform: translate(600px, -260px) rotate(-14deg); } 51% { transform: translate(-600px, 0); } 100% { transform: none; } }

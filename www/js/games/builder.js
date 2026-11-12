@@ -1,12 +1,14 @@
-// Build it! Pick a house, car or rocket. Saw a plank, then each part flies in loose:
-// tap its nails to hammer them in and its screws to screw them in. When it's all built it gets
-// painted and does something fun (smoke + wave, drive away, blast off).
+// Build it! Pick a house, car, rocket, boat, train, plane or dog kennel. Saw a plank, then each part flies in loose:
+// tap its nails to hammer them in and its screws to screw them in. When it's all built, pick paint pots and tap
+// the parts to paint them, then it does something fun (smoke + wave, drive away, blast off, sail, choo choo, fly, puppy).
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { currentPlayer } from '../store.js';
 import { avatarSVG } from '../avatar.js';
 import { homeBtn, wait } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
+import { petSVG } from './pet-art.js';
+import { animalSound, preloadAnimals } from '../animals.js';
 
 const WOOD = '#e8c48e', EDGE = '#8a5a2b';
 const S = `stroke="${EDGE}" stroke-width="4" stroke-linejoin="round"`;
@@ -46,15 +48,64 @@ const PROJECTS = {
       { svg: `<rect x="180" y="240" width="40" height="16" rx="4" ${S}/>`, paint: ['#64748b'], f: [[200, 248, 'screw']] },
     ],
   },
+  boat: {
+    icon: '⛵', name: 'boat',
+    parts: [
+      { svg: `<path d="M50 196 H350 L306 252 H96 Z" ${S}/>`, paint: ['#3b82f6'], f: [[76, 206, 'nail'], [324, 206, 'nail'], [200, 234, 'nail']] },
+      { svg: `<rect x="104" y="150" width="104" height="48" rx="6" ${S}/>`, paint: ['#ffffff'], f: [[118, 162, 'nail'], [194, 162, 'nail']] },
+      { svg: `<circle cx="134" cy="178" r="10" ${S}/><circle cx="178" cy="178" r="10" ${S}/>`, paint: ['#bde7ff'], f: [[156, 178, 'screw']] },
+      { svg: `<rect x="250" y="36" width="12" height="162" rx="4" ${S}/>`, paint: ['#a16207'], f: [[256, 184, 'nail']] },
+      { svg: `<path d="M266 50 Q330 110 340 184 H266 Z" ${S}/>`, paint: ['#ffffff'], f: [[290, 160, 'screw']] },
+      { svg: `<path d="M262 34 L296 44 L262 56 Z" ${S}/>`, paint: ['#ef4444'], f: [[270, 44, 'nail']], flag: true },
+    ],
+  },
+  train: {
+    icon: '🚂', name: 'train',
+    parts: [
+      { svg: `<rect x="60" y="136" width="200" height="76" rx="30" ${S}/><rect x="52" y="204" width="300" height="20" rx="6" ${S}/>`, paint: ['#22c55e', '#334155'], f: [[96, 160, 'nail'], [226, 160, 'nail'], [80, 214, 'nail'], [330, 214, 'nail']] },
+      { svg: `<rect x="250" y="88" width="96" height="120" rx="8" ${S}/>`, paint: ['#ef4444'], f: [[264, 102, 'nail'], [332, 102, 'nail']] },
+      { svg: `<rect x="270" y="108" width="56" height="42" rx="6" ${S}/>`, paint: ['#bde7ff'], f: [[298, 129, 'screw']] },
+      { svg: `<path d="M94 138 V98 H82 V80 H130 V98 H118 V138 Z" ${S}/>`, paint: ['#334155'], f: [[106, 120, 'nail']], chimney: true },
+      { svg: `<circle cx="108" cy="240" r="27" ${S}/><circle cx="108" cy="240" r="9" ${S}/>`, paint: ['#ef4444', '#ffd23f'], f: [[108, 240, 'screw']], wheel: true },
+      { svg: `<circle cx="200" cy="240" r="27" ${S}/><circle cx="200" cy="240" r="9" ${S}/>`, paint: ['#ef4444', '#ffd23f'], f: [[200, 240, 'screw']], wheel: true },
+      { svg: `<circle cx="296" cy="240" r="27" ${S}/><circle cx="296" cy="240" r="9" ${S}/>`, paint: ['#ef4444', '#ffd23f'], f: [[296, 240, 'screw']], wheel: true },
+    ],
+  },
+  plane: {
+    icon: '✈️', name: 'aeroplane',
+    parts: [
+      { svg: `<path d="M64 150 Q64 120 104 120 H300 Q348 122 358 150 Q348 178 300 180 H104 Q64 180 64 150 Z" ${S}/>`, paint: ['#ffd23f'], f: [[100, 150, 'nail'], [230, 166, 'nail'], [320, 166, 'nail']] },
+      { svg: `<path d="M74 128 L54 64 H94 L130 122 Z" ${S}/>`, paint: ['#ef4444'], f: [[84, 96, 'nail']] },
+      { svg: `<path d="M168 156 H262 L226 236 H190 Z" ${S}/>`, paint: ['#3b82f6'], f: [[214, 172, 'nail'], [208, 218, 'nail']] },
+      { svg: `<path d="M288 124 H312 Q336 128 346 146 H288 Z" ${S}/>`, paint: ['#bde7ff'], f: [[304, 136, 'screw']] },
+      { svg: `<circle cx="140" cy="140" r="8" ${S}/><circle cx="170" cy="140" r="8" ${S}/><circle cx="260" cy="140" r="8" ${S}/>`, paint: ['#bde7ff'], f: [[155, 140, 'screw']] },
+      { svg: `<rect x="356" y="104" width="14" height="92" rx="7" ${S}/>`, paint: ['#64748b'], f: [[363, 150, 'screw']], prop: true },
+    ],
+  },
+  kennel: {
+    icon: '🐶', name: 'dog kennel',
+    parts: [
+      { svg: `<rect x="110" y="140" width="180" height="115" rx="4" ${S}/>`, paint: ['#f59e0b'], f: [[126, 156, 'nail'], [274, 156, 'nail'], [126, 240, 'nail'], [274, 240, 'nail']] },
+      { svg: `<path d="M88 152 L200 70 L312 152 Z" ${S}/>`, paint: ['#e5534b'], f: [[140, 138, 'nail'], [200, 96, 'nail'], [260, 138, 'nail']] },
+      { svg: `<path d="M166 255 V208 A34 34 0 0 1 234 208 V255 Z" ${S}/>`, paint: ['#5b3a1e'], f: [[200, 236, 'screw']], doorway: true },
+      { svg: `<rect x="172" y="146" width="56" height="20" rx="6" ${S}/>`, paint: ['#ffffff'], f: [[200, 156, 'screw']] },
+      { svg: `<path d="M300 255 Q300 230 332 230 Q364 230 364 255 Z" ${S}/>`, paint: ['#3b82f6'], f: [[332, 244, 'screw']] },
+    ],
+  },
 };
+const PAINTS = ['#ef4444', '#ff8ac2', '#ff9f43', '#ffd23f', '#22c55e', '#3b82f6', '#a855f7', '#ffffff', '#5b3a1e', '#334155'];
+const shapesOf = (g) => [...g.querySelectorAll(':scope > rect, :scope > path, :scope > circle, :scope > ellipse')];
+// a painted preview of a project for the pick screen
+const preview = (P) => `<svg viewBox="40 24 336 248">${P.parts.map((p) => { let j = 0; return p.svg.replace(/<(rect|path|circle|ellipse)(?![^>]*fill=)/g, (m, tag) => `<${tag} fill="${p.paint[j++] || p.paint[0]}"`); }).join('')}</svg>`;
 
 export function mount(el) {
   let alive = true;
+  preloadAnimals();
   const me = currentPlayer();
   el.innerHTML = `<div class="screen build">${homeBtn()}<div class="pick"></div></div>`;
   const root = el.firstElementChild;
   const pick = () => {
-    root.innerHTML = `${homeBtn()}<div class="pick">${Object.entries(PROJECTS).map(([k, p]) => `<button class="pcard" data-k="${k}"><span>${p.icon}</span></button>`).join('')}</div>`;
+    root.innerHTML = `${homeBtn()}<div class="pick">${Object.entries(PROJECTS).map(([k, p]) => `<button class="pcard" data-k="${k}" aria-label="${p.name}">${preview(p)}</button>`).join('')}</div>`;
     root.querySelectorAll('.pcard').forEach((b) => (b.onclick = () => { sfx.tap(); build(b.dataset.k); }));
     say('What shall we build?');
   };
@@ -78,16 +129,14 @@ export function mount(el) {
       cheer();
     }
     if (!alive) return;
-    // paint everything + finale
-    made.querySelectorAll('.part').forEach((g, i) => setTimeout(() => {
-      [...g.querySelectorAll('rect,path,circle,ellipse')].filter((s) => s.getAttribute('fill') === WOOD).forEach((s, j) => s.setAttribute('fill', g.dataset.paint.split(',')[j] || g.dataset.paint.split(',')[0]));
-      sfx.chime(i);
-    }, i * 160));
-    await wait(P.parts.length * 160 + 300);
-    finale(key, bench, made, me);
-    if (key === 'rocket') await wait(2700);
+    await paintStep(made);
     if (!alive) return;
-    celebrate(`We built a ${P.name}!`);
+    cheer();
+    await wait(300);
+    finale(key, bench, made, me);
+    await wait({ rocket: 2700, plane: 1200, boat: 800, train: 600 }[key] || 0);
+    if (!alive) return;
+    celebrate(`We built ${/^[aeiou]/.test(P.name) ? 'an' : 'a'} ${P.name}!`);
     await wait(5200);
     if (alive) pick();
   }
@@ -166,6 +215,43 @@ export function mount(el) {
     });
   }
 
+  // Paint: pick a pot, tap the parts. When every part has been painted (or ✅ is pressed) we're done.
+  function paintStep(made) {
+    return new Promise((resolve) => {
+      const ws = root.querySelector('.workshop'), toolbox = root.querySelector('.toolbox');
+      toolbox.classList.add('paints');
+      toolbox.innerHTML = PAINTS.map((c, i) => `<button class="pot${i === 0 ? ' on' : ''}" style="--c:${c}"></button>`).join('') + '<button class="pdone">✅</button>';
+      let colour = PAINTS[0];
+      toolbox.querySelectorAll('.pot').forEach((b, i) => b.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); colour = PAINTS[i]; sfx.tap(); buzz(6);
+        toolbox.querySelectorAll('.pot').forEach((x) => x.classList.toggle('on', x === b));
+      }));
+      const parts = [...made.querySelectorAll('.part')];
+      const painted = new Set();
+      say('Pick a colour and paint it!');
+      const finish = () => {
+        if (!alive) return resolve();
+        // anything not painted gets its usual colours
+        parts.forEach((g) => { if (!painted.has(g)) shapesOf(g).forEach((s, j) => s.setAttribute('fill', g.dataset.paint.split(',')[j] || g.dataset.paint.split(',')[0])); });
+        toolbox.classList.remove('paints'); toolbox.innerHTML = '<span>🪚</span><span>🔨</span><span>🪛</span>';
+        ws.classList.remove('painting');
+        resolve();
+      };
+      ws.classList.add('painting');
+      toolbox.querySelector('.pdone').addEventListener('click', () => { sfx.ding(); finish(); });
+      parts.forEach((g) => g.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        const def = g.dataset.paint.split(',');
+        shapesOf(g).forEach((s, j) => s.setAttribute('fill', j === 0 ? colour : def[j] || colour));
+        g.classList.remove('splat'); void g.getBBox(); g.classList.add('splat');
+        sfx.pop(3 + painted.size % 5); buzz(10);
+        burst(e.clientX, e.clientY, { n: 12, colors: [colour, colour, '#fff'], shape: 'dot', speed: 220 });
+        const first = !painted.has(g); painted.add(g);
+        if (first && painted.size === parts.length) { setTimeout(() => { if (!alive) return; say('Beautiful!'); sfx.ding(); setTimeout(finish, 900); }, 400); }
+      }));
+    });
+  }
+
   function toolHit(fxg, x, y, type) {
     const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     t.textContent = type === 'nail' ? '🔨' : '🪛';
@@ -196,6 +282,26 @@ export function mount(el) {
     } else if (key === 'car') {
       sfx.beep(); setTimeout(() => sfx.vroom(), 300);
       made.classList.add('drive');
+    } else if (key === 'boat') {
+      const waves = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      waves.setAttribute('class', 'waves');
+      waves.innerHTML = `<path d="M-200 236 q25 -14 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V320 H-200 Z" fill="#60a5fa" opacity=".85"/>`;
+      bench.querySelector('.fx').appendChild(waves);
+      say('Sail away!'); sfx.splash ? sfx.splash() : sfx.boing();
+      made.classList.add('sail');
+    } else if (key === 'train') {
+      for (let i = 0; i < 6; i++) setTimeout(() => { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('cx', 106); c.setAttribute('cy', 76); c.setAttribute('r', 10); c.setAttribute('fill', '#e5e7eb'); c.setAttribute('class', 'smoke'); made.appendChild(c); }, i * 300);
+      say('Choo choo!'); sfx.beep();
+      setTimeout(() => { if (alive) { made.classList.add('drive'); sfx.vroom(); } }, 600);
+    } else if (key === 'plane') {
+      made.classList.add('spinprop'); sfx.vroom();
+      setTimeout(() => { if (!alive) return; say('Up, up and away!'); sfx.rocket(); made.classList.add('fly'); }, 900);
+    } else if (key === 'kennel') {
+      const pup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      pup.setAttribute('class', 'doorkid');
+      pup.innerHTML = `<svg x="148" y="168" width="104" height="104" viewBox="0 0 300 300">${petSVG('puppy', 1, 'excited').replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`;
+      made.appendChild(pup);
+      animalSound('dog'); setTimeout(() => alive && say('Woof woof! A puppy!'), 900);
     } else {
       ['3', '2', '1'].forEach((n, i) => setTimeout(() => say(n), i * 700));
       setTimeout(() => { say('Blast off!'); sfx.rocket(); made.classList.add('launch');

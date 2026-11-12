@@ -70,7 +70,7 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - [x] Levels (1.23): `www/js/levels.js` – GAMES table (max, wins per level), `getLevel/win/setLevel/levelBadge/resetAllLevels`, per child key `pg.levels.<playerId>`. Each game: badge + `win(game, badge)` at round end + difficulty from `getLevel`.
 - [x] Picture prompts (`askPill` in ui.js) so find-it rounds work without voice clips.
 - [ ] README: APK location + QR, install, every game with screenshot, levels + reset, voices how-to; keep updated.
-- [ ] Dino eggs improvement.
+- [x] Dino eggs improvement (1.27: 4 species, patterns, peeping eye, shell hats, mummy, pterodactyl; sfx.roar(pitch)).
 - [x] Colouring: 8 animal pages via `lineArt(petSVG())` in pictures.js (1.25).
 - [x] Music: xylophone + bells added (1.24).
 - [x] Peekaboo improvement (1.26: drawn pets, peek hints, curtain + flowerpot).

@@ -88,14 +88,14 @@ export const sfx = {
   ding() { tone(SCALE[4], 0.18, 'triangle', 0.18); tone(SCALE[7], 0.4, 'triangle', 0.18, 0.1); tone(SCALE[7] * 2, 0.4, 'sine', 0.05, 0.1); },
   oops() { tone(392, 0.16, 'sine', 0.16, 0, 330); tone(330, 0.24, 'sine', 0.14, 0.14, 262); },
   giggle() { [900, 1150, 980, 1250, 1050, 1300].forEach((f, k) => tone(f, 0.07, 'triangle', 0.13, k * 0.075, f * 0.8)); },
-  roar() {
+  roar(p = 1) {
     if (!on()) return;
     const t = ctx.currentTime;
     const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
     const lfo = ctx.createOscillator(), lg = ctx.createGain();
     o.type = 'sawtooth'; o2.type = 'square';
-    o.frequency.setValueAtTime(150, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.exponentialRampToValueAtTime(110, t + 0.8);
-    o2.frequency.setValueAtTime(75, t); o2.frequency.linearRampToValueAtTime(115, t + 0.25); o2.frequency.exponentialRampToValueAtTime(55, t + 0.8);
+    o.frequency.setValueAtTime(150 * p, t); o.frequency.linearRampToValueAtTime(230 * p, t + 0.25); o.frequency.exponentialRampToValueAtTime(110 * p, t + 0.8);
+    o2.frequency.setValueAtTime(75 * p, t); o2.frequency.linearRampToValueAtTime(115 * p, t + 0.25); o2.frequency.exponentialRampToValueAtTime(55 * p, t + 0.8);
     lfo.frequency.value = 28; lg.gain.value = 18; lfo.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
     lp.type = 'lowpass'; lp.frequency.setValueAtTime(700, t); lp.frequency.linearRampToValueAtTime(1600, t + 0.25); lp.frequency.linearRampToValueAtTime(500, t + 0.8); lp.Q.value = 4;
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.45, t + 0.06); g.gain.setValueAtTime(0.45, t + 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);

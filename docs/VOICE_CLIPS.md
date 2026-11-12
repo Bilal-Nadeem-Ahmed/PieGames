@@ -198,7 +198,7 @@ Names (Rahma, Ibrahim, …) are also spoken if recorded - record each child's na
 - ⬜ letter
 - ✅ pop _(Dad + Rahma)_
 - ✅ bubble _(Dad + Rahma)_
-- ✅ jumping _(Dad + Rahma)_
+- ✅ jumping _(Rahma)_
 
 ## Game openers (0/11)
 

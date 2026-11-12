@@ -34,5 +34,5 @@ firework-1 (fs-336008), magic-1 (fs-264981 Magic Reveal Chimes), poof-1 (fs-2081
 coin-1 (fs-242857 Retro Coin), spray-1 (fs-267709 Aerosol Spray), whoosh-1 (fs-184325 Woosh Slide In), roar-1 (fs-553173 Monster Roar).
 
 From **JimLynchCodes/Game-Sound-Effects** (https://github.com/JimLynchCodes/Game-Sound-Effects; described by its author as royalty free / open source, no formal licence file):
-boing-4 (badBoing.wav), cheer-2 (girl_yeaaaaah.wav), knock-1 (HAMMER.WAV), magic-2 (cast_a_spell_sound.wav), coin-2 (coin.wav), whoosh-2 (WHOOSH.WAV),
+boing-4 (badBoing.wav), knock-1 (HAMMER.WAV), magic-2 (cast_a_spell_sound.wav), coin-2 (coin.wav), whoosh-2 (WHOOSH.WAV),
 splash-1/2 (Splash_Small.wav / Splash_Big.wav), drumroll-1 (DRUMROLL.WAV), brush-1 (brush_sfx.wav).

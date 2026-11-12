@@ -56,7 +56,7 @@ function noise(dur, vol, when = 0, freq = 1800) {
 }
 
 // ---- recorded effects: name -> how many takes (name-1.mp3 ...), and a volume trim for each name
-const SAMPLES = { pop: 3, boing: 4, giggle: 2, cheer: 2, ding: 1, tada: 2, knock: 2, horn: 1, rocket: 1, firework: 1, magic: 2, poof: 1,
+const SAMPLES = { pop: 3, boing: 4, giggle: 2, cheer: 1, ding: 1, tada: 2, knock: 2, horn: 1, rocket: 1, firework: 1, magic: 2, poof: 1,
   creak: 1, drip: 1, coin: 2, spray: 1, whoosh: 2, roar: 1, splash: 2, drumroll: 1, brush: 1 };
 const TRIM = { coin: 0.45, pop: 0.8, cheer: 0.9, firework: 1.2, splash: 1.1, spray: 0.8, brush: 0.7 };
 const buffers = {};

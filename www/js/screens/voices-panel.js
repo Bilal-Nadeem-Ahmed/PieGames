@@ -3,7 +3,7 @@ import { getSettings, saveSettings } from '../store.js';
 import { sfx } from '../sound.js';
 import {
   initVoices, voiceList, catalog, keyOf, hasClip, isCustom, isBundled, previewClip,
-  startRecording, saveClip, deleteClip, addVoice, removeVoice, BUILTIN,
+  startRecording, saveClip, deleteClip, addVoice, removeVoice, BUILTIN, voiceWeight, setVoiceWeight,
 } from '../voices.js';
 
 export async function voicesPanel(host) {
@@ -33,6 +33,18 @@ export async function voicesPanel(host) {
     add.onclick = () => { const n = prompt('Whose voice is it? (e.g. Ibrahim, Grandma)'); if (n && n.trim()) { addVoice(n.trim()); cur = voiceList().at(-1).id; render(); } };
     chipsEl.appendChild(add);
 
+    // how often each voice is used
+    if (voices.length > 1) {
+      const wbox = document.createElement('div'); wbox.className = 'vweights';
+      wbox.innerHTML = '<b>How often each voice is used</b>';
+      for (const vv of voices) {
+        const r = document.createElement('label'); r.className = 'vweight';
+        r.innerHTML = `<span>${vv.name}</span><small>rarely</small><input type="range" min="0" max="100" value="${voiceWeight(vv.id)}"><small>mostly</small>`;
+        r.querySelector('input').oninput = (e) => setVoiceWeight(vv.id, +e.target.value);
+        wbox.appendChild(r);
+      }
+      host.insertBefore(wbox, host.querySelector('.vbar'));
+    }
     // bar: rename / remove voice, default voices on/off, phone voice fallback
     const bar = host.querySelector('.vbar');
     const btn = (label, cls, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = cls; b.onclick = fn; bar.appendChild(b); };

@@ -51,7 +51,8 @@ Read this first when picking the project back up. Keep it updated after each rel
 - Bundled: `www/audio/voice/<key>/<voice>-<n>.m4a` + `manifest.json`. Voices: `me` = Dad, `pie` = Rahma.
 - Import new clips: name `<words>-pie.wav` / `<words>-me.wav` → `python3 scripts/import_voice.py <folder>` →
   `node scripts/voice-checklist.mjs` (regenerates `docs/VOICE_CLIPS.md`).
-- Text → clips: split on punctuation; a segment plays only if every non-filler word has a clip; voices take turns.
+- Text → clips: split on punctuation; a segment plays only if every non-filler word has a clip.
+- Voice choice is weighted random: `settings.voiceWeights` (default Rahma 80, Dad 20, new voices 50), sliders in Grown-ups → Voices.
 - Grown-ups → Voices: per voice ▶/●record/⬆upload/🗑, add voices (IndexedDB `pg-voices`), "Remove default voices" toggle,
   "Phone voice for missing words" toggle.
 

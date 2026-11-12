@@ -76,14 +76,21 @@ function segments(text) {
 export const canSpeak = (text) => segments(text).length > 0;
 
 // ---------- playback ----------
-const turn = new Map();            // rotation: key -> how many times said
+// How often each voice is used when several can say the same thing (0-100). Rahma is used most by default.
+export const DEFAULT_WEIGHT = { pie: 80, me: 20 };
+export function voiceWeight(id) { const w = getSettings().voiceWeights || {}; return w[id] ?? DEFAULT_WEIGHT[id] ?? 50; }
+export function setVoiceWeight(id, v) { const s = getSettings(); s.voiceWeights = { ...(s.voiceWeights || {}), [id]: v }; saveSettings(s); }
 function pickVoice(keys) {
   const all = activeIds();
   const both = all.filter((v) => keys.every((k) => hasClip(v, k)));
   const pool = both.length ? both : all;
-  const n = (turn.get(keys.join('+')) || Math.floor(Math.random() * 10)) + 1;
-  turn.set(keys.join('+'), n);
-  return pool[n % pool.length];
+  // weighted random choice (a slider at 0 means never, unless no other voice can say it)
+  const weights = pool.map((v) => voiceWeight(v));
+  const total = weights.reduce((x, y) => x + y, 0);
+  if (!total) return pool[(Math.random() * pool.length) | 0];
+  let r = Math.random() * total, pick = pool[0];
+  for (let i = 0; i < pool.length; i++) { r -= weights[i]; if (r <= 0 && weights[i] > 0) { pick = pool[i]; break; } }
+  return pick;
 }
 async function urlFor(voice, key) {
   if (custom.get(voice)?.has(key)) { const r = await dbGet(`${voice}|${key}`); if (r?.blob) return URL.createObjectURL(r.blob); }

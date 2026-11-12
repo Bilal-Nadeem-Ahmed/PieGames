@@ -734,3 +734,6 @@ svg { display: block; }
 .foodbasket { position: absolute; left: 50%; bottom: calc(8px + var(--safe-b)); transform: translateX(-50%); display: flex; flex-direction: row; gap: 2.4vmin; padding: 1.2vmin 3vmin; z-index: 200;
   background: linear-gradient(#d9a066, #b97a3f); border: 5px solid #8a5a2b; border-radius: 22px 22px 34px 34px; box-shadow: 0 6px 0 #0003; min-height: 15vmin; min-width: 30vmin; align-items: center; justify-content: center; }
 .food2 { font-size: min(12vmin, 8vw); line-height: 1; filter: drop-shadow(0 4px 2px #0004); animation: popin .4s backwards; cursor: grab; }
+.vweights { background: #fbfcff; border: 1px solid #e3e8f0; border-radius: 14px; padding: 10px 14px; margin: 6px 0 10px; }
+.vweight { display: grid; grid-template-columns: 110px auto 1fr auto; align-items: center; gap: 8px; margin-top: 6px; font-weight: 700; }
+.vweight small { color: #889; font-weight: 600; } .vweight input { width: 100%; accent-color: #ec4899; }

@@ -9,6 +9,8 @@ const INSTRUMENTS = [
   { id: 'drums', icon: '🥁', label: 'Drums' },
   { id: 'guitar', icon: '🎸', label: 'Guitar' },
   { id: 'piano', icon: '🎹', label: 'Piano' },
+  { id: 'xylo', icon: '🎼', label: 'Xylophone' },
+  { id: 'bells', icon: '🔔', label: 'Bells' },
 ];
 const hz = (midi) => 440 * 2 ** ((midi - 69) / 12);
 
@@ -93,6 +95,28 @@ const DRUM = {
 };
 function drum(kind, arg) { const a = audioOut(); if (!a) return; DRUM[kind](a.ctx, a.out, a.ctx.currentTime, arg); }
 
+// wooden xylophone bar: bright sine + a quickly-fading overtone and a mallet click
+function xyloNote(midi) {
+  const a = audioOut(); if (!a) return;
+  const { ctx, out } = a, t = ctx.currentTime, f = hz(midi);
+  [[1, 0.5, 0.9], [3.93, 0.16, 0.12], [9.2, 0.05, 0.05]].forEach(([m, v, d]) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f * m;
+    env(ctx, g, t, 0.002, v, d); o.connect(g).connect(out); o.start(t); o.stop(t + d + 0.05);
+  });
+  const n = noise(ctx), ng = ctx.createGain(), nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 2500;
+  env(ctx, ng, t, 0.001, 0.12, 0.02); n.connect(nf).connect(ng).connect(out); n.start(t); n.stop(t + 0.04);
+}
+// handbell: inharmonic partials with a long shimmering ring
+function bellNote(midi) {
+  const a = audioOut(); if (!a) return;
+  const { ctx, out } = a, t = ctx.currentTime, f = hz(midi);
+  [[1, 0.28, 2.6], [2.0, 0.14, 2.0], [2.76, 0.1, 1.4], [5.4, 0.05, 0.8], [8.9, 0.025, 0.4]].forEach(([m, v, d]) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f * m;
+    const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 5 + m; lg.gain.value = f * m * 0.002; lfo.connect(lg).connect(o.frequency);
+    env(ctx, g, t, 0.004, v, d); o.connect(g).connect(out); o.start(t); lfo.start(t); o.stop(t + d + 0.1); lfo.stop(t + d + 0.1);
+  });
+}
+
 // floating note / sparkle at a point, coloured
 function floatNote(host, x, y, color, text = pickNote()) {
   const n = document.createElement('div');
@@ -113,7 +137,7 @@ export function mount(el) {
   let wasNarrow = area.clientWidth < area.clientHeight;
   const onResize = () => { const n = area.clientWidth < area.clientHeight; if (n !== wasNarrow && inst === 'piano') { wasNarrow = n; show(); } };
   addEventListener('resize', onResize);
-  const show = () => { cleanup?.(); cleanup = ({ drums, guitar, piano })[inst](area, root); };
+  const show = () => { cleanup?.(); cleanup = ({ drums, guitar, piano, xylo, bells })[inst](area, root); };
   show();
   return () => { cleanup?.(); removeEventListener('resize', onResize); resumeMusic(); };
 }
@@ -233,5 +257,61 @@ function drums(area) {
     });
     kit.appendChild(d);
   }
+  return () => {};
+}
+
+// ---------- xylophone ----------
+function xylo(area) {
+  const NOTES = [72, 74, 76, 77, 79, 81, 83, 84];            // C5 .. C6
+  const COLS = ['#ef4444', '#fb923c', '#facc15', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
+  area.innerHTML = `<div class="xylo"><div class="x-rail top"></div><div class="x-rail bottom"></div><div class="x-bars"></div><div class="mallet">🥢</div></div>`;
+  const bars = area.querySelector('.x-bars'), mallet = area.querySelector('.mallet');
+  NOTES.forEach((m, i) => {
+    const b = document.createElement('div');
+    b.className = 'x-bar'; b.dataset.i = i; b.style.setProperty('--c', COLS[i]); b.style.setProperty('--h', 100 - i * 7 + '%');
+    b.innerHTML = '<i></i><i></i>';
+    bars.appendChild(b);
+  });
+  const held = new Map();
+  const hit = (pid, bar, x, y) => {
+    if (held.get(pid) === bar) return; held.set(pid, bar);
+    if (!bar) return;
+    xyloNote(NOTES[+bar.dataset.i]); buzz(6);
+    bar.classList.remove('hit'); void bar.offsetWidth; bar.classList.add('hit');
+    const ar = area.getBoundingClientRect();
+    mallet.style.left = x - ar.left + 'px'; mallet.style.top = y - ar.top + 'px'; mallet.classList.remove('tap'); void mallet.offsetWidth; mallet.classList.add('tap');
+    floatNote(area, x - ar.left, y - ar.top - 30, getComputedStyle(bar).getPropertyValue('--c'));
+  };
+  const barAt = (x, y) => document.elementsFromPoint(x, y).find((n) => n.classList?.contains('x-bar'));
+  bars.addEventListener('pointerdown', (e) => { e.preventDefault(); bars.setPointerCapture(e.pointerId); hit(e.pointerId, barAt(e.clientX, e.clientY), e.clientX, e.clientY); });
+  bars.addEventListener('pointermove', (e) => { if (held.has(e.pointerId)) hit(e.pointerId, barAt(e.clientX, e.clientY), e.clientX, e.clientY); });
+  const up = (e) => held.delete(e.pointerId);
+  bars.addEventListener('pointerup', up); bars.addEventListener('pointercancel', up);
+  return () => held.clear();
+}
+
+// ---------- bells ----------
+function bells(area) {
+  const NOTES = [72, 74, 76, 77, 79, 81, 84];
+  const COLS = ['#ef4444', '#fb923c', '#facc15', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'];
+  area.innerHTML = `<div class="bells"></div>`;
+  const row = area.firstElementChild;
+  NOTES.forEach((m, i) => {
+    const b = document.createElement('button');
+    b.className = 'bell'; b.style.setProperty('--c', COLS[i]); b.style.setProperty('--s', 1.15 - i * 0.06);
+    b.innerHTML = `<svg viewBox="0 0 100 140"><rect x="44" y="2" width="12" height="34" rx="6" fill="#8a5a2b"/><circle cx="50" cy="40" r="7" fill="#d4a017"/>
+      <path d="M50 42 C24 42 22 70 20 96 C18 108 10 112 8 118 H92 C90 112 82 108 80 96 C78 70 76 42 50 42 Z" fill="var(--c)" stroke="#3a2a20" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M32 66 C32 56 38 50 46 49" fill="none" stroke="#fff8" stroke-width="6" stroke-linecap="round"/>
+      <rect x="6" y="114" width="88" height="10" rx="5" fill="#d4a017" stroke="#3a2a20" stroke-width="3"/>
+      <circle class="clapper" cx="50" cy="130" r="8" fill="#5b4636"/></svg>`;
+    b.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); bellNote(m); buzz(10);
+      b.classList.remove('ring'); void b.offsetWidth; b.classList.add('ring');
+      const ar = area.getBoundingClientRect(), r = b.getBoundingClientRect();
+      floatNote(area, r.left - ar.left + r.width / 2, r.top - ar.top, COLS[i], pickNote());
+      for (let k = 0; k < 3; k++) floatNote(area, r.left - ar.left + r.width * (0.2 + Math.random() * 0.6), r.top - ar.top + r.height * 0.4, '#ffd23f', '✨');
+    });
+    row.appendChild(b);
+  });
   return () => {};
 }

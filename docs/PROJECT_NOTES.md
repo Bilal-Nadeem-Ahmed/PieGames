@@ -72,7 +72,7 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - [ ] README: APK location + QR, install, every game with screenshot, levels + reset, voices how-to; keep updated.
 - [ ] Dino eggs improvement.
 - [ ] Colouring: more pictures (different animals etc.).
-- [ ] Music: more instruments (xylophone + another, e.g. trumpet/ukulele/bells).
+- [x] Music: xylophone + bells added (1.24).
 - [ ] Peekaboo improvement.
 - [ ] Build it: more projects/options and polish.
 - [ ] Puzzles: more pictures. Pairs: more card images.

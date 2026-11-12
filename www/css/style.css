@@ -764,3 +764,26 @@ svg { display: block; }
 .ask-card span { font-size: .4em; -webkit-text-stroke: 0; }
 @media (orientation: portrait) { .ask-pill { top: calc(150px + var(--safe-t)); } }
 .findit .ask-pill { top: calc(150px + var(--safe-t)); }
+
+/* xylophone */
+.xylo { position: absolute; inset: 6% 4%; }
+.x-rail { position: absolute; left: 2%; right: 2%; height: 7%; background: linear-gradient(#a0703f, #7a4f24); border-radius: 10px; box-shadow: 0 4px 0 #0003; }
+.x-rail.top { top: 22%; transform: rotate(-3deg); } .x-rail.bottom { bottom: 22%; transform: rotate(3deg); }
+.x-bars { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; gap: 1.6%; touch-action: none; }
+.x-bar { position: relative; width: 10.5%; height: var(--h); background: linear-gradient(90deg, color-mix(in srgb, var(--c) 80%, #fff), var(--c) 40%, color-mix(in srgb, var(--c) 75%, #000));
+  border-radius: 14px; box-shadow: 0 6px 0 color-mix(in srgb, var(--c) 55%, #000), inset 0 2px 0 #fff6; z-index: 1; }
+.x-bar i { position: absolute; left: 50%; width: 14px; height: 14px; transform: translateX(-50%); border-radius: 50%; background: #e5e7eb; box-shadow: inset 0 2px 2px #0005; }
+.x-bar i:first-child { top: 10%; } .x-bar i:last-child { bottom: 10%; }
+.x-bar.hit { animation: xhit .35s; }
+@keyframes xhit { 25% { translate: 0 6px; filter: brightness(1.4); box-shadow: 0 1px 0 color-mix(in srgb, var(--c) 55%, #000), 0 0 30px var(--c); } }
+.mallet { position: absolute; font-size: 9vmin; pointer-events: none; transform: translate(-20%, -80%) rotate(30deg); opacity: 0; z-index: 3; }
+.mallet.tap { animation: mallet .3s; }
+@keyframes mallet { 0% { opacity: 1; rotate: -30deg; } 50% { opacity: 1; rotate: 15deg; } 100% { opacity: 0; } }
+/* bells */
+.bells { position: absolute; inset: 4% 3%; display: flex; justify-content: center; align-items: flex-end; gap: 1.5%; padding-bottom: 6%; }
+.bell { width: 12%; background: none; padding: 0; transform-origin: 50% 2%; scale: var(--s); touch-action: none; filter: drop-shadow(0 8px 6px #0003); }
+.bell svg { width: 100%; display: block; overflow: visible; }
+.bell.ring { animation: bellswing 1.3s ease-out; }
+@keyframes bellswing { 10% { rotate: 22deg; } 25% { rotate: -18deg; } 40% { rotate: 12deg; } 55% { rotate: -8deg; } 70% { rotate: 4deg; } 100% { rotate: 0deg; } }
+.bell.ring .clapper { animation: clap 1.3s ease-out; transform-box: fill-box; transform-origin: 50% -200%; }
+@keyframes clap { 12% { transform: rotate(-30deg); } 28% { transform: rotate(25deg); } 45% { transform: rotate(-12deg); } 100% { transform: none; } }

@@ -55,12 +55,37 @@ The games speak with recorded family voices (Dad and Rahma by default). Where mo
 - Words nobody has recorded stay silent (or switch on **Phone voice for missing words**).
 - What still needs recording: [docs/VOICE_CLIPS.md](docs/VOICE_CLIPS.md). To add a batch of clips to the app itself: name them `<words>-pie.wav` / `<words>-me.wav`, run `python3 scripts/import_voice.py <folder>` then `node scripts/voice-checklist.mjs`.
 
+## Screenshots
+| | | |
+|---|---|---|
+| ![Home](docs/screenshots/home.jpg)<br>Home | ![Pie Pet](docs/screenshots/pet.jpg)<br>Pie Pet | ![Run & Jump](docs/screenshots/runner.jpg)<br>Run & Jump |
+| ![Dino Eggs](docs/screenshots/dino.jpg)<br>Dino Eggs | ![Colouring](docs/screenshots/colour.jpg)<br>Colouring | ![Music](docs/screenshots/music.jpg)<br>Music |
+| ![Peekaboo](docs/screenshots/peekaboo.jpg)<br>Peekaboo | ![Shapes](docs/screenshots/sorter.jpg)<br>Shapes | ![Build it](docs/screenshots/build.jpg)<br>Build it |
+| ![Feed](docs/screenshots/feed.jpg)<br>Feed | ![Pairs](docs/screenshots/pairs.jpg)<br>Pairs | ![Puzzles](docs/screenshots/puzzle.jpg)<br>Puzzles |
+| ![Find it](docs/screenshots/findit.jpg)<br>Find it | ![Counting](docs/screenshots/count.jpg)<br>Counting | ![Letters](docs/screenshots/abc.jpg)<br>Letters |
+| ![Grown-ups](docs/screenshots/parent.jpg)<br>Grown-ups area | | |
+
+Upright games:
+
+<img src="docs/screenshots/balloons.jpg" width="200" alt="Balloons"> <img src="docs/screenshots/bubbles.jpg" width="200" alt="Bubbles"> <img src="docs/screenshots/roundup.jpg" width="200" alt="Sheep pen">
+
+## Get the app (where the APK is)
+The latest app is always in this repo at **`dist/PieGames-<version>.apk`** (e.g. `dist/PieGames-1.28.apk`; only the newest build is kept, and the version is in the file name).
+
+Direct download link (needs a GitHub login with access to this private repo):
+`https://github.com/Bilal-Nadeem-Ahmed/PieGames/raw/main/dist/PieGames-<version>.apk`
+
+To share it with family:
+- **Easiest:** open the link above on your phone, download the APK, then send the file itself through WhatsApp / Google Drive / email. People without GitHub access can install from that file.
+- **QR code:** make a QR code of the link (any QR generator) and scan it with the phone camera. This only works for phones signed in to GitHub with access to the repo.
+- New versions install over the old one and keep each child's levels, pets, drawings and voices.
+
 ## Install on Android
 1. Copy `dist/PieGames-<version>.apk` (only the latest build is kept) to the phone/tablet (or download it there).
 2. Open it and allow "Install unknown apps" for your file manager/browser when asked.
 3. Tip: turn on **App pinning** (Settings → Security) so little ones can't leave the app.
 
-The talking voice uses the device's built-in text-to-speech (Google TTS). If it's silent, check Settings → Accessibility → Text-to-speech.
+The talking uses the recorded family voice clips (see **Voices**). The phone's own text-to-speech is only used for missing words if **Phone voice for missing words** is switched on; if that is silent, check Settings → Accessibility → Text-to-speech.
 
 ## Develop
 ```bash

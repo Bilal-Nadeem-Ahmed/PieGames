@@ -14,7 +14,7 @@ const WOOD = '#e8c48e', EDGE = '#8a5a2b';
 const S = `stroke="${EDGE}" stroke-width="4" stroke-linejoin="round"`;
 
 // x,y in a 400x300 drawing. Each part: shapes (SVG with fill WOOD), paint colours, fasteners [x, y, 'nail'|'screw'].
-const PROJECTS = {
+export const PROJECTS = {
   house: {
     icon: '🏠', name: 'house',
     parts: [

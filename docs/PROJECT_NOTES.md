@@ -87,3 +87,4 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - `const` arrow helpers used before definition inside `mount` → TDZ errors; use function declarations.
 - Wikimedia upload server rate-limits (429) this container; OpenGameArt works for CC0 sounds.
 - 1.30: Balloons background = www/js/sky.js createSky() (draw/tap), replaces meadow; Bubbles speaks words in non-count modes.
+- 1.31: Colouring: pics-more.js (19 pages), kid pages per child (me/mepet/meballoons/together, id includes sig(player) hash), blank + build pages; tools: fill patterns via paintRef ('pat:kind:col'), brushes, sticker picker, 3 sizes, 19 colours.

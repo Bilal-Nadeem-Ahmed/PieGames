@@ -3,10 +3,12 @@ import { cloud } from './shapes.js';
 import { avatarSVG } from './avatar.js';
 import { getPlayers } from './store.js';
 import { petSVG } from './games/pet-art.js';
+import { PROJECTS } from './games/builder.js';
+import { MORE_PICS } from './pics-more.js';
 
 const S = 'stroke="#2b2118" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"';
 
-function pic(build) {
+export function pic(build) {
   let n = 0;
   const api = {
     bg: () => `<rect class="r" id="r${n++}" x="0" y="0" width="400" height="400" fill="#fff"/>`,
@@ -18,7 +20,7 @@ function pic(build) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">${build(api)}</svg>`;
 }
 
-const flower = ({ r }, x, y, s = 1) =>
+export const flower = ({ r }, x, y, s = 1) =>
   [0, 72, 144, 216, 288].map((a) => r('circle', `cx="${(x + Math.cos((a * Math.PI) / 180) * 11 * s).toFixed(1)}" cy="${(y + Math.sin((a * Math.PI) / 180) * 11 * s).toFixed(1)}" r="${8 * s}"`)).join('') +
   r('circle', `cx="${x}" cy="${y}" r="${7 * s}"`);
 
@@ -142,7 +144,7 @@ function lineArt(svg, prefix) {
   let n = 0;
   for (const el of g.querySelectorAll('ellipse, circle, path, rect')) {
     const fill = (el.getAttribute('fill') || '').toLowerCase();
-    if (fill === 'none' || fill === '') { el.setAttribute('pointer-events', 'none'); continue; }
+    if (fill === 'none' || fill === '') { el.setAttribute('pointer-events', 'none'); if (el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#2b2118'); continue; }
     if (['#1b1b1b', '#111', '#2b2118', '#0002'].includes(fill)) { if (fill === '#0002') el.remove(); continue; }
     el.removeAttribute('opacity');
     el.setAttribute('fill', '#fff'); el.setAttribute('class', 'r'); el.setAttribute('id', `${prefix}${n++}`);
@@ -157,13 +159,52 @@ const ANIMAL_PAGES = ['puppy', 'kitten', 'bunny', 'lamb', 'cow', 'elephant', 'du
     `<g transform="translate(20 -10) scale(1.2)">${lineArt(petSVG(t, 3, 'happy'), 'p' + t + '-')}</g>`),
 }));
 
+// The Build it projects as colouring pages: every part becomes a tappable white region.
+const BUILD_PAGES = Object.entries(PROJECTS).map(([k, P]) => ({
+  id: 'build-' + k,
+  svg: () => pic(({ bg, p, r }) => {
+    let n = 0;
+    const parts = P.parts.map((pt) => pt.svg.replace(/stroke="#8a5a2b"/g, 'stroke="#2b2118"').replace(/<(rect|path|circle|ellipse) /g, (m, tag) => `<${tag} class="r" id="b${k}-${n++}" fill="#fff" `)).join('');
+    return bg() + p('M0 345 Q200 320 400 345 L400 400 L0 400 Z') + r('circle', 'cx="350" cy="50" r="28"') + p(cloud(60, 52, 42, 16, 8)) +
+      `<g transform="translate(0 70)">${parts}</g>`;
+  }),
+}));
+// a blank page for free drawing (the whole page is one region, so it can be filled with a colour or pattern too)
+const BLANK = { id: 'blank', svg: () => pic(({ bg }) => bg()) };
+
+// A short code for how a child's cartoon is set up (hair, skin, clothes, bow, toy...). It goes into the page id,
+// so if their look is changed in Grown-ups they get a fresh page that matches, instead of old colours landing on new shapes.
+const sig = (pl) => { const j = JSON.stringify({ ...pl, name: undefined }); let h = 0; for (let i = 0; i < j.length; i++) h = (h * 31 + j.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+const kidArt = (pl, x, y, sc, pose, prefix) => `<g transform="translate(${x} ${y}) scale(${sc})">${avatarSVG(pl, { line: true, inner: true, pose, idPrefix: prefix })}</g>`;
+function petOf(pl) { try { return JSON.parse(localStorage.getItem('pg.pet.' + pl.id) || 'null'); } catch { return null; } }
+
 export function getPictures() {
-  const kids = getPlayers().map((pl, i) => ({
-    id: 'me-' + pl.id,
-    player: pl,
-    svg: () => pic(({ bg, p, r }) => bg() + p('M0 340 Q200 312 400 340 L400 400 L0 400 Z') + r('circle', 'cx="350" cy="56" r="30"') +
-      p(cloud(70, 56, 46, 18, 8)) +
-      `<g transform="translate(50 18) scale(1.5)">${avatarSVG(pl, { line: true, inner: true, pose: i % 2 ? 'up' : 'down', idPrefix: 'a' })}</g>`),
-  }));
-  return [...kids, ...PICS, ...ANIMAL_PAGES];
+  const players = getPlayers();
+  const kids = players.flatMap((pl, i) => {
+    const s = sig(pl), pet = petOf(pl), petType = pet?.type || ['puppy', 'kitten'][i % 2];
+    return [
+      { id: `me-${pl.id}-${s}`, player: pl,
+        svg: () => pic(({ bg, p, r }) => bg() + p('M0 340 Q200 312 400 340 L400 400 L0 400 Z') + r('circle', 'cx="350" cy="56" r="30"') +
+          p(cloud(70, 56, 46, 18, 8)) + kidArt(pl, 50, 18, 1.5, i % 2 ? 'up' : 'down', 'a')) },
+      // the child with their own Pie Pet (or a puppy/kitten if they haven't got one yet)
+      { id: `mepet-${pl.id}-${s}-${petType}`, player: pl,
+        svg: () => pic(({ bg, p, r }) => bg() + p('M0 345 Q200 318 400 345 L400 400 L0 400 Z') + r('circle', 'cx="355" cy="50" r="26"') + p(cloud(190, 52, 40, 16, 8)) +
+          kidArt(pl, 6, 86, 1.18, 'down', 'a') + `<g transform="translate(168 88) scale(0.92)">${lineArt(petSVG(petType, Math.min(3, pet?.stage ?? 2), 'happy'), 'pp-')}</g>`) },
+      // the child holding three balloons
+      { id: `meballoons-${pl.id}-${s}`, player: pl,
+        svg: () => pic(({ bg, p, r, l }) => bg() + p('M0 350 Q200 325 400 350 L400 400 L0 400 Z') +
+          l('M106 252 L100 136 M106 252 L200 106 M106 252 L300 140') +
+          r('ellipse', 'cx="100" cy="88" rx="36" ry="44"') + r('ellipse', 'cx="200" cy="58" rx="36" ry="44"') + r('ellipse', 'cx="300" cy="92" rx="36" ry="44"') +
+          p('M100 132 l-7 10 h14 z') + p('M200 102 l-7 10 h14 z') + p('M300 136 l-7 10 h14 z') +
+          kidArt(pl, 80, 150, 1.0, 'up', 'a') + flower({ r }, 40, 370) + flower({ r }, 360, 372)) },
+    ];
+  });
+  // everyone together
+  if (players.length > 1) {
+    const n = players.length, w = Math.min(1.4, 2.25 / n), step = 400 / n;
+    kids.push({ id: 'together-' + players.map((pl) => pl.id + sig(pl)).join('-'),
+      svg: () => pic(({ bg, p, r }) => bg() + p('M0 345 Q200 318 400 345 L400 400 L0 400 Z') + r('circle', 'cx="200" cy="50" r="28"') + p(cloud(60, 60, 40, 16, 8)) + p(cloud(320, 60, 40, 16, 8)) +
+        players.map((pl, i) => kidArt(pl, step * i + step / 2 - 100 * w, 380 - 240 * w, w, i % 2 ? 'up' : 'down', `k${i}-`)).join('')) });
+  }
+  return [BLANK, ...kids, ...PICS, ...MORE_PICS, ...ANIMAL_PAGES, ...BUILD_PAGES];
 }

@@ -1,0 +1,98 @@
+{
+ "black": {
+  "me": 2
+ },
+ "blue": {
+  "me": 1,
+  "pie": 1
+ },
+ "bubble": {
+  "me": 1,
+  "pie": 1
+ },
+ "cat": {
+  "pie": 1
+ },
+ "cow": {
+  "pie": 1
+ },
+ "dinosaur": {
+  "pie": 1
+ },
+ "dog": {
+  "pie": 1
+ },
+ "excellent": {
+  "me": 1,
+  "pie": 2
+ },
+ "fish": {
+  "pie": 1
+ },
+ "good-job": {
+  "me": 1,
+  "pie": 1
+ },
+ "green": {
+  "me": 1,
+  "pie": 1
+ },
+ "hello": {
+  "me": 1,
+  "pie": 1
+ },
+ "horse": {
+  "pie": 1
+ },
+ "jumping": {
+  "me": 1,
+  "pie": 1
+ },
+ "meow": {
+  "pie": 1
+ },
+ "orange": {
+  "me": 1,
+  "pie": 1
+ },
+ "owl": {
+  "me": 1,
+  "pie": 1
+ },
+ "pie-game": {
+  "pie": 1
+ },
+ "pop": {
+  "me": 1,
+  "pie": 1
+ },
+ "purple": {
+  "me": 1,
+  "pie": 1
+ },
+ "red": {
+  "me": 1,
+  "pie": 1
+ },
+ "well-done": {
+  "me": 1,
+  "pie": 1
+ },
+ "white": {
+  "me": 1,
+  "pie": 1
+ },
+ "woof-woof": {
+  "pie": 1
+ },
+ "wow": {
+  "pie": 1
+ },
+ "yay": {
+  "pie": 1
+ },
+ "yellow": {
+  "me": 1,
+  "pie": 1
+ }
+}

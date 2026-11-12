@@ -3,6 +3,7 @@ import { sfx } from './sound.js';
 import { say } from './speech.js';
 import { currentPlayer } from './store.js';
 import { avatarSVG } from './avatar.js';
+import { pickSayable, canSpeak } from './voices.js';
 
 export const PARTY = ['#ef4444', '#fb923c', '#facc15', '#22c55e', '#3b82f6', '#a855f7', '#f472b6'];
 let cv, cx, parts = [], raf = 0, last = 0;
@@ -69,10 +70,10 @@ export function confettiRain(n = 140) {
   start();
 }
 
-const PRAISE = ['Well done', 'Yay', 'Brilliant', 'Great job', 'Amazing', 'Super', 'Hooray'];
+const PRAISE = ['Well done', 'Yay', 'Wow', 'Good job', 'Excellent', 'Brilliant', 'Amazing', 'Super', 'Hooray'];
 export function praise() {
   const p = currentPlayer();
-  const w = PRAISE[(Math.random() * PRAISE.length) | 0];
+  const w = pickSayable(PRAISE) || PRAISE[(Math.random() * PRAISE.length) | 0];
   return p?.name ? `${w}, ${p.name}!` : `${w}!`;
 }
 
@@ -80,7 +81,8 @@ export function praise() {
 export function celebrate(text = praise()) {
   confettiRain();
   sfx.yay();
-  setTimeout(() => say(text), 900);
+  // say the game's own line if it has been recorded, otherwise a recorded praise word (+ name)
+  setTimeout(() => say(canSpeak(text) ? text : praise()), 900);
   const p = currentPlayer();
   const d = document.createElement('div');
   d.className = 'cheer';

@@ -9,6 +9,7 @@ import { burst, confettiRain } from '../fx.js';
 import { drawBalloon, drawBubble, drawSheep, drawCloud } from '../draw.js';
 import { COLOURS, ANIMALS } from '../data.js';
 import { createSea, drawFish } from '../sea.js';
+import { canSpeak } from '../voices.js';
 import { createMeadow } from '../scenery.js';
 import { FARM, animalSound, preloadAnimals, SOUND_FOR_NAME } from '../animals.js';
 
@@ -107,7 +108,7 @@ export function mount(el, { theme = 'balloons' } = {}) {
     else if (mode === 'animals') {
       const snd = SOUND_FOR_NAME[b.animal[1]];
       // real animal recording when we have one, then the voice says its name
-      if (snd && animalSound(snd)) { words = ''; setTimeout(() => say(b.animal[1] + '!'), 900); } else words = `${b.animal[1]}! ${b.animal[2]}`;
+      if (snd && animalSound(snd)) { words = ''; setTimeout(() => say(`${b.animal[1]}! ${b.animal[2]}`), 900); } else words = `${b.animal[1]}! ${b.animal[2]}`;
       show = b.animal[0];
     }
     else if (mode === 'letters') { words = b.letter + '!'; show = b.letter; }
@@ -116,7 +117,11 @@ export function mount(el, { theme = 'balloons' } = {}) {
     // now and then, play the family "balloons" voice note instead of the spoken word
     const clipped = !bubbles && pops > 2 && Math.random() < 0.15 && playClip('balloons', 7000);
     // Bubbles is a quiet game: no talking voice
-    if (!bubbles && !clipped && (cfg.countAloud || mode !== 'count')) say(words, { rate: 1 });
+    if (!clipped) {
+      if (bubbles) { if (Math.random() < 0.2) say(Math.random() < 0.5 ? 'Bubble!' : 'Pop!'); }  // family voices only, now and then
+      else if (mode !== 'count') say(words);
+      else if (cfg.countAloud) say(canSpeak(words) ? words : Math.random() < 0.3 ? 'Pop!' : '');
+    }
     if (pops % 10 === 0) { setTimeout(() => { confettiRain(80); sfx.yay(); }, 250); }
   }
 

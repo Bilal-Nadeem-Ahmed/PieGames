@@ -18,13 +18,14 @@ export const OPTIONS = {
 
 // Defaults based on the two main players (parents can change everything in the parent area).
 const DEFAULT_PLAYERS = [
-  { id: 'p1', name: '', skin: '#ebbf98', hair: 'topBun', hairColor: '#1b120d', eyes: '#2e1c10', lashes: true,
+  { id: 'p1', name: 'Rahma', skin: '#ebbf98', hair: 'topBun', hairColor: '#1b120d', eyes: '#2e1c10', lashes: true,
     shirt: '#8fb0dc', pants: '#8fb0dc', sleeves: 'puff', outfit: 'dress', extra: 'bow', accent: '#6f9fe0' },
-  { id: 'p2', name: '', skin: '#d9a179', hair: 'swept', hairColor: '#1b120d', eyes: '#2e1c10', lashes: false, brows: 'thick',
+  { id: 'p2', name: 'Ibrahim', skin: '#d9a179', hair: 'swept', hairColor: '#1b120d', eyes: '#2e1c10', lashes: false, brows: 'thick',
     shirt: '#7d9fd0', pattern: 'stripes', stripe: '#f6f1e6', pants: '#7d9fd0', sleeves: 'long', outfit: 'top', extra: 'hammer', accent: '#29a8d8' },
 ];
 
 const DEFAULT_SETTINGS = { sound: true, voice: true, countMax: 10, familyClips: true, music: 0,
+  defaultVoices: true, phoneVoice: false, voiceNames: {}, voices: [],
   // volumes 0..1 (grown-ups area sliders)
   vol: { music: 0.7, sfx: 0.8, animals: 0.4, clips: 1, voice: 1 } };
 
@@ -35,7 +36,10 @@ function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch
 
 export function getPlayers() {
   const p = read(KEY, null);
-  return Array.isArray(p) && p.length ? p : structuredClone(DEFAULT_PLAYERS);
+  const list = Array.isArray(p) && p.length ? p : structuredClone(DEFAULT_PLAYERS);
+  // fill in the default names for the first two players if they were never set
+  for (const d of DEFAULT_PLAYERS) { const q = list.find((x) => x.id === d.id); if (q && !q.name) q.name = d.name; }
+  return list;
 }
 export function savePlayers(p) { write(KEY, p); }
 export function newPlayer() {

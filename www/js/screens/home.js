@@ -61,6 +61,8 @@ export function mount(el) {
     };
     pl.appendChild(b);
   }
+  // "Pie Game!" the first time the home screen opens
+  if (!window.__pgHello) { window.__pgHello = true; setTimeout(() => say('Pie Game!'), 700); }
   const tiles = el.querySelector('.tiles');
   GAMES.forEach((g, i) => {
     const a = document.createElement('a');

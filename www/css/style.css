@@ -567,3 +567,21 @@ svg { display: block; }
 .home .parent-btn { top: calc(72px + var(--safe-t)); bottom: auto; right: 16px; width: 44px; height: 44px; padding: 9px; opacity: .7; z-index: 6; }
 .home .parent-btn .ring { width: 52px; height: 52px; }
 @media (orientation: portrait) { .home .parent-btn { top: auto; bottom: calc(10px + var(--safe-b)); } .tiles { bottom: calc(64px + var(--safe-b)); } }
+
+/* ---------- grown-ups: Voices ---------- */
+.vchips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.vchip { padding: 10px 16px; border-radius: 22px; background: #eef2f8; font-weight: 800; font-size: 16px; }
+.vchip.on { background: #3a6fd8; color: #fff; } .vchip small { font-weight: 600; opacity: .7; } .vchip.add { background: #fff; border: 2px dashed #9aa7bd; }
+.vbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+.seg-b { padding: 10px 14px; border-radius: 12px; background: #eef2f8; font-weight: 700; } .seg-b.on { background: #3a6fd8; color: #fff; }
+.vgroup { border: 1px solid #e3e8f0; border-radius: 14px; margin: 8px 0; background: #fbfcff; }
+.vgroup summary { padding: 12px 14px; font-weight: 800; font-size: 17px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.vcount { font-size: 13px; background: #fde68a; padding: 3px 10px; border-radius: 12px; } .vcount.full { background: #b9f6ca; }
+.vrows { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 4px 14px; padding: 0 12px 12px; }
+.vrow { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid #eef0f4; }
+.vdot { width: 22px; text-align: center; color: #b0b8c6; font-weight: 900; } .vdot.ok { color: #22c55e; }
+.vword { flex: 1; font-weight: 700; font-size: 15px; }
+.vb { width: 40px; height: 40px; border-radius: 50%; background: #eef2f8; display: grid; place-items: center; font-size: 16px; cursor: pointer; flex: none; }
+.vb:disabled { opacity: .3; } .vb.rec { color: #ef4444; } .vb.rec.on { background: #ef4444; color: #fff; animation: glowpulse 1s infinite; }
+.vb.rec.on { animation: recpulse 1s infinite; }
+@keyframes recpulse { 50% { background: #fca5a5; } }

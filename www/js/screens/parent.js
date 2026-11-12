@@ -6,6 +6,7 @@ import { getPlayers, savePlayers, newPlayer, OPTIONS, getSettings, saveSettings,
 import { avatarSVG } from '../avatar.js';
 import { SONGS, setSong } from '../music.js';
 import { VERSION } from '../version.js';
+import { voicesPanel } from './voices-panel.js';
 
 const LABEL = {
   hair: 'Hair style', hairColor: 'Hair colour', skin: 'Skin', eyes: 'Eyes', outfit: 'Outfit', shirt: 'Clothes colour', pattern: 'Pattern',
@@ -25,6 +26,7 @@ export function mount(el) {
     <header><h1>Grown-ups</h1><button class="done">Done ✓</button></header>
     <section class="kids-edit"><div class="tabs"></div>
       <div class="editor"><div class="preview"></div><div class="opts"></div></div></section>
+    <section class="voices-sec"></section>
     <section class="settings"><h2>Settings</h2><div class="set"></div>
       <p class="tip">Tip: to stop little ones leaving the app, turn on <b>App pinning</b> in Android Settings → Security, then pin Pie Games.</p><p class="tip">Pie Games version ${VERSION}</p></section>
   </div>`;
@@ -108,8 +110,8 @@ export function mount(el) {
     slider('Sound effects volume', 'sfx', () => sfx.pop());
     slider('Animal sounds volume', 'animals', () => animalSound('cow'));
     slider('Voice notes volume', 'clips', () => playClip('balloons', 0));
-    slider('Talking voice volume', 'voice', () => say('Hello!'));
-    onoff('Talking voice', s, 'voice');
+    slider('Voice volume', 'voice', () => say('Well done!'));
+    onoff('Voice (family clips)', s, 'voice');
     onoff('Family voice notes', s, 'familyClips');
     {
       const w = document.createElement('div'); w.className = 'seg';
@@ -132,5 +134,6 @@ export function mount(el) {
 
   const renderAll = () => { renderTabs(); renderOpts(); };
   renderAll(); renderSettings();
+  voicesPanel(el.querySelector('.voices-sec'));
   el.querySelector('.done').onclick = () => { save(); location.hash = '#home'; };
 }

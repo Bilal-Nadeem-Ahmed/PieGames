@@ -11,6 +11,7 @@ import { drawBalloon, drawSheep, drawStar, drawDino } from '../draw.js';
 import { COLOURS } from '../data.js';
 import { createMeadow } from '../scenery.js';
 import { animalSound, preloadAnimals } from '../animals.js';
+import { say } from '../speech.js';
 
 const SPEED = { slow: 0.7, normal: 1, fast: 1.35 };
 
@@ -39,12 +40,14 @@ export function mount(el) {
   const obs = [], gifts = [], dust = [];
   let dustT = 0;
 
+  let lastJumpWord = 0;
   const gravity = () => 2600 * S;
   function jump() {
     if (hero.state !== 'run' || hero.jumps >= 2) return;
     hero.vy = -Math.sqrt(2 * gravity() * H * (hero.jumps ? 0.15 : 0.19));
     hero.onGround = false; hero.jumps++; hero.holdT = 0;
     sfx.boing(); buzz(8);
+    if (hero.jumps === 1 && Math.random() < 0.25 && performance.now() - lastJumpWord > 4000) { lastJumpWord = performance.now(); say('Jumping!'); }
   }
   const down = (e) => { e.preventDefault(); holding = true; jump(); };
   const up = () => { holding = false; };

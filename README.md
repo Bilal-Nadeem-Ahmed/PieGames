@@ -28,6 +28,13 @@ Quick buttons (top right): talking voice on/off, and music (tap to change song o
 ## Grown-ups area
 On the home screen, **hold the gear button for 2 seconds**. Edit each kid's cartoon (hair, skin, clothes, bow, toy hammer…) and name (spoken in games), and change settings: sounds, talking voice, family voice notes, background music, numbers up to 5/10/20, pop speed/amount/size, counting aloud, surprises, runner speed.
 
+## Voices
+The games speak with recorded family voices (Dad and Rahma by default). Where more than one voice has recorded a word, they take turns.
+- **Grown-ups → Voices**: pick a voice, then ▶ play, ● record (tap again to stop) or ⬆ upload a clip for any word. **+ Add a voice** for anyone else (e.g. Ibrahim, Grandma).
+- **Remove default voices** turns off Dad & Rahma so only your own voices are used (**Bring back default voices** undoes it).
+- Words nobody has recorded stay silent (or switch on **Phone voice for missing words**).
+- What still needs recording: [docs/VOICE_CLIPS.md](docs/VOICE_CLIPS.md). To add a batch of clips to the app itself: name them `<words>-pie.wav` / `<words>-me.wav`, run `python3 scripts/import_voice.py <folder>` then `node scripts/voice-checklist.mjs`.
+
 ## Install on Android
 1. Copy `dist/PieGames-<version>.apk` (only the latest build is kept) to the phone/tablet (or download it there).
 2. Open it and allow "Install unknown apps" for your file manager/browser when asked.

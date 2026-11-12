@@ -8,6 +8,7 @@ import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, shuffle, pick } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { FARM, animalSound, preloadAnimals } from '../animals.js';
+import { petSVG, PETS } from './pet-art.js';
 import { createMeadow } from '../scenery.js';
 
 const COVERS = {
@@ -25,7 +26,17 @@ const COVERS = {
   tree: `<svg viewBox="0 0 100 100"><rect x="38" y="46" width="24" height="50" rx="6" fill="#8a5a35" stroke="#5c3b1e" stroke-width="3"/>
     <circle cx="50" cy="34" r="30" fill="#3fae4f" stroke="#2b7a35" stroke-width="3"/><circle cx="26" cy="48" r="18" fill="#3fae4f" stroke="#2b7a35" stroke-width="3"/><circle cx="74" cy="48" r="18" fill="#3fae4f" stroke="#2b7a35" stroke-width="3"/>
     <circle cx="40" cy="26" r="4" fill="#ff5c5c"/><circle cx="62" cy="40" r="4" fill="#ff5c5c"/><circle cx="30" cy="50" r="4" fill="#ff5c5c"/></svg>`,
+  curtain: `<svg viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="10" rx="3" fill="#b45309" stroke="#7a3a06" stroke-width="3"/>
+    <path class="cl" d="M4 10 H50 V98 C40 96 30 99 20 97 C12 96 8 98 4 98 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="3"/>
+    <path class="cr" d="M50 10 H96 V98 C88 98 84 96 76 97 C66 99 58 96 50 98 Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="3"/>
+    <path d="M18 14 V94 M34 14 V94 M66 14 V94 M82 14 V94" stroke="#0002" stroke-width="5"/></svg>`,
+  pot: `<svg viewBox="0 0 100 100"><path d="M28 40 C10 28 14 6 34 10 C38 -2 62 -2 66 10 C86 6 90 28 72 40 Z" fill="#3fae4f" stroke="#2b7a35" stroke-width="3"/>
+    <circle cx="40" cy="20" r="6" fill="#ff6fa5"/><circle cx="60" cy="16" r="6" fill="#ffd23f"/><circle cx="52" cy="30" r="6" fill="#fff"/>
+    <path d="M14 42 H86 L76 98 H24 Z" fill="#e07a3f" stroke="#8a3f12" stroke-width="3"/><rect x="10" y="36" width="80" height="14" rx="5" fill="#f08a4b" stroke="#8a3f12" stroke-width="3"/></svg>`,
 };
+
+const PET_KINDS = Object.keys(PETS);
+const petSound = (k) => { const s = PETS[k].sound; if (s) animalSound(s); else if (k === 'dino') sfx.roar(); else sfx.giggle(); };
 
 export function mount(el) {
   el.innerHTML = `<div class="screen peek"><canvas class="peek-bg"></canvas>${homeBtn()}<div class="spots"></div></div>`;
@@ -43,7 +54,7 @@ export function mount(el) {
 
   function round() {
     const n = Math.min(W > H ? 5 : 3, [2, 3, 4, 5][getLevel('peekaboo') - 1]);
-    const animals = shuffle([...FARM]).slice(0, n).map((a) => ({ kind: 'animal', a }));
+    const animals = shuffle([...PET_KINDS]).slice(0, n).map((t) => ({ kind: 'pet', t }));
     const players = getPlayers();
     if (Math.random() < 0.5 && players.length) animals[(Math.random() * n) | 0] = { kind: 'kid', p: pick(players) };
     const covers = shuffle(Object.keys(COVERS)).slice(0, n);
@@ -52,23 +63,25 @@ export function mount(el) {
     animals.forEach((who, i) => {
       const s = document.createElement('div');
       s.className = 'spot'; s.style.animationDelay = i * 90 + 'ms';
-      const hider = who.kind === 'kid' ? `<div class="hider kid">${avatarSVG(who.p, { pose: 'up' })}</div>` : `<div class="hider">${who.a.e}</div>`;
+      const hider = who.kind === 'kid' ? `<div class="hider kid">${avatarSVG(who.p, { pose: 'up' })}</div>` : `<div class="hider critter">${petSVG(who.t, 2, 'ok')}</div>`;
       s.innerHTML = `${hider}<div class="cover cover-${covers[i]}">${COVERS[covers[i]]}</div>`;
       const cover = s.querySelector('.cover'), hid = s.querySelector('.hider');
       let open = false;
       const speak = () => {
         if (who.kind === 'kid') { sfx.giggle(); say(who.p.name ? `Peekaboo, ${who.p.name}!` : 'Peekaboo!'); }
-        else { animalSound(who.a.id); setTimeout(() => alive && say(`${/^[AEIOU]/.test(who.a.name) ? 'An' : 'A'} ${who.a.name.toLowerCase()}!`), 900); }
+        else { petSound(who.t); const nm = PETS[who.t].name.toLowerCase(); setTimeout(() => alive && say(`Peekaboo! ${/^[aeiou]/.test(nm) ? 'An' : 'A'} ${nm === 'dino' ? 'dinosaur' : nm}!`), 800); }
       };
       s.addEventListener('pointerdown', (e) => {
         e.preventDefault(); buzz(10);
         if (!open) {
-          open = true; s.classList.add('open'); sfx.boing();
+          open = true; s.classList.add('open'); s.classList.remove('peek'); sfx.boing();
+          if (who.kind === 'pet') { hid.innerHTML = petSVG(who.t, 2, 'excited'); setTimeout(() => { if (alive) hid.innerHTML = petSVG(who.t, 2, 'happy'); }, 1200); }
           const r = s.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * 0.4, { n: 18, shape: 'star' });
           setTimeout(speak, 250);
           if (++found === n) timer = setTimeout(() => { if (!alive) return; celebrate('You found them all!'); win('peekaboo', badge); timer = setTimeout(() => alive && closeAll(), 3200); }, 1800);
         } else {
           hid.classList.remove('hop'); void hid.offsetWidth; hid.classList.add('hop'); speak();
+          if (who.kind === 'pet') { hid.innerHTML = petSVG(who.t, 2, 'love'); clearTimeout(hid._t); hid._t = setTimeout(() => { if (alive) hid.innerHTML = petSVG(who.t, 2, 'happy'); }, 1200); }
         }
       });
       s.dataset.cover = covers[i];
@@ -81,6 +94,13 @@ export function mount(el) {
     sfx.tap();
     timer = setTimeout(() => alive && round(), 600);
   }
+  // hints: now and then someone peeps out of a hiding place that hasn't been opened yet
+  const peekT = setInterval(() => {
+    const closed = [...spotsEl.querySelectorAll('.spot:not(.open):not(.peek)')];
+    if (!closed.length) return;
+    const s = pick(closed); s.classList.add('peek'); sfx.tap();
+    setTimeout(() => s.classList.remove('peek'), 1400);
+  }, 2600);
   round();
-  return () => { alive = false; clearTimeout(timer); cancelAnimationFrame(raf); removeEventListener('resize', fit); };
+  return () => { alive = false; clearTimeout(timer); clearInterval(peekT); cancelAnimationFrame(raf); removeEventListener('resize', fit); };
 }

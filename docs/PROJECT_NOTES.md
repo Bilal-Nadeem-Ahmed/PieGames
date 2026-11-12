@@ -73,7 +73,7 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - [ ] Dino eggs improvement.
 - [x] Colouring: 8 animal pages via `lineArt(petSVG())` in pictures.js (1.25).
 - [x] Music: xylophone + bells added (1.24).
-- [ ] Peekaboo improvement.
+- [x] Peekaboo improvement (1.26: drawn pets, peek hints, curtain + flowerpot).
 - [ ] Build it: more projects/options and polish.
 - [x] Puzzles: animals in farm/seaside/snow/sunset scenes; Pairs: drawn animals + 22 more emoji cards (1.25).
 - Note: pet-art `dedupe()` removes duplicate attributes so petSVG works as an <img>/data URL too.

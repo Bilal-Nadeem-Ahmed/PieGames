@@ -787,3 +787,18 @@ svg { display: block; }
 @keyframes bellswing { 10% { rotate: 22deg; } 25% { rotate: -18deg; } 40% { rotate: 12deg; } 55% { rotate: -8deg; } 70% { rotate: 4deg; } 100% { rotate: 0deg; } }
 .bell.ring .clapper { animation: clap 1.3s ease-out; transform-box: fill-box; transform-origin: 50% -200%; }
 @keyframes clap { 12% { transform: rotate(-30deg); } 28% { transform: rotate(25deg); } 45% { transform: rotate(-12deg); } 100% { transform: none; } }
+/* peekaboo v2 */
+.spot { overflow: visible; }
+.spot .hider.critter { inset: -6% -4% 0; display: block; font-size: 0; }
+.spot .hider.critter svg { width: 100%; height: 100%; }
+.spot.peek .hider { animation: peekout 1.4s ease-in-out; }
+@keyframes peekout { 0% { opacity: 0; transform: translateY(20%) scale(.8); } 10%, 90% { opacity: 1; transform: translateY(15%) scale(.8); } 35%, 65% { opacity: 1; transform: translateY(-52%) scale(.8); } 100% { opacity: 0; transform: translateY(20%) scale(.8); } }
+.spot:not(.open) .hider { opacity: 0; }
+.spot .hider .pet-body { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 2.6s ease-in-out infinite; }
+.spot .hider .tail { transform-box: fill-box; transform-origin: 0% 100%; animation: wag .6s ease-in-out infinite alternate; }
+.spot .hider .ear.l, .spot .hider .ear.r { transform-box: fill-box; transform-origin: 50% 90%; animation: earwig 3s ease-in-out infinite; }
+.spot.open .cover-curtain { animation: none; }
+.spot.open .cover-curtain .cl { transform-box: fill-box; transform-origin: 0 0; animation: curtl .6s forwards; }
+.spot.open .cover-curtain .cr { transform-box: fill-box; transform-origin: 100% 0; animation: curtr .6s forwards; }
+@keyframes curtl { to { transform: scaleX(.22); } } @keyframes curtr { to { transform: scaleX(.22); } }
+.spot.open .cover-pot { animation: openpot .6s forwards; } @keyframes openpot { to { transform: translate(70%, 10%) scale(.55) rotate(18deg); } }

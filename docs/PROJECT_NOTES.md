@@ -86,3 +86,4 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - Playwright clicks wait for "stable" elements: use `{force:true}` on bouncing/pulsing buttons.
 - `const` arrow helpers used before definition inside `mount` → TDZ errors; use function declarations.
 - Wikimedia upload server rate-limits (429) this container; OpenGameArt works for CC0 sounds.
+- 1.30: Balloons background = www/js/sky.js createSky() (draw/tap), replaces meadow; Bubbles speaks words in non-count modes.

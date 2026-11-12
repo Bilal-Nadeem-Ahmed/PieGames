@@ -11,7 +11,7 @@ import { drawBalloon, drawBubble, drawSheep, drawCloud } from '../draw.js';
 import { COLOURS, ANIMALS } from '../data.js';
 import { createSea, drawFish } from '../sea.js';
 import { canSpeak } from '../voices.js';
-import { createMeadow } from '../scenery.js';
+import { createSky } from '../sky.js';
 import { FARM, animalSound, preloadAnimals, SOUND_FOR_NAME } from '../animals.js';
 
 const MODES = [
@@ -67,7 +67,7 @@ export function mount(el, { theme = 'balloons' } = {}) {
   let items = [], sheep = [], floaters = [], pops = 0, t = 0, raf = 0, last = performance.now();
   const clouds = Array.from({ length: 4 }, (_, i) => ({ x: Math.random() * 1.2, y: 0.08 + i * 0.09, s: 0.6 + Math.random() * 0.6, v: 0.004 + Math.random() * 0.006 }));
   const sea = bubbles ? createSea() : null;
-  const meadow = bubbles ? null : createMeadow();
+  const sky = bubbles ? null : createSky();
 
   function decorate(b) {
     b.colour = pick(bubbles && mode !== 'colours' ? [{ n: '', c: '' }] : COLOURS);
@@ -122,7 +122,8 @@ export function mount(el, { theme = 'balloons' } = {}) {
     const clipped = !bubbles && pops > 2 && Math.random() < 0.15 && playClip('balloons', 7000);
     // Bubbles is a quiet game: no talking voice
     if (!clipped) {
-      if (bubbles) { if (Math.random() < 0.2) say(Math.random() < 0.5 ? 'Bubble!' : 'Pop!'); }  // family voices only, now and then
+      // Bubbles stays quiet in plain popping mode, but says the colour / animal / letter / number in the others
+      if (bubbles && mode === 'count') { if (Math.random() < 0.2) say(Math.random() < 0.5 ? 'Bubble!' : 'Pop!'); }
       else if (mode !== 'count') say(words);
       else if (cfg.countAloud) say(canSpeak(words) ? words : Math.random() < 0.3 ? 'Pop!' : '');
     }
@@ -138,6 +139,8 @@ export function mount(el, { theme = 'balloons' } = {}) {
       const dx = (x - b.x) / (b.r * 1.3), dy = (y - b.y) / (b.r * (bubbles ? 1.3 : 1.5));
       if (dx * dx + dy * dy <= 1) return pop(b);
     }
+    const hit = sky && sky.tap(x, y);
+    if (hit) { if (hit === 'balloon') { sfx.boing(); } else { sfx.chime(rnd(8)); } burst(x, y, { n: 8, speed: 140, shape: 'star' }); return; }
     if (sea && sea.tap(x, y, W, H)) { sfx.chime(rnd(8)); burst(x, y, { n: 8, colors: ['#bfefff', '#fff'], speed: 140, shape: 'dot' }); return; }
     for (const s of sheep) if (Math.abs(x - s.x) < 70 && Math.abs(y - (s.y - 40)) < 70) { animalSound(s.farm.id); s.bleat = 0.8; return; }
     for (const k of kids) if (k.box && x > k.box[0] && x < k.box[0] + k.box[2] && y > k.box[1] && y < k.box[1] + k.box[3]) {
@@ -154,7 +157,7 @@ export function mount(el, { theme = 'balloons' } = {}) {
     if (bubbles) {
       sea.draw(c, W, H, t, dt);
     } else {
-      meadow.draw(c, W, H, t, dt, t * 12, H * 0.88);
+      sky.draw(c, W, H, t, dt);
     }
   }
 

@@ -14,7 +14,7 @@ Everything works offline. Art is drawn in code and music/effects are generated; 
 - **Peekaboo** – animals (and sometimes the kids) hide behind bushes, barn doors, haystacks, boxes and trees; tap to find them, hear their real sound and name.
 - **Shapes** – 🔷 drag shapes into matching holes on a wooden board, or 🎨 put fruit and toys into the basket of the same colour.
 - **Build it** – pick a house, car or rocket: saw a plank, then hammer the nails and screw the screws as each part flies in; it gets painted and the house puffs smoke (builder waves from the door), the car drives off, the rocket blasts off.
-- **Feed** – drag the right food to each hungry animal (dog 🦴, cat 🐟, bunny 🥕, elephant 🥜, monkey 🍌, sheep 🌿): mouths open as food comes near, they chew, then get happy eyes, hearts, a dance and their own sound; wrong food gets a head shake.
+- **Feed** – up to 4 animals (puppy, kitten, bunny, lamb, cow, elephant, duck, dino) wander around the farm; each hungry one shows the food it wants in a bubble. Drag food to it: it stops, opens its mouth, munches and does a happy wiggle with its own sound. Stroke an animal to pet it (love eyes and hearts), tap it to make it hop. Wrong food gets a head shake. They get hungry again after a while, and new animals wander in.
 - **Pairs** – memory game with 2, 3, 4 or 6 pairs of big flip cards: animals (with their sounds), a ladybird and the kids' own faces.
 - **Sheep pen** – tap the wandering sheep to make them leap into the pen; they're counted out loud, the gate shuts, they dance, then run out for another round.
 - **Puzzles** – 2, 4, 6 or 9 big pieces to drag onto a faint guide picture: sheep, dinosaur, balloons, ladybird, fish and the kids themselves.

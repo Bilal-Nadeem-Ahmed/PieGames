@@ -710,3 +710,27 @@ svg { display: block; }
 .poops { bottom: calc(13vmin + 52px + var(--safe-b)); }
 .tray { left: calc(10px + var(--safe-t, 0px)); right: auto; top: 50%; bottom: auto; transform: translate(-30px, -50%); display: grid; grid-template-columns: repeat(2, auto); }
 .tray.open { transform: translate(0, -50%); }
+
+/* ======================= Feed the animals v2 ======================= */
+.feed2 .farm-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.feed2 .field { position: absolute; inset: 0; }
+.beastie { position: absolute; left: 0; top: 0; aspect-ratio: 1; transform-origin: 50% 100%; touch-action: none; cursor: grab; }
+.beastie .b-art { width: 100%; height: 100%; }
+.beastie .pet-body { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 2.6s ease-in-out infinite; }
+.beastie .pet-head { animation: headbob 3.2s ease-in-out infinite; }
+.beastie .ear.l, .beastie .ear.r { transform-box: fill-box; transform-origin: 50% 90%; animation: earwig 4s ease-in-out infinite; }
+.beastie .tail { transform-box: fill-box; transform-origin: 0% 100%; animation: wag .6s ease-in-out infinite alternate; }
+.beastie.walking .b-art { animation: walkbob .42s ease-in-out infinite; }
+@keyframes walkbob { 50% { translate: 0 -5%; rotate: 2deg; } }
+.beastie.chewing .pet-head { animation: chew .26s ease-in-out infinite; }
+.beastie.wiggle .b-art { animation: petdance .5s ease-in-out 3; }
+.beastie.hop .b-art { animation: pethop .5s; }
+.beastie.nope .b-art { animation: nodno .5s; }
+@keyframes nodno { 20% { rotate: -9deg; } 40% { rotate: 9deg; } 60% { rotate: -6deg; } 80% { rotate: 4deg; } }
+.b-want { position: absolute; right: 2%; top: 2%; width: 34%; aspect-ratio: 1.1; display: grid; place-items: center; font-size: min(7vmin, 4.5vw); background: #fff; border-radius: 50%;
+  box-shadow: 0 5px 12px #0003; opacity: 0; transform: scale(.3); transition: all .3s cubic-bezier(.3, 1.6, .5, 1); pointer-events: none; }
+.b-want::after { content: ""; position: absolute; left: 4%; bottom: -10%; width: 24%; aspect-ratio: 1; background: #fff; border-radius: 50%; }
+.b-want.on { opacity: 1; transform: scale(1); animation: needbob 1.6s ease-in-out infinite; }
+.foodbasket { position: absolute; left: 50%; bottom: calc(8px + var(--safe-b)); transform: translateX(-50%); display: flex; flex-direction: row; gap: 2.4vmin; padding: 1.2vmin 3vmin; z-index: 200;
+  background: linear-gradient(#d9a066, #b97a3f); border: 5px solid #8a5a2b; border-radius: 22px 22px 34px 34px; box-shadow: 0 6px 0 #0003; min-height: 15vmin; min-width: 30vmin; align-items: center; justify-content: center; }
+.food2 { font-size: min(12vmin, 8vw); line-height: 1; filter: drop-shadow(0 4px 2px #0004); animation: popin .4s backwards; cursor: grab; }

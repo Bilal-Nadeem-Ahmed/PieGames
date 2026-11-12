@@ -1,131 +1,173 @@
-// Feed the animals: drag the right food to each hungry animal. As the food comes close the animal
-// opens its mouth; the right food gets munched (chewing, crunch sounds) then the animal is happy
-// (happy eyes, hearts, dance, its own sound). The wrong food gets a head shake: "No thank you!"
+// Feed the animals (v2): animals wander around the farm field. Each hungry one shows the food it wants.
+// Drag food to it - it stops, turns, opens its mouth, munches and does a happy wiggle with its own sound.
+// Stroke an animal to pet it (love eyes + hearts); tap it to make it hop. Wrong food gets a polite head shake.
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
-import { homeBtn, shuffle, draggable, inside, wait } from '../ui.js';
+import { homeBtn, shuffle, pick, draggable, wait } from '../ui.js';
 import { burst, celebrate } from '../fx.js';
 import { animalSound, preloadAnimals } from '../animals.js';
+import { petSVG, PETS } from './pet-art.js';
+import { createMeadow } from '../scenery.js';
 
-const O = 'stroke="#2b2118" stroke-width="4" stroke-linejoin="round"';
-// Shared face parts. Each animal places them with (eyeY, mouthY).
-const face = (ey, my, { eyeGap = 26, pupil = '#1b1b1b', muzzle = '' } = {}) => `
-  ${muzzle}
-  <g class="eyes">${[-1, 1].map((s) => `<g transform="translate(${100 + s * eyeGap} ${ey})"><ellipse rx="11" ry="13" fill="#fff" ${O}/><circle class="pupil" cx="0" cy="2" r="6.5" fill="${pupil}"/><circle cx="2.5" cy="-1.5" r="2.4" fill="#fff"/></g>`).join('')}</g>
-  <g class="happy-eyes">${[-1, 1].map((s) => `<path d="M${100 + s * eyeGap - 11} ${ey + 3} Q${100 + s * eyeGap} ${ey - 11} ${100 + s * eyeGap + 11} ${ey + 3}" fill="none" stroke="#2b2118" stroke-width="5" stroke-linecap="round"/>`).join('')}</g>
-  <path class="mouth-closed" d="M${100 - 14} ${my} Q100 ${my + 14} ${100 + 14} ${my}" fill="none" stroke="#2b2118" stroke-width="4.5" stroke-linecap="round"/>
-  <g class="mouth-open"><ellipse cx="100" cy="${my + 6}" rx="18" ry="16" fill="#7a1f2b" ${O}/><ellipse cx="100" cy="${my + 14}" rx="10" ry="6" fill="#ff7a8a"/></g>
-  <g class="cheeks"><ellipse cx="${100 - eyeGap - 12}" cy="${my - 4}" rx="9" ry="6" fill="#ff8a8a" opacity=".5"/><ellipse cx="${100 + eyeGap + 12}" cy="${my - 4}" rx="9" ry="6" fill="#ff8a8a" opacity=".5"/></g>`;
-
-const ANIMALS = {
-  dog: { food: '🦴', name: 'dog', sound: () => animalSound('dog'), svg: `
-    <ellipse cx="100" cy="178" rx="52" ry="30" fill="#c98a4b" ${O}/>
-    <ellipse cx="46" cy="96" rx="20" ry="40" fill="#8a5a2b" ${O} transform="rotate(18 46 96)"/><ellipse cx="154" cy="96" rx="20" ry="40" fill="#8a5a2b" ${O} transform="rotate(-18 154 96)"/>
-    <circle cx="100" cy="95" r="58" fill="#c98a4b" ${O}/><ellipse cx="78" cy="70" rx="14" ry="10" fill="#e0a868"/>
-    ${face(84, 128, { muzzle: `<ellipse cx="100" cy="122" rx="34" ry="26" fill="#f1d2a8" ${O}/><ellipse cx="100" cy="106" rx="11" ry="8" fill="#2b2118"/>` })}` },
-  cat: { food: '🐟', name: 'cat', sound: () => animalSound('cat'), svg: `
-    <ellipse cx="100" cy="178" rx="50" ry="30" fill="#b0b7c3" ${O}/>
-    <path d="M50 70 L58 18 L92 50 Z" fill="#b0b7c3" ${O}/><path d="M150 70 L142 18 L108 50 Z" fill="#b0b7c3" ${O}/>
-    <path d="M60 58 L63 32 L80 48 Z" fill="#ffb3c1"/><path d="M140 58 L137 32 L120 48 Z" fill="#ffb3c1"/>
-    <circle cx="100" cy="96" r="56" fill="#b0b7c3" ${O}/>
-    ${face(88, 126, { muzzle: `<ellipse cx="100" cy="122" rx="24" ry="16" fill="#f4f4f4"/><path d="M93 109 L107 109 L100 117 Z" fill="#ff8aa0" ${O}/>
-      <path d="M58 116 H30 M58 124 L32 132 M142 116 H170 M142 124 L168 132" stroke="#2b2118" stroke-width="2.5" stroke-linecap="round"/>` })}` },
-  bunny: { food: '🥕', name: 'bunny', sound: () => { sfx.giggle(); }, svg: `
-    <ellipse cx="100" cy="180" rx="48" ry="28" fill="#f4f4f4" ${O}/>
-    <ellipse cx="74" cy="34" rx="16" ry="42" fill="#f4f4f4" ${O} transform="rotate(-10 74 34)"/><ellipse cx="126" cy="34" rx="16" ry="42" fill="#f4f4f4" ${O} transform="rotate(10 126 34)"/>
-    <ellipse cx="74" cy="36" rx="7" ry="30" fill="#ffc2cf" transform="rotate(-10 74 36)"/><ellipse cx="126" cy="36" rx="7" ry="30" fill="#ffc2cf" transform="rotate(10 126 36)"/>
-    <circle cx="100" cy="102" r="52" fill="#f4f4f4" ${O}/>
-    ${face(94, 130, { muzzle: `<ellipse cx="100" cy="116" rx="8" ry="6" fill="#ff8aa0"/><rect class="teeth" x="93" y="131" width="14" height="10" rx="2" fill="#fff" ${O}/>` })}` },
-  elephant: { food: '🥜', name: 'elephant', sound: () => animalSound('elephant'), svg: `
-    <ellipse cx="100" cy="182" rx="56" ry="28" fill="#9fb3c8" ${O}/>
-    <circle cx="40" cy="96" r="38" fill="#9fb3c8" ${O}/><circle cx="160" cy="96" r="38" fill="#9fb3c8" ${O}/>
-    <circle cx="40" cy="96" r="24" fill="#ffc2cf"/><circle cx="160" cy="96" r="24" fill="#ffc2cf"/>
-    <circle cx="100" cy="94" r="56" fill="#9fb3c8" ${O}/>
-    ${face(80, 136, { eyeGap: 24 })}
-    <g class="trunk"><path d="M86 104 C84 150 96 172 116 168 C126 166 124 156 116 156 C104 158 106 140 114 104 Z" fill="#9fb3c8" ${O}/></g>` },
-  monkey: { food: '🍌', name: 'monkey', sound: () => say('Ooh ooh, aah aah!', { pitch: 1.6, rate: 1.2 }), svg: `
-    <ellipse cx="100" cy="180" rx="50" ry="30" fill="#8b5a3c" ${O}/>
-    <circle cx="42" cy="92" r="22" fill="#8b5a3c" ${O}/><circle cx="158" cy="92" r="22" fill="#8b5a3c" ${O}/><circle cx="42" cy="92" r="12" fill="#f3d1a6"/><circle cx="158" cy="92" r="12" fill="#f3d1a6"/>
-    <circle cx="100" cy="96" r="56" fill="#8b5a3c" ${O}/>
-    ${face(86, 128, { eyeGap: 22, muzzle: `<path d="M100 66 C82 56 58 66 62 92 C52 104 62 150 100 150 C138 150 148 104 138 92 C142 66 118 56 100 66 Z" fill="#f3d1a6" ${O}/><circle cx="94" cy="110" r="3" fill="#2b2118"/><circle cx="106" cy="110" r="3" fill="#2b2118"/>` })}` },
-  sheep: { food: '🌿', name: 'sheep', sound: () => animalSound('sheep'), svg: `
-    <ellipse cx="100" cy="180" rx="56" ry="30" fill="#fbfaf6" ${O}/>
-    <ellipse cx="52" cy="88" rx="22" ry="10" fill="#34302e" transform="rotate(-25 52 88)"/><ellipse cx="148" cy="88" rx="22" ry="10" fill="#34302e" transform="rotate(25 148 88)"/>
-    <ellipse cx="100" cy="104" rx="44" ry="54" fill="#3b3633" ${O}/>
-    <path d="M62 66 a14 14 0 0 1 22 -14 a14 14 0 0 1 32 0 a14 14 0 0 1 22 14 a12 12 0 0 1 -10 14 h-56 a12 12 0 0 1 -10 -14z" fill="#fbfaf6" ${O}/>
-    ${face(98, 132, { eyeGap: 20 })}` },
-};
+const KINDS = ['puppy', 'kitten', 'bunny', 'lamb', 'cow', 'elephant', 'duck', 'dino'];
+const SPOKEN = { puppy: 'puppy', kitten: 'kitten', bunny: 'bunny', lamb: 'lamb', cow: 'cow', elephant: 'elephant', duck: 'duck', dino: 'dinosaur' };
 
 export function mount(el) {
   preloadAnimals();
-  el.innerHTML = `<div class="screen feed">${homeBtn()}<div class="critters"></div><div class="tray"></div></div>`;
-  const root = el.firstElementChild, critters = root.querySelector('.critters'), tray = root.querySelector('.tray');
-  let alive = true, timer = 0;
+  el.innerHTML = `<div class="screen feed2"><canvas class="farm-bg"></canvas>${homeBtn()}<div class="field"></div><div class="foodbasket"></div></div>`;
+  const root = el.firstElementChild, field = root.querySelector('.field'), basket = root.querySelector('.foodbasket');
+  const cv = root.querySelector('.farm-bg'), c = cv.getContext('2d'), meadow = createMeadow();
+  let W, H, alive = true, raf = 0, t = 0, last = performance.now(), timer = 0, animals = [];
+  const fit = () => { const d = Math.min(devicePixelRatio || 1, 2); W = root.clientWidth; H = root.clientHeight; cv.width = W * d; cv.height = H * d; c.setTransform(d, 0, 0, d, 0, 0); };
+  fit(); addEventListener('resize', fit);
 
-  function round() {
-    const kinds = shuffle(Object.keys(ANIMALS)).slice(0, 4);
-    critters.innerHTML = kinds.map((k) => `<div class="critter" data-k="${k}"><svg viewBox="0 0 200 215">${ANIMALS[k].svg}</svg><div class="hearts"></div></div>`).join('');
-    tray.innerHTML = '';
-    let hungry = kinds.length;
-    const els = [...critters.children];
-    // blink now and then
-    els.forEach((c, i) => setTimeout(() => c.classList.add('blinky'), i * 700));
-    for (const k of shuffle([...kinds])) {
+  const sound = (k) => { const s = PETS[k].sound; if (s) animalSound(s); else if (k === 'dino') sfx.roar(); else sfx.giggle(); };
+  const rand = (a, b) => a + Math.random() * (b - a);
+  // the field is the lower part of the screen, above the basket
+  const area = () => ({ x0: 0.1, x1: 0.9, y0: 0.5, y1: 0.8 });
+
+  function makeAnimal(kind, i, n) {
+    const a = area();
+    const d = document.createElement('div');
+    d.className = 'beastie';
+    d.innerHTML = '<div class="b-art"></div><div class="b-want"></div>';
+    field.appendChild(d);
+    const an = { kind, el: d, x: a.x0 + ((i + 0.5) / n) * (a.x1 - a.x0) + rand(-0.04, 0.04), y: rand(a.y0, a.y1), tx: a.x0 + ((i + 0.5) / n) * (a.x1 - a.x0), ty: rand(a.y0, a.y1), dir: 1,
+      state: 'walk', mood: 'ok', hungry: true, wait: 0, sig: '', t: Math.random() * 5 };
+    // petting + tapping
+    let lp = null, rub = 0, downAt = 0;
+    d.addEventListener('pointerdown', (e) => { e.preventDefault(); d.setPointerCapture(e.pointerId); lp = [e.clientX, e.clientY]; rub = 0; downAt = performance.now(); });
+    d.addEventListener('pointermove', (e) => {
+      if (!lp || an.state === 'eat') return;
+      rub += Math.hypot(e.clientX - lp[0], e.clientY - lp[1]); lp = [e.clientX, e.clientY];
+      if (rub > 140) { rub = 0; pet(an, e.clientX, e.clientY); }
+    });
+    d.addEventListener('pointerup', (e) => { if (lp && performance.now() - downAt < 250 && rub < 15) hop(an); lp = null; });
+    return an;
+  }
+
+  function round(fresh) {
+    const n = W > H ? 4 : 3;
+    if (fresh || !animals.length) {
+      field.innerHTML = '';
+      animals = shuffle([...KINDS]).slice(0, n).map((k, i) => makeAnimal(k, i, n));
+    } else {
+      // swap one animal for a new one now and then
+      if (Math.random() < 0.6) {
+        const old = animals.shift(); old.state = 'leave'; old.tx = 1.25; setTimeout(() => old.el.remove(), 4000);
+        const used = new Set(animals.map((x) => x.kind)), k = pick(KINDS.filter((x) => !used.has(x) && x !== old.kind));
+        animals.push(makeAnimal(k, 0, n));
+      }
+      animals.forEach((an) => { an.hungry = true; an.state = an.state === 'leave' ? 'leave' : 'walk'; });
+    }
+    fillBasket();
+    say('Feed the animals!');
+  }
+
+  function fillBasket() {
+    basket.innerHTML = '';
+    for (const an of shuffle(animals.filter((a) => a.hungry))) {
       const f = document.createElement('div');
-      f.className = 'food'; f.textContent = ANIMALS[k].food; f.dataset.k = k;
-      tray.appendChild(f);
-      let hover = null;
+      f.className = 'food2'; f.textContent = PETS[an.kind].food; f.dataset.k = an.kind;
+      basket.appendChild(f);
+      let target = null;
       draggable(f, {
         onStart: () => sfx.tap(),
         onMove: (x, y) => {
-          const near = els.find((c) => !c.classList.contains('fed') && inside(c, x, y, 40));
-          if (near !== hover) { hover?.classList.remove('open'); hover = near; if (near) { near.classList.add('open'); sfx.boing(); } }
+          const near = nearest(x, y);
+          if (near !== target) { if (target) { target.state = 'walk'; } target = near; if (near) { near.state = 'look'; near.dir = x < screenX(near) ? -1 : 1; sfx.boing(); } }
         },
         onDrop: (x, y) => {
-          hover?.classList.remove('open'); hover = null;
-          const c = els.find((e) => !e.classList.contains('fed') && inside(e, x, y, 40));
-          if (!c) return false;
-          if (c.dataset.k !== k) { refuse(c); return false; }
-          eat(c, f).then(() => { if (--hungry === 0 && alive) timer = setTimeout(() => { if (!alive) return; celebrate('All the animals are full!'); timer = setTimeout(() => alive && round(), 3500); }, 600); });
-          return true;
+          if (target) target.state = 'walk';
+          const an = nearest(x, y); target = null;
+          if (!an) return false;
+          if (!an.hungry) { an.state = 'walk'; say("I'm full!"); refuse(an); return false; }
+          if (an.kind !== f.dataset.k) { refuse(an); say('No thank you!'); return false; }
+          eat(an, f); return true;
         },
       });
     }
-    say('The animals are hungry! Give them their food.');
   }
 
-  function refuse(c) {
-    c.classList.remove('nope'); void c.offsetWidth; c.classList.add('nope');
-    sfx.oops(); buzz(30); say('No thank you!');
+  const screenX = (an) => an.x * W, screenY = (an) => an.y * H;
+  function nearest(x, y) {
+    let best = null, bd = 1e9;
+    for (const an of animals) {
+      if (an.state === 'leave') continue;
+      const r = an.el.getBoundingClientRect();
+      const d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height * 0.45));
+      if (d < r.width * 0.75 && d < bd) { bd = d; best = an; }
+    }
+    return best;
   }
 
-  async function eat(c, f) {
-    f.dataset.locked = 1;
-    const k = c.dataset.k, A = ANIMALS[k];
-    // fly the food into the mouth
-    c.classList.add('open');
-    const mouth = c.querySelector('.mouth-open').getBoundingClientRect(), fr = f.getBoundingClientRect();
-    const m = new DOMMatrix(getComputedStyle(f).transform);
-    f.style.transition = 'transform .35s ease-in, opacity .35s';
-    f.style.transform = `translate(${m.e + mouth.left + mouth.width / 2 - (fr.left + fr.width / 2)}px, ${m.f + mouth.top + mouth.height / 2 - (fr.top + fr.height / 2)}px) scale(.25)`;
-    f.style.opacity = '0';
-    await wait(380);
-    f.remove();
-    // chew chew chew
-    c.classList.remove('open'); c.classList.add('chew');
+  async function eat(an, f) {
+    f.dataset.locked = 1; an.state = 'eat'; an.mood = 'eat';
+    const mouth = an.el.querySelector('.mouth, .beak, .trunk')?.getBoundingClientRect() || an.el.getBoundingClientRect();
+    const r = f.getBoundingClientRect(), m = new DOMMatrix(getComputedStyle(f).transform);
+    f.style.transition = 'transform .3s ease-in, opacity .3s'; f.style.opacity = '0';
+    f.style.transform = `translate(${m.e + mouth.left + mouth.width / 2 - r.left - r.width / 2}px, ${m.f + mouth.top + mouth.height / 2 - r.top - r.height / 2}px) scale(.2)`;
+    await wait(320); f.remove();
+    an.el.classList.add('chewing');
     for (let i = 0; i < 3; i++) { sfx.munch(); buzz(8); await wait(260); }
-    c.classList.remove('chew');
-    // happy!
-    c.classList.add('fed', 'happy');
-    A.sound();
-    sfx.ding();
-    const r = c.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * 0.35, { n: 16, colors: ['#ff5c8a', '#ff8ac2', '#fff'], shape: 'dot' });
-    const hearts = c.querySelector('.hearts');
-    for (let i = 0; i < 5; i++) { const h = document.createElement('span'); h.textContent = '❤️'; h.style.left = 20 + Math.random() * 60 + '%'; h.style.animationDelay = i * 0.12 + 's'; hearts.appendChild(h); }
-    setTimeout(() => alive && say(`Yum! The ${A.name} is happy!`), 1100);
-    await wait(1400);
+    an.el.classList.remove('chewing');
+    an.hungry = false; an.mood = 'love'; an.el.classList.add('wiggle');
+    sound(an.kind); sfx.ding();
+    const b = an.el.getBoundingClientRect(); burst(b.left + b.width / 2, b.top + b.height * 0.3, { n: 16, colors: ['#ff5c8a', '#ff8ac2', '#fff'], shape: 'dot' });
+    hearts(an, 4);
+    setTimeout(() => alive && say(`Yum! ${SPOKEN[an.kind]}!`), 900);
+    await wait(1500);
+    an.el.classList.remove('wiggle'); an.mood = 'happy'; an.state = 'walk';
+    if (!animals.some((x) => x.hungry && x.state !== 'leave')) timer = setTimeout(() => {
+      if (!alive) return;
+      celebrate('All the animals are full!');
+      timer = setTimeout(() => alive && round(false), 9000);   // after a little while they get hungry again
+    }, 500);
+  }
+  function refuse(an) { an.el.classList.remove('nope'); void an.el.offsetWidth; an.el.classList.add('nope'); an.mood = 'sad'; sfx.oops(); buzz(25); setTimeout(() => { if (an.mood === 'sad') an.mood = an.hungry ? 'ok' : 'happy'; }, 900); }
+  function pet(an, x, y) {
+    an.state = 'look'; an.mood = 'love'; clearTimeout(an.petT);
+    hearts(an, 1, x, y); buzz(5);
+    if (!an.petSound || performance.now() - an.petSound > 1800) { an.petSound = performance.now(); sound(an.kind); }
+    an.petT = setTimeout(() => { an.mood = an.hungry ? 'ok' : 'happy'; an.state = 'walk'; }, 1000);
+  }
+  function hop(an) { an.el.classList.remove('hop'); void an.el.offsetWidth; an.el.classList.add('hop'); sound(an.kind); }
+  function hearts(an, n, x, y) {
+    const r = an.el.getBoundingClientRect();
+    for (let i = 0; i < n; i++) setTimeout(() => {
+      const h = document.createElement('div'); h.className = 'heart-pop'; h.textContent = pick(['❤️', '💕', '💖']);
+      h.style.left = (x ?? r.left + r.width * (0.3 + Math.random() * 0.4)) + 'px'; h.style.top = (y ?? r.top + r.height * 0.25) + 'px';
+      document.body.appendChild(h); setTimeout(() => h.remove(), 1000);
+    }, i * 180);
   }
 
-  round();
-  return () => { alive = false; clearTimeout(timer); };
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    meadow.draw(c, W, H, t, dt, t * 4, H * 0.4);
+    const a = area(), size = Math.min(H * 0.46, W * 0.24);
+    for (const an of animals) {
+      an.t += dt;
+      if (an.state === 'walk' || an.state === 'leave') {
+        const dx = an.tx - an.x, dy = an.ty - an.y, d = Math.hypot(dx * W, dy * H), sp = (an.state === 'leave' ? 0.12 : 0.05) * W;
+        if (d > 4) { an.x += (dx * W / d) * sp * dt / W; an.y += (dy * H / d) * sp * dt / H; if (Math.abs(dx) > 0.002) an.dir = dx > 0 ? 1 : -1; an.walking = true; }
+        else { an.walking = false; an.wait -= dt; if (an.wait <= 0) { an.wait = rand(1, 4); an.tx = rand(a.x0, a.x1); an.ty = rand(a.y0, a.y1); } }
+      } else an.walking = false;
+      const mood = an.mood === 'ok' && an.hungry ? 'ok' : an.mood;
+      const sig = mood;
+      if (an.sig !== sig) { an.sig = sig; an.el.querySelector('.b-art').innerHTML = petSVG(an.kind, 2, mood); }
+      const want = an.el.querySelector('.b-want');
+      want.textContent = an.hungry && an.state !== 'leave' ? PETS[an.kind].food : '';
+      want.classList.toggle('on', an.hungry && an.state !== 'leave' && an.state !== 'eat');
+      const depth = 0.8 + ((an.y - a.y0) / (a.y1 - a.y0)) * 0.3;
+      an.el.style.width = size + 'px';
+      an.el.style.transform = `translate(${an.x * W - size / 2}px, ${an.y * H - size * 0.9}px) scale(${depth})`;
+      an.el.querySelector('.b-art').style.transform = `scaleX(${-an.dir})`;
+      an.el.style.zIndex = Math.round(an.y * 100);
+      an.el.classList.toggle('walking', an.walking);
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+  round(true);
+  return () => { alive = false; clearTimeout(timer); cancelAnimationFrame(raf); removeEventListener('resize', fit); };
 }

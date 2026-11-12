@@ -7,6 +7,9 @@ export const PETS = {
   bunny: { name: 'Bunny', body: '#f7f3ef', dark: '#d8cfc6', belly: '#ffffff', food: '🥕', sound: null },
   lamb: { name: 'Lamb', body: '#fbfaf6', dark: '#3b3633', belly: '#fbfaf6', food: '🌿', sound: 'sheep' },
   dino: { name: 'Dino', body: '#6fcf5b', dark: '#3f9a3a', belly: '#d7f5c9', food: '🍃', sound: null },
+  cow: { name: 'Cow', body: '#ffffff', dark: '#2b2b2b', belly: '#f4f4f4', food: '🌾', sound: 'cow', extra: true },
+  elephant: { name: 'Elephant', body: '#a7b8cc', dark: '#8396ad', belly: '#c9d6e4', food: '🥜', sound: 'elephant', extra: true },
+  duck: { name: 'Duck', body: '#ffd84a', dark: '#f2a20c', belly: '#fff3a6', food: '🍞', sound: 'duck', extra: true },
 };
 export const STAGES = ['Baby', 'Little', 'Big', 'Grown-up'];
 
@@ -39,7 +42,7 @@ export function petSVG(type, stage, mood, { dirty = false, wet = false } = {}) {
   if (type === 'dino') for (let i = 0; i < 4; i++) { const x = 120 + i * (bRx * 0.42), y = bCy - bRy * (0.95 - Math.abs(i - 1.5) * 0.1); back += `<path d="M${x - 10} ${y + 8} L${x} ${y - 14} L${x + 10} ${y + 8} Z" fill="#ffb347" ${O} stroke-width="3"/>`; }
 
   // ---- legs/feet
-  const legC = type === 'lamb' ? dark : skin;
+  const legC = type === 'lamb' ? dark : type === 'duck' ? '#ff9f1c' : type === 'cow' ? '#fff' : skin;
   let legs = '';
   for (const lx of [-0.55, -0.2, 0.2, 0.55]) legs += `<ellipse cx="${150 + lx * bRx * 1.1}" cy="${feetY - 8}" rx="${12 + stage * 2}" ry="${10 + stage}" fill="${legC}" ${O} stroke-width="4"/>`;
 
@@ -48,6 +51,8 @@ export function petSVG(type, stage, mood, { dirty = false, wet = false } = {}) {
   if (type === 'lamb') body = `<path d="${cloudPath(150, bCy, bRx * 1.08, bRy * 1.05, 12)}" fill="#fbfaf6" ${O}/>`;
   else body = `<ellipse cx="150" cy="${bCy}" rx="${bRx}" ry="${bRy}" fill="${skin}" ${O}/><ellipse cx="150" cy="${bCy + bRy * 0.25}" rx="${bRx * 0.62}" ry="${bRy * 0.6}" fill="${P.belly}"/>`;
   if (type === 'puppy') body += `<ellipse cx="${150 - bRx * 0.45}" cy="${bCy - bRy * 0.3}" rx="${bRx * 0.25}" ry="${bRy * 0.22}" fill="${dark}" opacity=".7"/>`;
+  if (type === 'cow') for (const [dx, dy, r] of [[-0.45, -0.2, 0.28], [0.35, 0.1, 0.24], [0.05, -0.55, 0.16]]) body += `<ellipse cx="${150 + dx * bRx}" cy="${bCy + dy * bRy}" rx="${bRx * r}" ry="${bRy * r * 0.85}" fill="#2b2b2b"/>`;
+  if (type === 'duck') for (const s of [-1, 1]) body += `<ellipse cx="${150 + s * bRx * 0.78}" cy="${bCy - 2}" rx="${bRx * 0.32}" ry="${bRy * 0.55}" fill="${dark}" ${O} stroke-width="4" transform="rotate(${s * -20} ${150 + s * bRx * 0.78} ${bCy})"/>`;
   if (type === 'kitten') for (const sx of [-0.35, 0, 0.35]) body += `<path d="M${150 + sx * bRx} ${bCy - bRy * 0.95} q6 ${bRy * 0.35} 0 ${bRy * 0.6}" fill="none" stroke="${dark}" stroke-width="6" stroke-linecap="round"/>`;
 
   // ---- ears (behind head) and head
@@ -55,12 +60,15 @@ export function petSVG(type, stage, mood, { dirty = false, wet = false } = {}) {
   if (type === 'puppy') ears = `<ellipse class="ear l" cx="${hCx - headR * 0.88}" cy="${hCy + headR * 0.05}" rx="${headR * 0.32}" ry="${headR * 0.62}" fill="${dark}" ${O} transform="rotate(18 ${hCx - headR * 0.88} ${hCy})"/><ellipse class="ear r" cx="${hCx + headR * 0.88}" cy="${hCy + headR * 0.05}" rx="${headR * 0.32}" ry="${headR * 0.62}" fill="${dark}" ${O} transform="rotate(-18 ${hCx + headR * 0.88} ${hCy})"/>`;
   if (type === 'kitten') for (const s of [-1, 1]) ears += `<path class="ear ${s < 0 ? 'l' : 'r'}" d="M${hCx + s * headR * 0.85} ${hCy - headR * 0.15} L${hCx + s * headR * 0.7} ${hCy - headR * 1.15} L${hCx + s * headR * 0.15} ${hCy - headR * 0.75} Z" fill="${skin}" ${O}/><path d="M${hCx + s * headR * 0.72} ${hCy - headR * 0.35} L${hCx + s * headR * 0.66} ${hCy - headR * 0.92} L${hCx + s * headR * 0.32} ${hCy - headR * 0.68} Z" fill="#ffb3c1"/>`;
   if (type === 'bunny') for (const s of [-1, 1]) ears += `<g class="ear ${s < 0 ? 'l' : 'r'}"><ellipse cx="${hCx + s * headR * 0.42}" cy="${hCy - headR * 1.3}" rx="${headR * 0.26}" ry="${headR * 0.75}" fill="${skin}" ${O} transform="rotate(${s * 10} ${hCx + s * headR * 0.42} ${hCy - headR * 0.6})"/><ellipse cx="${hCx + s * headR * 0.42}" cy="${hCy - headR * 1.28}" rx="${headR * 0.12}" ry="${headR * 0.55}" fill="#ffc2cf" transform="rotate(${s * 10} ${hCx + s * headR * 0.42} ${hCy - headR * 0.6})"/></g>`;
+  if (type === 'cow') for (const s of [-1, 1]) ears += `<ellipse class="ear ${s < 0 ? 'l' : 'r'}" cx="${hCx + s * headR * 1.0}" cy="${hCy - headR * 0.15}" rx="${headR * 0.42}" ry="${headR * 0.2}" fill="#fff" ${O} transform="rotate(${s * 18} ${hCx + s * headR} ${hCy})"/><path d="M${hCx + s * headR * 0.45} ${hCy - headR * 0.82} q${s * 8} -16 ${s * 18} -18" fill="none" stroke="#e9d8a6" stroke-width="9" stroke-linecap="round"/>`;
+  if (type === 'elephant') for (const s of [-1, 1]) ears += `<g class="ear ${s < 0 ? 'l' : 'r'}"><circle cx="${hCx + s * headR * 0.95}" cy="${hCy - headR * 0.05}" r="${headR * 0.62}" fill="${skin}" ${O}/><circle cx="${hCx + s * headR * 0.95}" cy="${hCy - headR * 0.05}" r="${headR * 0.38}" fill="#ffc2cf"/></g>`;
   if (type === 'lamb') for (const s of [-1, 1]) ears += `<ellipse class="ear ${s < 0 ? 'l' : 'r'}" cx="${hCx + s * headR * 1.0}" cy="${hCy - headR * 0.1}" rx="${headR * 0.42}" ry="${headR * 0.18}" fill="${dark}" transform="rotate(${s * 22} ${hCx + s * headR} ${hCy})"/>`;
 
   const faceC = type === 'lamb' ? dark : skin;
   let head = `<circle cx="${hCx}" cy="${hCy}" r="${headR}" fill="${faceC}" ${O}/>`;
   if (type === 'lamb') head += `<path d="${cloudPath(hCx, hCy - headR * 0.82, headR * 0.65, headR * 0.32, 8)}" fill="#fbfaf6" ${O} stroke-width="3"/>`;
   if (type === 'dino') head += `<path d="M${hCx - 12} ${hCy - headR + 4} L${hCx - 2} ${hCy - headR - 16} L${hCx + 8} ${hCy - headR + 4} Z" fill="#ffb347" ${O} stroke-width="3"/>`;
+  if (type === 'duck') head += `<path d="M${hCx - 6} ${hCy - headR + 4} q-4 -18 8 -22 q-2 10 4 20" fill="${skin}" ${O} stroke-width="3"/>`;
   if (type === 'puppy' || type === 'kitten' || type === 'bunny') head += `<ellipse cx="${hCx}" cy="${hCy + headR * 0.42}" rx="${headR * 0.45}" ry="${headR * 0.3}" fill="${P.belly}"/>`;
   if (sick) head += `<circle cx="${hCx}" cy="${hCy}" r="${headR - 3}" fill="#9be36b" opacity=".35"/>`;
 
@@ -88,6 +96,7 @@ export function petSVG(type, stage, mood, { dirty = false, wet = false } = {}) {
   if (type === 'puppy') face += `<ellipse cx="${hCx}" cy="${my - headR * 0.18}" rx="${headR * 0.14}" ry="${headR * 0.1}" fill="#2b2118"/>`;
   if (type === 'kitten' || type === 'bunny') face += `<path d="M${hCx - 6} ${my - headR * 0.22} L${hCx + 6} ${my - headR * 0.22} L${hCx} ${my - headR * 0.12} Z" fill="#ff8aa0"/>`;
   if (type === 'kitten') face += `<path d="M${hCx - headR * 0.4} ${my - 4} H${hCx - headR * 1.0} M${hCx - headR * 0.4} ${my + 4} L${hCx - headR * 0.95} ${my + 14} M${hCx + headR * 0.4} ${my - 4} H${hCx + headR * 1.0} M${hCx + headR * 0.4} ${my + 4} L${hCx + headR * 0.95} ${my + 14}" stroke="#3a2a20" stroke-width="2.5" stroke-linecap="round"/>`;
+  if (type === 'cow') face += `<ellipse cx="${hCx}" cy="${my - headR * 0.02}" rx="${headR * 0.5}" ry="${headR * 0.3}" fill="#ffc2d1" ${O} stroke-width="3"/><ellipse cx="${hCx - headR * 0.18}" cy="${my - headR * 0.06}" rx="4" ry="6" fill="#b06a7a"/><ellipse cx="${hCx + headR * 0.18}" cy="${my - headR * 0.06}" rx="4" ry="6" fill="#b06a7a"/>`;
   const mouthC = type === 'lamb' ? '#fff' : '#3a2a20';
   const open = mood === 'eat' || mood === 'excited';
   face += `<g class="mouth">` + (open
@@ -97,6 +106,8 @@ export function petSVG(type, stage, mood, { dirty = false, wet = false } = {}) {
       : mood === 'sleep'
         ? `<circle cx="${hCx}" cy="${my + 4}" r="${headR * 0.06}" fill="${mouthC}"/>`
         : `<path d="M${hCx - headR * 0.22} ${my} Q${hCx - headR * 0.1} ${my + headR * 0.16} ${hCx} ${my} Q${hCx + headR * 0.1} ${my + headR * 0.16} ${hCx + headR * 0.22} ${my}" fill="none" stroke="${mouthC}" stroke-width="4.5" stroke-linecap="round"/>`) + `</g>`;
+  if (type === 'elephant') face += `<path class="trunk" d="M${hCx - headR * 0.16} ${hCy + headR * 0.2} C${hCx - headR * 0.2} ${hCy + headR * 1.1} ${hCx + headR * 0.1} ${hCy + headR * 1.45} ${hCx + headR * 0.4} ${hCy + headR * 1.25} C${hCx + headR * 0.5} ${hCy + headR * 1.15} ${hCx + headR * 0.38} ${hCy + headR * 1.0} ${hCx + headR * 0.28} ${hCy + headR * 1.06} C${hCx + headR * 0.1} ${hCy + headR * 1.1} ${hCx + headR * 0.14} ${hCy + headR * 0.7} ${hCx + headR * 0.16} ${hCy + headR * 0.2} Z" fill="${skin}" ${O} stroke-width="4"/>`;
+  if (type === 'duck') face += `<g class="beak"><ellipse cx="${hCx}" cy="${my - 2}" rx="${headR * 0.42}" ry="${open ? headR * 0.12 : headR * 0.16}" fill="#ff9f1c" ${O} stroke-width="3"/>${open ? `<ellipse cx="${hCx}" cy="${my + headR * 0.16}" rx="${headR * 0.36}" ry="${headR * 0.12}" fill="#ff9f1c" ${O} stroke-width="3"/>` : ''}</g>`;
   if (type === 'bunny' && !open) face += `<rect x="${hCx - 6}" y="${my + 2}" width="12" height="9" rx="2" fill="#fff" ${O} stroke-width="2"/>`;
   if (!sick) face += `<ellipse cx="${hCx - headR * 0.62}" cy="${my - 6}" rx="${headR * 0.16}" ry="${headR * 0.1}" fill="#ff7b7b" opacity=".45"/><ellipse cx="${hCx + headR * 0.62}" cy="${my - 6}" rx="${headR * 0.16}" ry="${headR * 0.1}" fill="#ff7b7b" opacity=".45"/>`;
   if (sick) face += `<g transform="rotate(-25 ${hCx + 10} ${my})"><rect x="${hCx + 4}" y="${my - 3}" width="${headR * 0.7}" height="7" rx="3.5" fill="#fff" ${O} stroke-width="2"/><circle cx="${hCx + 6}" cy="${my + 0.5}" r="5" fill="#ef4444"/></g>`;

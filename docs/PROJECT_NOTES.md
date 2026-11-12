@@ -65,7 +65,7 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - [x] **Pie Pet** (`games/pet.js`, `games/pet-art.js`) shipped 1.20: real-Tamagotchi: needs decay in real time (IN_APP 30x), sick+medicine,
       sleep/lights, poops, bath, toys, growth stages. Fixing: poops under dock, pet too small (crop viewBox), food tray
       covers pet (move to side), offline decay too harsh (auto-sleep, 0.6x), faster sleep refill.
-- [ ] Feed v2: animals walk around a farm, feed + pet (stroke) with sounds, higher quality.
+- [x] Feed v2 (1.21): reuses pet-art.js animals (+cow, elephant, duck), wander/feed/pet. Class `.foodbasket` (`.basket` belongs to the sorter).
 - [ ] Levels per child: auto level-up w/ star celebration, hold-to-reset badge in each game, "Start again" in grown-ups.
 - [ ] README: APK location + QR, install, every game with screenshot, levels + reset, voices how-to; keep updated.
 - [ ] Dino eggs improvement.

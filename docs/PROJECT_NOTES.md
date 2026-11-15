@@ -90,3 +90,4 @@ Sheep pen, Puzzles, Find it, Counting, Letters.
 - 1.31: Colouring: pics-more.js (19 pages), kid pages per child (me/mepet/meballoons/together, id includes sig(player) hash), blank + build pages; tools: fill patterns via paintRef ('pat:kind:col'), brushes, sticker picker, 3 sizes, 19 colours.
 - 1.32: Recorded sfx in www/audio/sfx/<name>-<n>.mp3; sound.js SAMPLES/TRIM + sample() with synth fallback; new sfx: splash whoosh poof creak drip coin spray brush firework cheer. Credits in CREDITS.md. To add: drop name-N.mp3 in and bump SAMPLES count.
 - 1.33: removed cheer-2 (girl 'yeaaah') at user's request.
+- 1.34: pop.js rewrite (balloons+bubbles): swipe, nudge, shapes, specials (giant/bunch tie/star/gift/creatures), moments every 30 pops, find-it round (askPill), chest (bubbles), scraps/rings/trail, `later()` scheduler; sky.draw(...,mood) day/sunset/night; sea.lure(). User feedback: Music, Pairs, Colouring are liked as-is; next to improve: Run & Jump, then Dino eggs.

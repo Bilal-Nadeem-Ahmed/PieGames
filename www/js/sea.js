@@ -85,6 +85,7 @@ export function createSea() {
   const stars = Array.from({ length: 2 }, () => ({ x: 0.1 + R() * 0.8, col: R() < 0.5 ? '#ff9f43' : '#ff6b8a' }));
   const tiny = Array.from({ length: 22 }, () => ({ x: R(), y: R(), v: 0.03 + R() * 0.06, r: 1.5 + R() * 3 }));
   const crab = { x: 0.3, dir: 1 };
+  let lure = null;   // where a finger is: nearby fish swim over to have a look
   const jelly = { x: 0.75, y: 0.35 };
 
   function draw(c, W, H, t, dt) {
@@ -112,12 +113,17 @@ export function createSea() {
     // fish
     for (const f of fish) {
       f.boost = Math.max(0, f.boost - dt * 1.5);
+      if (lure && lure.life > 0) {
+        const dx = lure.x - f.x, dy = lure.y - f.y;
+        if (Math.abs(dx) < 0.45 && Math.abs(dy) < 0.4) { if (Math.abs(dx) > 0.04) f.dir = dx > 0 ? 1 : -1; else f.x -= f.dir * (f.v + f.boost) * dt * (0.6 + f.depth * 0.6); f.y += dy * dt * 0.9; }
+      }
       f.x += f.dir * (f.v + f.boost) * dt * (0.6 + f.depth * 0.6);
       if (f.x > 1.15) { f.x = -0.15; f.y = 0.1 + R() * 0.62; }
       if (f.x < -0.15) { f.x = 1.15; f.y = 0.1 + R() * 0.62; }
       c.globalAlpha = Math.min(1, 0.45 + f.depth * 0.5);
       drawFish(c, f.x * W, f.y * H + Math.sin(t * 1.5 + f.ph) * 8, u * 0.045 * f.depth, f.col, f.dir, t + f.ph);
     }
+    if (lure) lure.life -= dt;
     c.globalAlpha = 1;
     // sand
     c.fillStyle = '#f3d79b';
@@ -162,5 +168,5 @@ export function createSea() {
     return false;
   }
 
-  return { draw, tap, addFish };
+  return { draw, tap, addFish: (x, y, o) => { if (fish.length < 34) addFish(x, y, o); }, lure: (x, y) => { lure = { x, y, life: 0.4 }; } };
 }

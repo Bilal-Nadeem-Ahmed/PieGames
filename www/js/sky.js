@@ -67,7 +67,36 @@ export function createSky() {
   const seeds = Array.from({ length: 16 }, () => ({ x: R(), y: R(), v: 0.012 + R() * 0.02, s: 0.6 + R() * 0.6, ph: R() * 7 }));
   const trees = Array.from({ length: 5 }, (_, i) => ({ x: 0.08 + i * 0.21 + (R() - 0.5) * 0.08, s: 0.7 + R() * 0.5 }));
 
-  function draw(c, W, H, t, dt) {
+  const nightStars = Array.from({ length: 46 }, () => ({ x: R(), y: R() * 0.62, s: 0.5 + R(), ph: R() * 7 }));
+  // mood: 0 = day, 1 = sunset, 2 = night, 3 = day again (any value in between blends)
+  function draw(c, W, H, t, dt, mood = 0) {
+    const m = ((mood % 3) + 3) % 3, near = (k) => Math.max(0, 1 - Math.min(Math.abs(m - k), 3 - Math.abs(m - k)));
+    const sunset = near(1), night = near(2);
+    drawDay(c, W, H, t, dt, night);
+    const u = Math.min(W, H);
+    if (sunset > 0.01) {
+      const g = c.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, `rgba(255,110,90,${0.42 * sunset})`); g.addColorStop(0.6, `rgba(255,170,70,${0.4 * sunset})`); g.addColorStop(1, `rgba(120,60,120,${0.25 * sunset})`);
+      c.fillStyle = g; c.fillRect(0, 0, W, H);
+    }
+    if (night > 0.01) {
+      const g = c.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, `rgba(8,14,60,${0.78 * night})`); g.addColorStop(0.7, `rgba(20,30,90,${0.6 * night})`); g.addColorStop(1, `rgba(10,30,50,${0.5 * night})`);
+      c.fillStyle = g; c.fillRect(0, 0, W, H);
+      for (const s of nightStars) { c.fillStyle = `rgba(255,255,230,${night * (0.5 + 0.5 * Math.sin(t * 2 + s.ph))})`; c.beginPath(); c.arc(s.x * W, s.y * H, u * 0.004 * s.s, 0, 7); c.fill(); }
+      // the moon takes the sun's place
+      const mx = W * 0.82, my = H * 0.12, mr = u * 0.085;
+      c.globalAlpha = night;
+      const mg = c.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 3); mg.addColorStop(0, 'rgba(220,230,255,.5)'); mg.addColorStop(1, 'rgba(220,230,255,0)');
+      c.fillStyle = mg; c.fillRect(mx - mr * 3, my - mr * 3, mr * 6, mr * 6);
+      c.fillStyle = '#f4f1d8'; c.beginPath(); c.arc(mx, my, mr, 0, 7); c.fill();
+      c.fillStyle = 'rgba(190,190,170,.6)'; for (const [dx, dy, rr] of [[-0.3, -0.2, 0.2], [0.3, 0.25, 0.15], [0.1, -0.45, 0.1]]) { c.beginPath(); c.arc(mx + dx * mr, my + dy * mr, rr * mr, 0, 7); c.fill(); }
+      c.globalAlpha = 1;
+      // fireflies over the grass
+      for (let i = 0; i < 10; i++) { const fx = (0.05 + ((i * 0.097 + Math.sin(t * 0.2 + i) * 0.04) % 0.9)) * W, fy = H * (0.72 + 0.12 * Math.sin(t * 0.5 + i * 2.1)); c.fillStyle = `rgba(230,255,120,${night * (0.4 + 0.6 * Math.abs(Math.sin(t * 1.6 + i)))})`; c.beginPath(); c.arc(fx, fy, u * 0.006, 0, 7); c.fill(); }
+    }
+  }
+  function drawDay(c, W, H, t, dt) {
     const u = Math.min(W, H);
     // sky: deep blue at the top fading to a warm glow at the horizon, gently breathing
     const g = c.createLinearGradient(0, 0, 0, H);

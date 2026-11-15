@@ -12,7 +12,7 @@ git add -A
 git commit -q -F - <<MSG
 $1 (version $new)
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01RyopxMYo4eGreAeLbh7AsM
 MSG
 git branch -f claude/pie-games-app main

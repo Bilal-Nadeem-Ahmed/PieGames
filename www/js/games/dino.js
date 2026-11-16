@@ -1,11 +1,13 @@
 // Dino eggs: tap the patterned eggs to crack them. A baby peeps through the crack, then hatches wearing
 // its shell as a hat. Four kinds of dinosaur (T-rex, long-neck, triceratops, stegosaurus).
-// Tap a baby to make it squeak-roar and jump. When the nest is all hatched, mummy dinosaur walks in.
+// Tap a baby to make it squeak-roar and jump. Once the nest has hatched the babies are hungry: tap the fruit on the
+// trees and bushes, it drops, and a baby runs over to munch it and grows a bit. When they're all fed, mummy dinosaur
+// walks in. Now and then there's a golden egg with a rainbow baby inside. Tap the volcano to make it pop.
 import { sfx, buzz } from '../sound.js';
 import { say } from '../speech.js';
 import { getLevel, win, levelBadge } from '../levels.js';
 import { homeBtn, pick, shuffle } from '../ui.js';
-import { burst, celebrate } from '../fx.js';
+import { burst, celebrate, confettiRain } from '../fx.js';
 import { drawDino, drawCloud } from '../draw.js';
 
 const DINO_COLOURS = [['green', '#6fcf5b'], ['orange', '#ff9f43'], ['blue', '#5fa8ff'], ['purple', '#b98cff'], ['pink', '#ff8ac2'], ['yellow', '#ffd43b'], ['red', '#ff6b6b']];
@@ -13,6 +15,9 @@ const KINDS = ['rex', 'longneck', 'trike', 'stego'];
 const KIND_NAME = { rex: 'dinosaur', longneck: 'long-neck dinosaur', trike: 'triceratops', stego: 'stegosaurus' };
 const PATTERNS = ['spots', 'stripes', 'zigzag', 'stars'];
 const INK = '#2b2118';
+const FRUIT = ['🍎', '🍐', '🍊', '🍉', '🍌', '🍓'];
+// where fruit grows: the two palms and the vine strung between them (x, y as parts of the screen)
+const SPOTS = [[0.07, 0.43], [0.23, 0.345], [0.374, 0.315], [0.5, 0.305], [0.626, 0.315], [0.93, 0.43]];
 // where the top of each kind's head is (in drawDinoKind units, size 100), for the shell hat
 const HEAD = { rex: [30, -96], longneck: [52, -112], trike: [40, -60], stego: [48, -44] };
 
@@ -88,13 +93,17 @@ export function mount(el) {
   const taps = () => [2, 3, 3, 4][getLevel('dino') - 1];
   let W, H, S, dpr;
   const resize = () => { dpr = Math.min(devicePixelRatio || 1, 2); W = root.clientWidth; H = root.clientHeight; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); S = Math.min(W / 900, H / 600); layout(); };
-  let eggs = [], t = 0, raf = 0, last = performance.now(), timer = 0, alive = true, mum = null, ptero = null, shells = [];
+  let eggs = [], t = 0, raf = 0, last = performance.now(), timer = 0, alive = true, mum = null, ptero = null, shells = [], fruits = [], phase = 'hatch', erupt = 0;
+  const feedsEach = () => [1, 1, 2, 2][getLevel('dino') - 1];
+  function drawEmoji(e, x, y, s) { c.font = `${s}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#000'; c.fillText(e, x, y); }
 
   function newNest() {
     const n = [2, 3, 4, 5][getLevel('dino') - 1];
     const cols = shuffle([...DINO_COLOURS]).slice(0, n), kinds = shuffle([...KINDS, ...KINDS]);
-    eggs = cols.map(([name, col], i) => ({ i, name, col, kind: kinds[i], pat: pick(PATTERNS), taps: 0, state: 'egg', wob: 0, jump: 0, vy: 0, roar: 0, t: Math.random() * 5, out: 0, cap: 0, shake: 2 + Math.random() * 4, dance: 0 }));
-    mum = null; shells = [];
+    eggs = cols.map(([name, col], i) => ({ i, name, col, kind: kinds[i], pat: pick(PATTERNS), taps: 0, state: 'egg', wob: 0, jump: 0, vy: 0, roar: 0, t: Math.random() * 5, out: 0, cap: 0, shake: 2 + Math.random() * 4, dance: 0, fed: 0, grow: 1, size: 1, off: 0, goal: null, eatT: 0, face: false }));
+    // now and then one egg is golden, with a rainbow baby inside
+    if (Math.random() < 0.35) { const g = pick(eggs); g.gold = true; g.name = 'rainbow'; }
+    mum = null; shells = []; fruits = []; phase = 'hatch';
     layout();
   }
   function layout() {
@@ -111,18 +120,29 @@ export function mount(el) {
   cv.addEventListener('pointerdown', (ev) => {
     const b = cv.getBoundingClientRect(), x = ev.clientX - b.left, y = ev.clientY - b.top;
     if (hitPtero(x, y)) { ptero.flap = 1; ptero.vy = -200; sfx.roar(2.4); burst(x, y, { n: 10, shape: 'star' }); return; }
+    // fruit: tap it and it drops for a baby to eat
+    for (const f of fruits) if (f.state === 'hang' && Math.hypot(x - f.x, y - f.y) < Math.max(44, 46 * S)) { f.state = 'fall'; f.vy = 0; sfx.pop(2); buzz(10); burst(x, y, { n: 6, colors: ['#3fae4f', '#8fd96b'], speed: 150, shape: 'dot' }); return; }
     if (mum && mum.x < W && Math.abs(x - mum.x) < 130 * S && y > H * 0.3) { mum.roar = 1; sfx.roar(0.7); buzz(30); eggs.forEach((e) => { e.vy = -650 * S; }); return; }
     for (const e of eggs) {
       const r = R();
-      if (Math.abs(x - e.x) < r * 1.2 && y > e.y - r * 3 && y < e.y + r * 0.4) {
+      const ex = e.x + (e.state === 'egg' ? 0 : e.off);
+      if (Math.abs(x - ex) < r * 1.2 && y > e.y - r * 3 && y < e.y + r * 0.4) {
         if (e.state === 'egg') {
-          e.taps++; e.wob = 0.5; sfx.pop(e.taps + 2); buzz(12);
+          e.taps++; e.wob = 0.5; e.vy = -240 * S; sfx.knock(); sfx.pop(e.taps + 2); buzz(12);
+          for (let k = 0; k < 2; k++) shells.push({ x, y, vx: (Math.random() - 0.5) * 300 * S, vy: -300 * S - Math.random() * 150 * S, rot: 0, vr: (Math.random() - 0.5) * 12, s: R() * 0.14, life: 0.9 });
           burst(x, y, { n: 6, colors: ['#fff6dc', '#e9d8a6'], speed: 160, shape: 'dot' });
           if (e.taps >= taps()) hatch(e);
           else if (e.taps === taps() - 1) sfx.giggle();
         } else roar(e);
         return;
       }
+    }
+    // the volcano: tap it for a harmless pop of sparkly lava
+    if (x > W * 0.66 && x < W * 0.88 && y > H * 0.2 && y < H * 0.5 && erupt <= 0) {
+      erupt = 1.4; sfx.firework(); sfx.roar(0.55); buzz(40);
+      for (let k = 0; k < 4; k++) setTimeout(() => alive && burst(W * 0.765 + (Math.random() - 0.5) * 30 * S, H * 0.27, { n: 16, colors: ['#ff7043', '#ffd23f', '#ff9f43', '#fff3b0'], speed: 420 }), k * 160);
+      eggs.forEach((e) => { if (e.state !== 'egg') e.vy = -500 * S; else e.wob = 0.5; });
+      return;
     }
     burst(x, y, { n: 6, speed: 140, shape: 'star' });
   });
@@ -134,27 +154,43 @@ export function mount(el) {
     e.state = 'hatched'; e.out = 0; e.cap = 0;
     sfx.pop(4); sfx.giggle(); buzz(30);
     burst(e.x, e.y - r, { n: 30, colors: ['#fff6dc', '#f1e3b5', e.col], speed: 380 });
+    if (e.gold) { confettiRain(50); sfx.sparkle(); }
     e.vy = -600 * S;
     for (let k = 0; k < 4; k++) shells.push({ x: e.x + (k - 1.5) * r * 0.4, y: e.y - r, vx: (k - 1.5) * 160 * S, vy: -420 * S - Math.random() * 200 * S, rot: 0, vr: (Math.random() - 0.5) * 12, s: r * 0.3, life: 1.4 });
     setTimeout(() => alive && say(`A ${e.name} ${KIND_NAME[e.kind]}!`), 300);
-    if (eggs.every((x) => x.state === 'hatched')) {
-      timer = setTimeout(() => {
-        if (!alive) return;
-        mum = { x: W + 220 * S, tx: W - Math.min(170 * S, W * 0.16), roar: 0, kind: pick(eggs).kind, col: pick(eggs).col, arrived: false };
-        timer = setTimeout(() => { if (!alive) return; celebrate(`${eggs.length} baby dinosaurs! Hooray!`); win('dino', badge); eggs.forEach((x) => { x.dance = 4; }); timer = setTimeout(() => alive && leave(), 4800); }, 2600);
-      }, 1400);
-    }
+    if (eggs.every((x) => x.state === 'hatched')) timer = setTimeout(() => alive && startFeed(), 1800);
+  }
+  // the babies are hungry: fruit appears on the trees and bushes
+  function startFeed() {
+    phase = 'feed';
+    fruits = SPOTS.map(([fx, fy], i) => ({ i, hx: fx, hy: fy, x: W * fx, y: H * fy, e: FRUIT[i % FRUIT.length], state: 'grow', k: -i * 0.15, vy: 0, eater: null }));
+    say('Feed the babies!'); sfx.sparkle();
+  }
+  function fed(e, f) {
+    e.fed++; e.grow = 1 + Math.min(2, e.fed) * 0.12; e.goal = null; e.vy = -520 * S; e.roar = 0.5;
+    f.state = 'gone'; f.k = -1.6; f.eater = null;
+    sfx.ding(); buzz(15);
+    burst(e.x + e.off, e.y - R() * 2, { n: 12, colors: ['#ff5c8a', '#ff8ac2', '#fff'], shape: 'dot', speed: 220 });
+    if (Math.random() < 0.6) say('Yum!');
+    if (phase === 'feed' && eggs.every((x) => x.fed >= feedsEach())) { phase = 'done'; timer = setTimeout(() => alive && finale(), 1200); }
+  }
+  function finale() {
+    fruits.forEach((f) => { if (f.state === 'hang' || f.state === 'grow') f.state = 'hide'; });
+    mum = { x: W + 220 * S, tx: W - Math.min(170 * S, W * 0.16), roar: 0, kind: pick(eggs).kind, col: pick(eggs).col, arrived: false };
+    timer = setTimeout(() => { if (!alive) return; celebrate(`${eggs.length} baby dinosaurs! Hooray!`); win('dino', badge); eggs.forEach((x) => { x.dance = 4; }); timer = setTimeout(() => alive && leave(), 4800); }, 2600);
   }
   function leave() { if (mum) mum.tx = W + 400 * S; eggs.forEach((e) => { e.state = 'follow'; }); timer = setTimeout(() => alive && newNest(), 2600); }
 
   function eggPath(r) { c.beginPath(); c.ellipse(0, -r, r * 0.8, r, 0, 0, 7); }
   function drawEgg(e, r) {
-    c.save(); c.translate(e.x, e.y);
+    c.save(); c.translate(e.x, e.y + e.jump);
     c.rotate(Math.sin(t * 30) * e.wob * 0.25);
-    c.fillStyle = '#fff6dc'; c.strokeStyle = INK; c.lineWidth = 4 * S;
+    c.fillStyle = e.gold ? '#ffd23f' : '#fff6dc'; c.strokeStyle = INK; c.lineWidth = 4 * S;
     eggPath(r); c.fill();
+    if (e.gold) { c.save(); eggPath(r); c.clip(); c.fillStyle = 'rgba(255,255,255,.55)'; c.rotate(0.5); c.fillRect(-r * 2 + ((t * 0.7 + e.i) % 2) * r * 2.4, -r * 3, r * 0.28, r * 4); c.restore();
+      for (let k = 0; k < 4; k++) { const a = t * 2 + k * 1.6; c.fillStyle = `rgba(255,255,255,${0.5 + 0.5 * Math.sin(a * 3)})`; c.beginPath(); c.arc(Math.cos(a) * r * 1.05, -r + Math.sin(a) * r * 1.2, 4 * S, 0, 7); c.fill(); } }
     // pattern, clipped to the egg
-    c.save(); eggPath(r); c.clip(); c.fillStyle = e.col; c.strokeStyle = e.col;
+    c.save(); eggPath(r); c.clip(); c.fillStyle = e.gold ? '#f59e0b' : e.col; c.strokeStyle = c.fillStyle;
     if (e.pat === 'spots') for (const [dx, dy, rr] of [[-0.3, -1.4, 0.16], [0.3, -1.1, 0.2], [-0.2, -0.6, 0.14], [0.35, -0.5, 0.1], [0, -1.75, 0.1], [-0.55, -1, 0.12]]) { c.beginPath(); c.arc(dx * r, dy * r, rr * r, 0, 7); c.fill(); }
     if (e.pat === 'stripes') for (const yy of [-1.5, -1.0, -0.5]) { c.fillRect(-r, yy * r, 2 * r, r * 0.16); }
     if (e.pat === 'zigzag') { c.lineWidth = r * 0.13; for (const yy of [-1.35, -0.75]) { c.beginPath(); for (let k = 0; k <= 8; k++) c.lineTo(-r + k * r * 0.25, yy * r + (k % 2 ? -0.12 : 0.12) * r); c.stroke(); } }
@@ -191,6 +227,7 @@ export function mount(el) {
     c.fillStyle = '#d9a46c'; c.beginPath(); c.moveTo(0, H * 0.62); c.quadraticCurveTo(W * 0.2, H * 0.42, W * 0.42, H * 0.6); c.lineTo(0, H * 0.7); c.fill();
     c.fillStyle = '#8d6e63'; c.beginPath(); c.moveTo(W * 0.6, H * 0.64); c.lineTo(W * 0.73, H * 0.27); c.lineTo(W * 0.8, H * 0.27); c.lineTo(W * 0.95, H * 0.64); c.fill();
     c.fillStyle = '#ff7043'; c.beginPath(); c.moveTo(W * 0.73, H * 0.27); c.lineTo(W * 0.8, H * 0.27); c.lineTo(W * 0.79, H * 0.36); c.lineTo(W * 0.77, H * 0.31); c.lineTo(W * 0.755, H * 0.38); c.lineTo(W * 0.74, H * 0.32); c.fill();
+    if (erupt > 0) { c.fillStyle = `rgba(255,150,40,${Math.min(1, erupt)})`; c.beginPath(); c.ellipse(W * 0.765, H * 0.25, 50 * S, 70 * S * Math.min(1, erupt), 0, 0, 7); c.fill(); }
     c.fillStyle = 'rgba(120,120,120,.35)'; for (let i = 0; i < 4; i++) { const k = ((t * 0.4 + i / 4) % 1); c.beginPath(); c.arc(W * 0.765 + Math.sin(t + i) * 10 * S + k * 40 * S, H * 0.25 - k * H * 0.22, (10 + k * 26) * S, 0, 7); c.fill(); }
     c.fillStyle = '#7cc46a'; c.beginPath(); c.moveTo(0, H * 0.64); c.quadraticCurveTo(W * 0.5, H * 0.56, W, H * 0.64); c.lineTo(W, H); c.lineTo(0, H); c.fill();
     c.fillStyle = '#6ab35a'; c.beginPath(); c.moveTo(0, H * 0.78); c.quadraticCurveTo(W * 0.5, H * 0.72, W, H * 0.8); c.lineTo(W, H); c.lineTo(0, H); c.fill();
@@ -199,6 +236,10 @@ export function mount(el) {
       c.fillStyle = '#2f9e44'; for (let a = 0; a < 5; a++) { c.save(); c.translate(W * px, H * 0.36); c.rotate(-2.6 + a * 0.65 + Math.sin(t * 1.2 + a) * 0.04); c.beginPath(); c.ellipse(45 * S, 0, 50 * S, 13 * S, 0, 0, 7); c.fill(); c.restore(); }
       c.fillStyle = '#8d5a2b'; c.beginPath(); c.arc(W * px + 8 * S, H * 0.38, 7 * S, 0, 7); c.arc(W * px - 6 * S, H * 0.39, 7 * S, 0, 7); c.fill();
     }
+    // a leafy vine strung between the palms: fruit grows on it when the babies are hungry
+    c.strokeStyle = '#3a9a48'; c.lineWidth = 6 * S; c.beginPath(); c.moveTo(W * 0.05, H * 0.36); c.quadraticCurveTo(W * 0.5, H * 0.14, W * 0.95, H * 0.36); c.stroke();
+    c.fillStyle = '#4fb85a';
+    for (let i = 1; i < 16; i++) { const k = i / 16, vx = W * (0.05 + 0.9 * k), vy = H * ((1 - k) * (1 - k) * 0.36 + 2 * k * (1 - k) * 0.14 + k * k * 0.36); c.save(); c.translate(vx, vy); c.rotate((i % 2 ? 0.9 : 2.2) + Math.sin(t * 1.5 + i) * 0.08); c.beginPath(); c.ellipse(12 * S, 0, 13 * S, 6 * S, 0, 0, 7); c.fill(); c.restore(); }
     // ferns
     c.strokeStyle = '#3a9a48'; c.lineWidth = 5 * S;
     for (const fx of [0.18, 0.36, 0.64, 0.82]) for (let k = -2; k <= 2; k++) { c.beginPath(); c.moveTo(W * fx, H * 0.72); c.quadraticCurveTo(W * fx + k * 18 * S, H * 0.64, W * fx + k * 30 * S, H * 0.66 + Math.abs(k) * 8 * S); c.stroke(); }
@@ -234,11 +275,25 @@ export function mount(el) {
       mum.roar = Math.max(0, mum.roar - dt);
       drawDinoKind(c, mum.kind, mum.x, H * 0.8, Math.min(H * 0.62, 300 * S), mum.col, { flip: mum.tx < mum.x || mum.arrived && mum.tx < W, t, roar: mum.roar > 0, walking: Math.abs(d) > 2 });
     }
+    erupt = Math.max(0, erupt - dt);
+    // fruit: grows, hangs (pulsing so it asks to be tapped), drops, waits on the ground for a baby
+    const groundY = H * 0.86;
+    for (const f of fruits) {
+      if (f.state === 'gone' || f.state === 'grow') { f.k += dt * 1.2; if (f.k >= 1) { f.state = phase === 'feed' ? 'hang' : 'hide'; } if (f.state === 'gone' && f.k >= 0) { f.state = 'grow'; f.x = W * f.hx; f.y = H * f.hy; f.e = pick(FRUIT); } }
+      if (f.state === 'fall') { f.vy += 1800 * S * dt; f.y += f.vy * dt; f.x += (Math.min(W * 0.9, Math.max(W * 0.1, f.x)) - f.x) * Math.min(1, dt * 3); if (f.y >= groundY) { f.y = groundY; f.state = 'ground'; sfx.tap(); } }
+      // a fruit on its way down or on the ground gets claimed by the nearest baby (hungry ones first)
+      if ((f.state === 'fall' || f.state === 'ground') && !f.eater) {
+        const free = eggs.filter((e) => e.state === 'hatched' && !e.goal && e.eatT <= 0);
+        const pool = free.filter((e) => e.fed < feedsEach()); const cand = (pool.length ? pool : free).sort((a, b) => Math.abs(a.x + a.off - f.x) - Math.abs(b.x + b.off - f.x))[0];
+        if (cand) { cand.goal = f; f.eater = cand; }
+      }
+    }
     for (const e of eggs) {
       e.wob = Math.max(0, e.wob - dt);
       if (e.state === 'egg') {
         // eggs wiggle by themselves now and then, asking to be tapped
         e.shake -= dt; if (e.shake <= 0) { e.shake = 3 + Math.random() * 5; e.wob = 0.35; }
+        e.vy += 2200 * S * dt; e.jump = Math.min(0, e.jump + e.vy * dt); if (e.jump === 0) e.vy = 0;
         drawEgg(e, r);
         continue;
       }
@@ -246,11 +301,32 @@ export function mount(el) {
       e.roar = Math.max(0, e.roar - dt); e.t += dt; e.out = Math.min(1, e.out + dt * 3); e.cap = Math.min(1, e.cap + dt * 1.4);
       if (e.dance > 0) { e.dance -= dt; if (e.jump === 0 && Math.sin(e.t * 9) > 0.95) e.vy = -380 * S; }
       if (e.state === 'follow') e.x += 230 * S * dt;
-      const wander = e.state === 'follow' ? 0 : e.out >= 1 ? Math.sin(e.t * 0.9 + e.i) * r * 0.45 : 0;
-      const facing = e.state === 'follow' ? false : Math.cos(e.t * 0.9 + e.i) < 0;
-      const sz = r * 2.3, bx = e.x + wander, by = e.y - r * (e.state === "follow" ? 0.1 : 0.55) + e.jump;
+      // off to fetch fruit, munching it, or wandering by the nest
+      let running = false;
+      if (e.state === 'hatched') {
+        const want = e.goal ? e.goal.x - e.x : 0, d = want - e.off;
+        if (Math.abs(d) > r * 0.35) { e.off += Math.sign(d) * Math.min(Math.abs(d), 340 * S * dt); e.face = d < 0; running = true; }
+        else if (e.goal && e.goal.state === 'ground' && e.eatT <= 0) { e.eatT = 0.9; e.munch = 0; }
+        if (e.eatT > 0) {
+          e.eatT -= dt; e.munch -= dt; if (e.munch <= 0) { e.munch = 0.28; sfx.munch(); e.roar = 0.14; }
+          if (e.eatT <= 0 && e.goal) fed(e, e.goal);
+        }
+      }
+      e.size += (e.grow - e.size) * Math.min(1, dt * 4);
+      const idle = e.state === 'hatched' && !e.goal && Math.abs(e.off) < r * 0.4;
+      const wander = idle && e.out >= 1 ? Math.sin(e.t * 0.9 + e.i) * r * 0.45 : 0;
+      const facing = e.state === 'follow' ? false : idle ? Math.cos(e.t * 0.9 + e.i) < 0 : e.face;
+      const col = e.gold ? `hsl(${(t * 90 + e.i * 40) % 360},85%,62%)` : e.col;
+      const sz = r * 2.3 * e.size, bx = e.x + e.off + wander, by = e.y - r * (e.state === 'follow' || Math.abs(e.off) > r * 0.6 ? 0.1 : 0.55) + e.jump - (running ? Math.abs(Math.sin(e.t * 14)) * 6 * S : 0);
+      // hungry? a little thought bubble with fruit in it
+      if (phase === 'feed' && e.state === 'hatched' && e.fed < feedsEach() && !e.goal) {
+        const ux = bx + r * 0.9, uy = by - sz * 1.15 + Math.sin(t * 3 + e.i) * 3 * S, ur = r * 0.42;
+        c.fillStyle = '#fff'; c.strokeStyle = 'rgba(43,33,24,.5)'; c.lineWidth = 2 * S;
+        c.beginPath(); c.arc(ux, uy, ur, 0, 7); c.fill(); c.stroke(); c.beginPath(); c.arc(ux - ur * 0.9, uy + ur * 1.0, ur * 0.22, 0, 7); c.fill(); c.stroke();
+        drawEmoji('🍎', ux, uy + ur * 0.05, ur * 1.1);
+      }
       c.save(); c.translate(bx, by); if (facing) c.scale(-1, 1); c.scale(e.out, e.out); c.rotate(Math.sin(e.t * (e.dance > 0 ? 9 : 3)) * (e.dance > 0 ? 0.15 : 0.06));
-      drawDinoKind(c, e.kind, 0, 0, sz, e.col, { roar: e.roar > 0, t: e.t, walking: e.state === 'follow' || Math.abs(Math.cos(e.t * 0.9 + e.i)) > 0.3 });
+      drawDinoKind(c, e.kind, 0, 0, sz, col, { roar: e.roar > 0, t: e.t, walking: running || e.state === 'follow' || (idle && Math.abs(Math.cos(e.t * 0.9 + e.i)) > 0.3) });
       // shell hat flies up from the egg and lands on the head
       const [hx, hy] = HEAD[e.kind], k = e.cap, ease = 1 - (1 - k) * (1 - k);
       const capX = hx * sz / 100 * ease, capY = (-r * 1.6) * (1 - ease) + (hy * sz / 100) * ease - Math.sin(k * Math.PI) * r * 1.4;
@@ -262,6 +338,13 @@ export function mount(el) {
         c.beginPath(); c.moveTo(e.x - r * 0.8, e.y - r * 0.5); c.lineTo(e.x - r * 0.5, e.y - r * 0.75); c.lineTo(e.x - r * 0.2, e.y - r * 0.5); c.lineTo(e.x + r * 0.15, e.y - r * 0.78); c.lineTo(e.x + r * 0.5, e.y - r * 0.5); c.lineTo(e.x + r * 0.8, e.y - r * 0.7);
         c.ellipse(e.x, e.y - r * 0.5, r * 0.8, r * 0.5, 0, 0, Math.PI); c.closePath(); c.fill(); c.stroke();
       }
+    }
+    // fruit is drawn in front of the babies so it's always easy to see and tap
+    for (const f of fruits) {
+      if (f.state === 'hide' || f.state === 'gone') continue;
+      const fs = Math.max(36, 50 * S), k = f.state === 'grow' ? Math.max(0, f.k) : 1, pulse = f.state === 'hang' ? 1 + Math.sin(t * 5 + f.i) * 0.08 : 1;
+      if (f.state === 'hang') { c.fillStyle = `rgba(255,255,255,${0.35 + 0.2 * Math.sin(t * 5 + f.i)})`; c.beginPath(); c.arc(f.x, f.y, fs * 0.72, 0, 7); c.fill(); }
+      if (k > 0) drawEmoji(f.e, f.x, f.y, fs * k * pulse * (f.eater && f.eater.eatT > 0 ? Math.max(0.2, f.eater.eatT / 0.9) : 1));
     }
     // flying shell bits
     shells = shells.filter((s) => (s.life -= dt) > 0);

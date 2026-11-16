@@ -19,8 +19,8 @@ Everything works offline. Art is drawn in code, music is generated, and sound ef
 - **Sheep pen** – tap the wandering sheep to make them leap into the pen; they're counted out loud, the gate shuts, they dance, then run out for another round.
 - **Puzzles** – 2, 4, 6 or 9 big pieces to drag onto a faint guide picture: sheep, dinosaur, balloons, ladybird, fish, the kids themselves, and 8 animals at the farm, seaside, snow and sunset.
 - **Find it** – 🐞 ladybird hunt (ladybirds crawl around the garden and hide under leaves; tap to find them and they fly away, counted) and 🔍 find the animal ("Where is the cow?").
-- **Counting** – tap and count, "how many?", "find the number", pop the number, trace the number.
-- **Letters** – A-is-for-apple flashcards, "find the letter", pop the letter, trace the letter.
+- **Counting** – the child's Pie Pet sits in the corner, cheers for right answers and can be tapped. Six activities: 👆 **tap and count** (a number line lights up as each thing is tapped), 🍪 **feed the pet** (the pet asks for a number of treats; tap them one at a time and it munches and counts), ❓ **how many?** (pick the number; dots under the numbers help), 🚂 **number train** (one carriage has lost its number: what comes next / which is missing?), 🎈 pop the number, ✍️ trace the number. A wrong answer just fades away and is said aloud, so the choice gets easier; nothing is punished.
+- **Letters** – same helper pet and gentle answers. Five activities: 📖 **learn** (a big letter with three pictures to tap, e.g. B: balloon, bear, banana, plus an A–Z strip along the bottom to jump to any letter; letters already visited turn blue), 🍎 **what starts with…?** (pick the picture that starts with the letter), 🔍 **find the letter**, 🎈 pop the letter, ✍️ trace the letter.
 
 Screen direction: Balloons, Bubbles and Sheep pen turn the phone upright; the home screen, the grown-ups area and all other games are sideways. The app turns the screen itself.
 
@@ -38,8 +38,8 @@ Each child has their own level in each game (the ⭐ badge at the top right show
 |---|---|
 | Balloons / Bubbles | a level every 20 pops: a bit faster, one more balloon, slightly smaller |
 | Run & Jump | a level every 20 stars: faster, things on the path more often, more high stars (the tap hint only shows on level 1) |
-| Counting | numbers up to 3 → 5 → 10 → 15 → 20 (never past *Numbers up to* in settings), more choices |
-| Letters | 2 → 3 → 4 choices, level 4 uses lowercase letters |
+| Counting | numbers up to 3 → 5 → 10 → 15 → 20 (never past *Numbers up to* in settings), more choices; feed the pet has spare treats from level 3; the number train hides any carriage from level 3; the dots under numbers go at level 4 |
+| Letters | 2 → 3 → 4 choices; level 3 matches a capital to its small letter; level 4 uses lowercase letters |
 | Shapes | 3 → 6 shapes; 2 → 4 colour baskets |
 | Feed | 2 → 3 → 4 animals, level 4 adds a food nobody wants |
 | Sheep pen | 3 → 4 → 6 → 8 sheep that wander faster |

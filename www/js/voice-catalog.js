@@ -11,8 +11,9 @@ export const CATALOG = [
   ['Animals', L('dog|cat|cow|sheep|lamb|duck|elephant|horse|chicken|lion|frog|monkey|bunny|bear|tiger|fish|owl|dinosaur|ladybird|penguin|puppy|kitten')],
   ['Animal noises', L('woof woof|meow|baa|moo|quack|roar|ribbit|neigh|cluck|hoot')],
   ['A is for…', L('apple|balloon|grapes|house|ice cream|juice|kite|nose|queen|tree|umbrella|van|whale|fox|yo-yo|zebra')],
+  ['More letter words', L('ant|aeroplane|banana|car|egg|eye|flower|giraffe|goat|hat|iguana|island|jacket|juggler|key|koala|lemon|mushroom|nuts|night|octopus|pig|pear|question|quiet|rabbit|rocket|sun|tiger|train|unicorn|up|violin|volcano|watermelon|watch|box|six|yellow|yarn|zip|zero')],
   ['Counting words', L('apples|balloons|stars|ducks|cars|flowers|strawberries|dinosaurs|elephants|bubbles|ladybirds|puppies')],
-  ['Little words', L("is for|that's|where's the|find|pop the|trace the|how many|let's count|number|letter|pop|bubble|jumping")],
+  ['Little words', L("is for|is in|that's|where's the|find|pop the|trace the|how many|let's count|number|letter|pop|bubble|jumping|give me|what comes next|which number is missing|what starts with")],
   ['Game openers', L("Tap the eggs|Who's hiding|What shall we build|Find the pairs|Help the sheep into the pen|Find the ladybirds|Feed the animals|Put the shapes in|Do the puzzle|Tap to jump|3, 2, 1, blast off")],
   ['Pet', L("I'm hungry|let's play|sleepy|bath time|night night|good morning|I love you|tickle|bigger")],
 ];

@@ -1,4 +1,4 @@
-# Voice clips checklist (27/178 recorded)
+# Voice clips checklist (28/225 recorded)
 
 Every word or phrase the games can say. ✅ = a default clip exists (who recorded it is shown).
 Record the missing ones and send them over, or record them on the phone in **Grown-ups → Voices**.
@@ -169,6 +169,51 @@ Names (Rahma, Ibrahim, …) are also spoken if recorded - record each child's na
 - ⬜ yo-yo
 - ⬜ zebra
 
+## More letter words (1/42)
+
+- ⬜ ant
+- ⬜ aeroplane
+- ⬜ banana
+- ⬜ car
+- ⬜ egg
+- ⬜ eye
+- ⬜ flower
+- ⬜ giraffe
+- ⬜ goat
+- ⬜ hat
+- ⬜ iguana
+- ⬜ island
+- ⬜ jacket
+- ⬜ juggler
+- ⬜ key
+- ⬜ koala
+- ⬜ lemon
+- ⬜ mushroom
+- ⬜ nuts
+- ⬜ night
+- ⬜ octopus
+- ⬜ pig
+- ⬜ pear
+- ⬜ question
+- ⬜ quiet
+- ⬜ rabbit
+- ⬜ rocket
+- ⬜ sun
+- ⬜ tiger
+- ⬜ train
+- ⬜ unicorn
+- ⬜ up
+- ⬜ violin
+- ⬜ volcano
+- ⬜ watermelon
+- ⬜ watch
+- ⬜ box
+- ⬜ six
+- ✅ yellow _(Dad + Rahma)_
+- ⬜ yarn
+- ⬜ zip
+- ⬜ zero
+
 ## Counting words (0/12)
 
 - ⬜ apples
@@ -184,9 +229,10 @@ Names (Rahma, Ibrahim, …) are also spoken if recorded - record each child's na
 - ⬜ ladybirds
 - ⬜ puppies
 
-## Little words (3/13)
+## Little words (3/18)
 
 - ⬜ is for
+- ⬜ is in
 - ⬜ that's
 - ⬜ where's the
 - ⬜ find
@@ -199,6 +245,10 @@ Names (Rahma, Ibrahim, …) are also spoken if recorded - record each child's na
 - ✅ pop _(Dad + Rahma)_
 - ✅ bubble _(Dad + Rahma)_
 - ✅ jumping _(Rahma)_
+- ⬜ give me
+- ⬜ what comes next
+- ⬜ which number is missing
+- ⬜ what starts with
 
 ## Game openers (0/11)
 

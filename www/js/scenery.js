@@ -181,5 +181,6 @@ export function createMeadow({ zones = false } = {}) {
       for (const fl of flakes) { fl.y += fl.v * dt; if (fl.y > 1) { fl.y = 0; fl.x = Math.random(); } c.beginPath(); c.arc(((fl.x * W + Math.sin(t + fl.x * 9) * 12 - scroll * 0.2) % W + W) % W, fl.y * H, fl.r, 0, 7); c.fill(); }
     }
   }
-  return { draw };
+  // themeAt(worldX): which place is at that distance; zoneLen(): how long each place is (set by the last draw)
+  return { draw, themeAt: (worldX) => THEMES[zoneAt(worldX)].id, zoneLen: () => zoneLen };
 }
